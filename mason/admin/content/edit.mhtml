@@ -1,0 +1,129 @@
+%# --- DOC --------------------------------------------------------------------
+<%doc>
+    slym - is an instance of Slym::Content
+</%doc>
+%# --- ARGS -------------------------------------------------------------------
+<%args>
+    $slym
+    $a => undef
+    $c_name => undef
+    $p_id => undef
+    $p_name => undef
+    $p_content => undef
+    $p_type => undef
+</%args>
+%# --- ONCE -------------------------------------------------------------------
+<%once>
+    use Data::Dumper;
+    my $note = 'The standard Slym::Content install supports: <b>text</b>, <b>html</b> and <b>code</b>';
+</%once>
+%# --- INIT -------------------------------------------------------------------
+<%init>
+    my $error;
+    my $contents;
+    my $pages;
+    my $page;
+
+    # load up some residual information if we have a blog name
+    if ( defined $c_name ) {
+        $pages = $slym->page_sel_section_all({ c_name => $c_name });
+    }
+    if ( defined $p_id ) {
+        $page = $slym->page_sel_id({ p_id => $p_id });
+    }
+
+    if ( defined $a ) {
+        if ( $a eq 'c_ins' ) {
+            $slym->section_ins({ c_name => $c_name });
+            $m->redirect("?");
+            return;
+        }
+        elsif ( $a eq 'c_del' ) {
+            $slym->section_del({ c_name => $c_name });
+            $m->redirect("?");
+            return;
+        }
+        elsif ( $a eq 'p_ins' ) {
+            # remove horrible \r chars
+            $p_content =~ s{\r}{}gxms;
+
+            $slym->page_ins({ c_name => $c_name, p_name => $p_name, p_content => $p_content, p_type => $p_type });
+            $m->redirect("?c_name=$c_name");
+            return;
+        }
+        elsif ( $a eq 'p_edit' ) {
+            $page = $slym->page_sel_id({ p_id => $p_id });
+            unless ( defined $page->{p_id} ) {
+                $m->redirect("?c_name=$c_name");
+                return;
+            }
+        }
+        elsif ( $a eq 'p_upd' ) {
+            # remove horrible \r chars
+            $p_content =~ s{\r}{}gxms;
+
+            $slym->page_upd({ p_id => $p_id, p_name => $p_name, p_content => $p_content, p_type => $p_type });
+            $m->redirect("?c_name=$c_name");
+            return;
+        }
+        elsif ( $a eq 'p_del' ) {
+            $slym->page_del({ p_id => $p_id });
+            $m->redirect("?c_name=$c_name");
+            return;
+        }
+        else {
+            $contents = $slym->section_sel_all();
+        }
+    }
+    else {
+        $contents = $slym->section_sel_all();
+    }
+
+</%init>
+%# --- HTML -------------------------------------------------------------------
+<h1>Slym::Content</h1>
+<& /slym/common/err.mhtml, error => $error &>
+
+% if ( defined $a and $a eq 'p_add' ) {
+    <h2>Add Entry...</h2>
+    <&  /slym/common/form.mhtml, elements => [
+            { type => 'hidden', name => 'a', value => 'p_ins' },
+            { type => 'hidden', name => 'c_name', value => $c_name },
+            { type => 'text', field => 'Name', name => 'p_name', size => 60, value => '' },
+            { type => 'textarea', field => 'Content', name => 'p_content', rows => 10, cols => 60, value => '' },
+            { type => 'text', field => 'Type', name => 'p_type', size => 60, value => '' },
+            { type => 'html', field => 'Note', value => $note },
+            { type => 'submit', field => 'Actions', value => 'Add Page' },
+        ]
+    &>
+% }
+
+% if ( defined $a and $a eq 'p_edit' ) {
+    <h2>Edit Entry...</h2>
+    <&  /slym/common/form.mhtml, elements => [
+            { type => 'hidden', name => 'a', value => 'p_upd' },
+            { type => 'hidden', name => 'c_name', value => $c_name },
+            { type => 'hidden', name => 'p_id', value => $page->{p_id} },
+            { type => 'info', field => 'Id', value => $page->{p_id} },
+            { type => 'text', field => 'Name', name => 'p_name', size => 60, value => $page->{p_name} },
+            { type => 'textarea', field => 'Content', name => 'p_content', rows => 10, cols => 60, value => $page->{p_content} },
+            { type => 'text', field => 'Type', name => 'p_type', size => 60, value => $page->{p_type} },
+            { type => 'html', field => 'Note', value => $note },
+            { type => 'submit', field => 'Actions', value => 'Save Entry' },
+        ]
+    &>
+% }
+
+<& /slym/plugin/content/edit_p.mhtml, c_name => $c_name, pages => $pages &>
+<& /slym/plugin/content/edit_s.mhtml, contents => $contents &>
+
+% if ( 0 ) {
+<h2>Debug</h2>
+<pre>
+<% Data::Dumper->Dump([\%ARGS], ['args']) | h %>
+<% Data::Dumper->Dump([$contents], ['contents']) | h %>
+<% Data::Dumper->Dump([$pages], ['pages']) | h %>
+</pre>
+% }
+
+%# --- END --------------------------------------------------------------------

@@ -1,0 +1,62 @@
+%# --- DOC --------------------------------------------------------------------
+<%doc>
+    This is the edit page for the 'Content' model.
+</%doc>
+%# --- ARGS -------------------------------------------------------------------
+<%args>
+    $zaapt
+    $roles
+</%args>
+%# --- INIT -------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Content');
+    my $contents = $model->sel_content_all();
+</%init>
+%# --- HTML -------------------------------------------------------------------
+<h1>Content</h1>
+
+<h2>All Content Sections</h2>
+
+% if ( 0 ) { # need a way to see who has privileges to create a section
+[ <a href="#">Add Section</a> ]
+% }
+
+<table class="edit">
+    <thead>
+        <tr>
+            <th class="list">Name</th>
+            <th class="action">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+% my $row = 1;
+% foreach my $content ( @$contents ) {
+%     if ( 0 ) {
+        <tr><td><pre><% Data::Dumper->Dump([$content], ['row']) %><pre></td></tr>
+%     }
+%        next unless exists $roles->{$content->{_view}};
+        <tr class="r<% $row=1-$row %>">
+            <td>
+                <a href="edit_p_list.html?c_id=<% $content->{c_id} | u %>"><% $content->{c_name} | h %></a>
+            </td>
+            <td>
+%         if ( exists $roles->{$content->{_admin}} ) {
+                [
+                <a href="edit_p_add.html?c_id=<% $content->{c_id} | u %>">Add Page</a>
+                |
+                <a href="#">Delete</a>
+                ]
+%         } else {
+                -
+%         }
+            </td>
+        </tr>
+% }
+    </tbody>
+</table>
+
+<pre>
+% print Data::Dumper->Dump([$roles], ['roles']);
+</pre>
+
+%# --- END --------------------------------------------------------------------

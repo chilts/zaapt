@@ -1,0 +1,14 @@
+-------------------------------------------------------------------------------
+
+In this directory is where we place implementations for the various data
+stores.
+
+At the moment, there is only a PG.pm and it's related Pg/*.pm models which have
+been implemented. Possible future stores might be:
+
+ - Pg
+ - MySQL
+ - Oracle
+ - (etc)
+
+-------------------------------------------------------------------------------

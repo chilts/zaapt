@@ -1,0 +1,71 @@
+%# ----------------------------------------------------------------------------
+<%doc>
+    This is the edit page for the 'Content' model.
+</%doc>
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $roles
+    $p_id
+    $p_name
+    $p_content
+    $t_id
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Content');
+    my $page = $model->sel_page({ p_id => $p_id });
+
+    my $err = [];
+
+    # if there is no page, then we can't edit
+    $m->redirect('edit.html') unless defined $page;
+
+    # to edit this page, the user needs the '_edit' role
+    $m->redirect('edit.html') unless exists $roles->{$page->{_edit}};
+
+    # check that the page name consists only of letters
+    unless ( @$err ) {
+        unless ( $p_name =~ m{ \A [a-z0-9\-]+ \z }xms ) {
+            push @$err, "Page name '$p_name' must contain only 'a-z', '0-9' and '-'."
+        }
+    }
+
+    $p_content =~ s{\r}{}gxms;
+
+    unless ( @$err ) {
+        $model->upd_page({
+            p_id => $p_id,
+            p_name => $p_name,
+            p_content => $p_content,
+            t_id => $t_id
+        });
+        $m->redirect("edit_p_list.html?c_id=$page->{c_id}");
+        return;
+    }
+
+    my @options;
+    if ( @$err ) {
+        my $page_types = $model->sel_all_types();
+        @options = map { { value => $_->{t_id}, text => $_->{t_name} } } @$page_types;
+    }
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Editing: 'Content'</h1>
+
+<p><a href="edit_p_list.html?c_id=<% $page->{c_id} | h %>">&lt;&lt; Back to Page List</a></p>
+
+<h2>Add a Page to <% $page->{c_name} | h %></h2>
+
+<& /zaapt/common/err.mhtml, err => $err &>
+
+<&  /zaapt/common/form.mhtml, action => 'edit_p_ins.html', elements => [
+        { type => 'hidden', name => 'p_id', value => $p_id },
+        { type => 'text', field => 'Name', name => 'p_name', size => 40, value => $p_name },
+        { type => 'textarea', field => 'Content', name => 'p_content', rows => 10, cols => 40, value => $p_content },
+        { type => 'select', field => 'Type', name => 't_id', selected => $t_id, options => \@options },
+        { type => 'submit', field => 'Actions', value => 'Save', cancel => "edit_c_list.html?c_id=$page->{c_id}" },
+    ]
+&>
+
+%# ----------------------------------------------------------------------------

@@ -1,0 +1,85 @@
+%# ----------------------------------------------------------------------------
+<%doc>
+    This is the edit page for the 'Content' model.
+</%doc>
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $roles
+    $c_id
+    $p_name
+    $p_content
+    $t_id
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Content');
+    my $content = $model->sel_content({ c_id => $c_id });
+
+    # this content section firstly needs to exist to be able to add a page
+    $m->redirect('edit.html') unless defined $content;
+
+    # to insert this page, the user needs the '_admin' role on this content section
+    $m->redirect('edit.html') unless exists $roles->{$content->{_edit}};
+
+    my $err = [];
+
+    # check that the page name has been given
+    if ( !defined $p_name or $p_name eq '' ) {
+        push @$err, "Please specify the page name";
+    }
+
+    # check that the page name consists only of letters
+    unless ( @$err ) {
+        unless ( $p_name =~ m{ \A [a-z0-9\-]+ \z }xms ) {
+            push @$err, "Page name '$p_name' must contain only 'a-z', '0-9' and '-'."
+        }
+    }
+
+    # TODO:
+    # check that this $t_id exists in the content.type table
+
+    unless ( @$err ) {
+        # see if this page name already exists
+        my $page = $model->sel_page_using_name({ c_id => $c_id, p_name => $p_name });
+        push @$err, "Page name '$p_name' already exists" if defined $page;
+    }
+
+    $p_content =~ s{\r}{}gxms;
+
+    unless ( @$err ) {
+        $model->ins_page({
+            c_id      => $c_id,
+            p_name    => $p_name,
+            p_content => $p_content,
+            t_id      => $t_id
+        });
+        $m->redirect("edit_p_list.html?c_id=$c_id");
+        return;
+    }
+
+    my @options;
+    if ( @$err ) {
+        my $page_types = $model->sel_all_types();
+        @options = map { { value => $_->{t_id}, text => $_->{t_name} } } @$page_types;
+    }
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Editing: 'Content'</h1>
+
+<p><a href="edit_p_list.html?c_id=<% $c_id | h %>">&laquo; Back to Page List</a></p>
+
+<h2>Add a Page to <% $content->{c_name} | h %></h2>
+
+<& /zaapt/common/err.mhtml, err => $err &>
+
+<&  /zaapt/common/form.mhtml, action => 'edit_p_ins.html', elements => [
+        { type => 'hidden', name => 'c_id', value => $c_id },
+        { type => 'text', field => 'Name', name => 'p_name', size => 40, value => $p_name },
+        { type => 'textarea', field => 'Content', name => 'p_content', rows => 10, cols => 40, value => $p_content },
+        { type => 'select', field => 'Type', name => 't_id', selected => $t_id, options => \@options },
+        { type => 'submit', field => 'Actions', value => 'Add Page', cancel => "edit_c_list.html?c_id=$c_id" },
+    ]
+&>
+
+%# ----------------------------------------------------------------------------

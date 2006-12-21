@@ -1,0 +1,65 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $action => undef
+    $elements
+</%args>
+%# ----------------------------------------------------------------------------
+<form action="<% $action || '?' %>" method="post">
+<table>
+% foreach my $e ( @$elements ) {
+%     if ( defined $e->{field} ) {
+    <tr>
+        <td class="r"><% $e->{field} | h %> :</td>
+        <td>
+%     }
+%     if ( $e->{type} eq 'text' ) {
+            <input type="text" name="<% $e->{name} | h %>" value="<% $e->{value} | h %>"<% $e->{size} ? " size=\"$e->{size}\"" : ''%><% $e->{maxlength} && " maxlength=\"$e->{maxlength}\"" %> />\
+
+%     } elsif ( $e->{type} eq 'textarea' ) {
+            <textarea name="<% $e->{name} | h %>"<% $e->{rows} && " rows=\"$e->{rows}\"" %><% $e->{cols} && " cols=\"$e->{cols}\"" %>><% $e->{value} | h %></textarea>\
+
+%     } elsif ( $e->{type} eq 'select' ) {
+            <select name="<% $e->{name} | h %>">
+%         foreach ( @{$e->{options}} ) {
+                <option value="<% $_->{value} | h %>"<% $e->{selected} eq $_->{value} ? ' selected="selected"' : '' %>><% $_->{text} | h %></option>
+%         }
+            </select>
+
+%     } elsif ( $e->{type} eq 'info' ) {
+            <% $e->{value} | h %>\
+
+%     } elsif ( $e->{type} eq 'note' ) {
+            <% $e->{value} | h %>\
+
+%     } elsif ( $e->{type} eq 'html' ) {
+            <% $e->{value} %>\
+
+%     } elsif ( $e->{type} eq 'hidden' ) {
+            <input type="hidden" name="<% $e->{name} | h %>" value="<% $e->{value} | h %>" />\
+
+%     } elsif ( $e->{type} eq 'read' ) {
+            <input type="hidden" name="<% $e->{name} | h %>" value="<% $e->{value} | h %>" /><% $e->{value} | h %>\
+
+%     } elsif ( $e->{type} eq 'check' ) {
+            <input type="checkbox" name="<% $e->{name} | h %>"<% $e->{checked} && ' checked="checked"' %> />\
+
+%     } elsif ( $e->{type} eq 'submit' ) {
+            <button class="button" type="submit"><% $e->{value} | h %></button>\
+%         if ( defined $e->{cancel} ) {
+            <button class="button" type="button" onClick="document.location='<% $e->{cancel} | h %>';">Cancel</button>\
+%         }
+
+%     } elsif ( $e->{type} eq 'button' ) {
+            <button type="button" onClick="<% $e->{onclick} | h %>"><% $e->{value} | h %></button>\
+
+%     } else {
+            Unknown type: <% $e->{type} | h %>\
+%     }
+%     if ( defined $e->{field} ) {
+        </td>
+    </tr>
+%     }
+% }
+</table>
+</form>
+%# ----------------------------------------------------------------------------

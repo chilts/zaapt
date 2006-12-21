@@ -1,0 +1,53 @@
+%# ----------------------------------------------------------------------------
+<%doc>
+    This is the edit page for the 'Content' model.
+</%doc>
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $roles
+    $p_id
+</%args>
+%# ----------------------------------------------------------------------------
+<%once>
+    use URI::Escape;
+</%once>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Content');
+    my $page = $model->sel_page({ p_id => $p_id });
+
+    # if there is no page, then we can't edit
+    $m->redirect('edit.html') unless defined $page;
+
+    # to edit this page, the user needs the '_edit' role
+    $m->redirect('edit.html') unless exists $roles->{$page->{_edit}};
+
+    my $page_types = $model->sel_all_types();
+    my @options = map { { value => $_->{t_id}, text => $_->{t_name} } } @$page_types;
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Editing: 'Content'</h1>
+
+% if ( 0 ) {
+<pre>
+% print Data::Dumper->Dump([$page], ['page']);
+</pre>
+% }
+
+<p><a href="edit_p_list.html?c_name=<% $page->{c_name} | h %>&amp;c_id=<% $page->{c_id} | h %>">&lt;&lt; Back to Page List</a></p>
+
+<h2>Editing page '<% $page->{p_name} | h %>' in '<% $page->{c_name} | h %>'</h2>
+
+<&  /zaapt/common/form.mhtml, action => 'edit_p_upd.html', elements => [
+        { type => 'hidden', name => 'c_id', value => $page->{c_id} },
+        { type => 'read', field => 'Section', name => 'c_name', value => $page->{c_name} },
+        { type => 'hidden', name => 'p_id', value => $page->{p_id} },
+        { type => 'text', field => 'Page', name => 'p_name', value => $page->{p_name} },
+        { type => 'textarea', field => 'Content', name => 'p_content', rows => 10, cols => 40, value => $page->{p_content} },
+        { type => 'select', field => 'Type', name => 't_id', selected => $page->{t_id}, options => \@options },
+        { type => 'submit', field => 'Actions', value => 'Save Page', cancel => 'edit_c_list.html?c_name=' . uri_escape($page->{c_name}) },
+    ]
+&>
+
+%# ----------------------------------------------------------------------------

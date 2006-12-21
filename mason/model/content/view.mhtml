@@ -1,0 +1,47 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $c_name
+    $p_name
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Content');
+    my $content = $model->sel_content_using_name({ c_name => $c_name });
+
+    unless ( defined $content ) {
+        $m->clear_buffer();
+        $m->abort(404);
+        return;
+    }
+
+    my $page = $model->sel_page_using_name({ c_id => $content->{c_id}, p_name => $p_name });
+
+    unless ( defined $page ) {
+        $m->clear_buffer();
+        $m->abort(404);
+        return;
+    }
+</%init>
+%# ----------------------------------------------------------------------------
+% if ( 0 ) {
+<pre>
+<% Data::Dumper->Dump([$page], ['page']) | h %>
+</pre>
+% }
+<div "z_content">
+% if ( $page->{t_name} eq 'text' ) {
+    <% $page->{p_content} | h %>
+% } elsif ( $page->{t_name} eq 'html' ) {
+    <% $page->{p_content} %>
+% } elsif ( $page->{t_name} eq 'code' ) {
+<pre>
+<% $page->{p_content} %>
+</pre>
+% } elsif ( $page->{t_name} eq 'phliky' ) {
+    <% Text::Phliky->text2html( $page->{p_content} ) %>
+% } else {
+    <p>Unknown content type: '<% $page->{t_name} | h %>'
+% }
+</div>
+%# ----------------------------------------------------------------------------

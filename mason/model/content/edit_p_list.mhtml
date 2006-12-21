@@ -1,0 +1,51 @@
+%# --- DOC --------------------------------------------------------------------
+<%doc>
+    This is the edit page for the 'Content' model.
+</%doc>
+%# --- ARGS -------------------------------------------------------------------
+<%args>
+    $zaapt
+    $roles
+    $c_id
+</%args>
+%# --- INIT -------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Content');
+    my $content = $model->sel_content({ c_id => $c_id });
+    my $pages = $model->sel_all_pages_in({ c_id => $c_id });
+</%init>
+%# --- HTML -------------------------------------------------------------------
+<h1>Editing: 'Content'</h1>
+
+<p><a href="edit.html">&lt;&lt; Back to Section List</a></p>
+
+<h2>Section: '<% $content->{c_name} | h %>'</h2>
+
+<p>[ <a href="edit_p_add.html?c_id=<% $content->{c_id} | u %>">Add Page</a> ]</p>
+
+<table class="edit">
+    <thead>
+        <tr>
+            <th class="list">Page Name</th>
+            <th class="action">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+% my $row = 1;
+% foreach my $page ( @$pages ) {
+        <tr class="r<% $row=1-$row %>">
+            <td><a href="edit_p_edit.html?p_id=<% $page->{p_id} | u %>"><% $page->{p_name} | h %></a></td>
+            <td>[ <a href="edit_p_edit.html?p_id=<% $page->{p_id} | u %>">Edit</a> | <a href="edit_p_del.html?p_id=<% $page->{p_id} | u %>">Delete</a> ]</td>
+        </tr>
+% }
+% unless ( @$pages ) {
+        <tr><td colspan="2">No pages here!</td></tr>
+% }
+    </tbody>
+</table>
+
+<pre>
+% print Data::Dumper->Dump([$roles], ['roles']);
+</pre>
+
+%# --- END --------------------------------------------------------------------

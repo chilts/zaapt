@@ -1,0 +1,21 @@
+%# --- DOC --------------------------------------------------------------------
+<%doc>
+
+    Input Args - same as /controller/content/view_page.mas
+
+</%doc>
+%# --- ARGS -------------------------------------------------------------------
+<%args>
+    $page
+</%args>
+%# --- INIT -------------------------------------------------------------------
+<%init>
+    # since we aren't using any other page types
+    return;
+
+    # or as an example
+    if ( $page->{p_type} eq 'phliky' ) {
+        $m->comp( '/slym/view/content/phliky.mhtml', page => $page );
+    }
+</%init>
+%# --- END --------------------------------------------------------------------

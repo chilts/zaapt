@@ -1,0 +1,7 @@
+<%args>
+    $msg => undef
+</%args>
+<%init>
+    return unless defined $msg;
+</%init>
+<p style="color: green;"><% $msg | h %></p>

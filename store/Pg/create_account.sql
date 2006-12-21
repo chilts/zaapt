@@ -12,7 +12,6 @@ CREATE TABLE account.account (
     email           TEXT NOT NULL,
     salt            VARCHAR(8) NOT NULL,
     password        VARCHAR(32) NOT NULL,
-    code            VARCHAR(32) NOT NULL,
     confirmed       BOOLEAN NOT NULL DEFAULT False,
     admin           BOOLEAN NOT NULL DEFAULT False,
 

@@ -75,6 +75,7 @@
 
 <&  /zaapt/common/form.mhtml, action => 'edit_p_ins.html', elements => [
         { type => 'hidden', name => 'c_id', value => $c_id },
+        { type => 'read', field => 'Section', name => 'c_name', value => $content->{c_name} },
         { type => 'text', field => 'Name', name => 'p_name', size => 40, value => $p_name },
         { type => 'textarea', field => 'Content', name => 'p_content', rows => 10, cols => 40, value => $p_content },
         { type => 'select', field => 'Type', name => 't_id', selected => $t_id, options => \@options },

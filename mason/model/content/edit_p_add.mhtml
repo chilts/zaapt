@@ -1,8 +1,4 @@
 %# ----------------------------------------------------------------------------
-<%doc>
-    This is the insert page for the 'Content' model.
-</%doc>
-%# ----------------------------------------------------------------------------
 <%args>
     $zaapt
     $my_roles
@@ -15,34 +11,37 @@
 %# ----------------------------------------------------------------------------
 <%init>
     my $model = $zaapt->get_model('Content');
+
     my $content = $model->sel_content({ c_id => $c_id });
-    unless ( defined $content ) {
-        $m->redirect('edit.html');
-        return;
-    }
+    $m->redirect('edit_c_list.html') unless defined $content;
+
+    # need admin
+    $m->redirect('edit_c_list.html') unless exists $my_roles->{$content->{_admin}};
+
     my $page_types = $model->sel_all_types();
     my @options = map { { value => $_->{t_id}, text => $_->{t_name} } } @$page_types;
 </%init>
 %# ----------------------------------------------------------------------------
-<h1>Editing: 'Content'</h1>
+<h1>Add a Page</h1>
 
-% if ( 0 ) {
-<pre>
-% print Data::Dumper->Dump([\@options], ['o']);
-</pre>
-% }
+<p><a href="edit_p_list.html?c_id=<% $c_id | h %>">&laquo; Back to Page List</a></p>
 
-<p><a href="edit_p_list.html?c_id=<% $c_id | h %>">&lt;&lt; Back to Page List</a></p>
-
-<h2>Add a Page to <% $content->{c_name} | h %></h2>
+<h2>Content: '<% $content->{c_title} | h %>'</h2>
 
 <&  /zaapt/common/form.mhtml, action => 'edit_p_ins.html', elements => [
         { type => 'hidden', name => 'c_id', value => $c_id },
+        { type => 'read', field => 'Section', name => 'c_name', value => $content->{c_name} },
         { type => 'text', field => 'Name', name => 'p_name', size => 40, value => '' },
         { type => 'textarea', field => 'Content', name => 'p_content', rows => 10, cols => 40, value => '' },
         { type => 'select', field => 'Type', name => 't_id', options => \@options },
         { type => 'submit', field => 'Actions', value => 'Add', cancel => "edit_c_list.html?c_id=$c_id" },
     ]
 &>
+
+% if ( 0 ) {
+<pre>
+% print Data::Dumper->Dump([\@options], ['o']);
+</pre>
+% }
 
 %# ----------------------------------------------------------------------------

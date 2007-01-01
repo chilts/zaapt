@@ -27,10 +27,11 @@
 
 <p><a href="edit_q_list.html?f_id=<% $question->{f_id} | u %>">&laquo; Back to Question List</a></p>
 
-<h2>FAQ: <% $question->{f_name} | h %> - <% $question->{f_title} | h %></h2>
+<h2>FAQ: '<% $question->{f_title} | h %>'</h2>
 
 <& /zaapt/common/form.mhtml, action => 'edit_q_upd.html', elements => [
         { type => 'hidden', name => 'q_id', value => $question->{q_id} },
+        { type => 'read', field => 'FAQ', name => 'f_name', value => $question->{f_name} },
         { type => 'text', field => 'Question', name => 'q_question', size => 40, value => $question->{q_question} },
         { type => 'textarea', field => 'Answer', name => 'q_answer', rows => 10, cols => 40, value => $question->{q_answer} },
         { type => 'select', field => 'Type', name => 't_id', options => \@options, selected => $question->{t_id} },

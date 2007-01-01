@@ -54,4 +54,8 @@ CREATE TABLE account.confirm (
 CREATE TRIGGER confirm_updated BEFORE UPDATE ON account.confirm
     FOR EACH ROW EXECUTE PROCEDURE updated();
 
+-- always have an admin role
+INSERT INTO account.role(name, description)
+    VALUES('admin', 'Super level admin user.');
+
 -- ----------------------------------------------------------------------------

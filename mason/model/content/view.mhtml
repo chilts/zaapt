@@ -30,18 +30,6 @@
 </pre>
 % }
 <div "z_content">
-% if ( $page->{t_name} eq 'text' ) {
-    <% $page->{p_content} | h %>
-% } elsif ( $page->{t_name} eq 'html' ) {
-    <% $page->{p_content} %>
-% } elsif ( $page->{t_name} eq 'code' ) {
-<pre>
-<% $page->{p_content} %>
-</pre>
-% } elsif ( $page->{t_name} eq 'phliky' ) {
-    <% Text::Phliky->text2html( $page->{p_content} ) %>
-% } else {
-    <p>Unknown content type: '<% $page->{t_name} | h %>'
-% }
+<& /zaapt/common/render.mhtml, t_name => $page->{t_name}, content => $page->{p_content} &>
 </div>
 %# ----------------------------------------------------------------------------

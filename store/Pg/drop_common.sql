@@ -1,12 +1,5 @@
 -- ----------------------------------------------------------------------------
 
-BEGIN;
-
-\i drop_faq.sql
-\i drop_content.sql
-\i drop_account.sql
-\i drop_zaapt.sql
-
-COMMIT;
+DROP SCHEMA common CASCADE;
 
 -- ----------------------------------------------------------------------------

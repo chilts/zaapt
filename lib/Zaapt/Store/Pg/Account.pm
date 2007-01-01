@@ -14,11 +14,9 @@ my $role_tablename = "account.role r";
 my $privilege_tablename = "account.privilege p";
 my $confirm_tablename = "account.confirm c";
 
-my @account_cols = qw(username firstname lastname email salt password confirmed admin);
-
 # helper
 my $account_cols = __PACKAGE__->_mk_cols( 'a', qw(id username firstname lastname email salt password confirmed admin) );
-my $role_cols = __PACKAGE__->_mk_cols( 'r', qw(name description) );
+my $role_cols = __PACKAGE__->_mk_cols( 'r', qw(id name description) );
 my $privilege_cols = __PACKAGE__->_mk_cols( 'p', qw(account_id privilege_id) );
 my $confirm_cols = __PACKAGE__->_mk_cols( 'c', qw(account_id code) );
 
@@ -31,6 +29,7 @@ my $upd_account = __PACKAGE__->_mk_upd( 'account.account', 'id', qw(username fir
 # role
 my $ins_role = __PACKAGE__->_mk_ins( 'account.role', qw(name description) );
 my $del_role = __PACKAGE__->_mk_del( 'account.role', qw(id) );
+my $sel_all_roles = "SELECT $role_cols FROM $role_tablename ORDER BY name";
 
 # privilege
 my $ins_privilege = __PACKAGE__->_mk_ins( 'account.privilege', qw(account_id role_id) );
@@ -56,6 +55,11 @@ sub ins_account {
 sub ins_privilege {
     my ($self, $hr) = @_;
     $self->_do( $ins_privilege, $hr->{a_id}, $hr->{r_id} );
+}
+
+sub sel_all_roles {
+    my ($self, $hr) = @_;
+    return $self->_rows( $sel_all_roles );
 }
 
 sub sel_roles_for_account {

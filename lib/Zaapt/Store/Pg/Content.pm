@@ -14,7 +14,7 @@ my $page_tablename = "content.page p";
 my $type_tablename = "content.type t";
 
 # helper
-my $content_cols = __PACKAGE__->_mk_cols( 'c', qw(id name r:admin_id r:view_id r:edit_id r:publish_id) );
+my $content_cols = __PACKAGE__->_mk_cols( 'c', qw(id name title description r:admin_id r:view_id r:edit_id r:publish_id) );
 my $page_cols = __PACKAGE__->_mk_cols( 'p', qw(id content_id type_id name content) );
 my $type_cols = __PACKAGE__->_mk_cols( 't', qw(id name) );
 
@@ -23,7 +23,7 @@ my $c_p_join = "JOIN $page_tablename ON (c.id = p.content_id)";
 my $p_t_join = "JOIN $type_tablename ON (t.id = p.type_id)";
 
 # content
-my $ins_content = __PACKAGE__->_mk_ins( 'content.content', 'name', 'admin_pid', 'view_pid', 'edit_pid', 'publish_pid' );
+my $ins_content = __PACKAGE__->_mk_ins( 'content.content', qw(name title description admin_id view_id edit_id publish_id) );
 my $sel_content = "SELECT $content_cols FROM $content_tablename WHERE c.id = ?";
 my $sel_content_using_name = "SELECT $content_cols FROM $content_tablename WHERE c.name = ?";
 my $sel_content_all = "SELECT $content_cols FROM $content_tablename ORDER BY c.name";
@@ -46,7 +46,7 @@ my $sel_all_types = "SELECT $type_cols FROM $type_tablename ORDER BY name";
 
 sub ins_content {
     my ($self, $hr) = @_;
-    $self->_do( $ins_content, $hr->{c_name}, $hr->{_admin}, $hr->{_view}, $hr->{_edit}, $hr->{_publish} );
+    $self->_do( $ins_content, $hr->{c_name}, $hr->{c_title}, $hr->{c_description}, $hr->{_admin}, $hr->{_view}, $hr->{_edit}, $hr->{_publish} );
 }
 
 sub sel_content_all {

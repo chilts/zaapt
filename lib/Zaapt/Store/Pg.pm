@@ -51,23 +51,35 @@ sub _mk_cols {
 }
 
 sub _mk_sel {
-    my ($class, $table, $where_h, @colnames) = @_;
+    my ($class, $table, $letter, @colnames) = @_;
     return '' unless @colnames;
 
-    my $cols = shift @colnames;
-    my $qs = '?';
+    my $cols;
     foreach my $colname ( @colnames ) {
-        $cols .= ", $colname";
-        $qs .= ', ?';
+        $cols .= ", " if defined $cols;
+        $cols .= "$colname AS ${letter}_${colname}";
     }
 
-    my $sql = "SELECT $cols FROM $table";
+    return "SELECT $cols FROM $table $letter WHERE id = ?";
+}
+
+sub _mk_sel_where {
+    my ($class, $table, $letter, $where_h, @colnames) = @_;
+    return '' unless @colnames;
+
+    my $cols;
+    foreach my $colname ( @colnames ) {
+        $cols .= ", " if defined $cols;
+        $cols .= "$colname AS ${letter}_${colname}";
+    }
+
+    my $sql = "SELECT $cols FROM $table $letter";
 
     if ( defined $where_h and %$where_h ) {
         my $where = '';
         foreach my $col ( keys %$where_h ) {
             $where .= ' AND ' if $where;
-            $where .= "$col = ?";
+            $where .= "$letter.$col = ?";
         }
         $sql .= " WHERE $where";
     }

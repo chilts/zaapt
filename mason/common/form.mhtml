@@ -46,7 +46,7 @@
 %     } elsif ( $e->{type} eq 'submit' ) {
             <button class="button" type="submit"><% $e->{value} | h %></button>\
 %         if ( defined $e->{cancel} ) {
-            <button class="button" type="button" onClick="document.location='<% $e->{cancel} | h %>';">Cancel</button>\
+            <button class="button" type="button" onClick="document.location='<% $e->{cancel} %>';">Cancel</button>\
 %         }
 
 %     } elsif ( $e->{type} eq 'button' ) {

@@ -1,0 +1,74 @@
+%# ----------------------------------------------------------------------------
+<%once>
+    use Zaapt::Utils::Valid;
+</%once>
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $my_roles
+    $c_name        => undef
+    $c_title       => undef
+    $c_description => undef
+    $_admin        => undef
+    $_view         => undef
+    $_edit         => undef
+    $_publish      => undef
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Content');
+
+    # to insert this page, the user needs the '_admin' role on this content section
+    $m->redirect('edit_c_list.html') unless exists $my_roles->{super};
+
+    my $err = [];
+
+    unless ( Zaapt::Utils::Valid::is_valid_name($c_name) ) {
+        push @$err, Zaapt::Utils::Valid::err();
+    }
+
+    # no Content Section of this name should exist
+    unless ( @$err ) {
+        my $content = $model->sel_content_using_name({ c_name => $c_name });
+        push @$err, "Content Section '$c_name' already exists." if defined $content;
+    }
+
+    $c_description =~ s{\r}{}gxms;
+
+    unless ( @$err ) {
+        $model->ins_content({
+            c_name        => $c_name,
+            c_title       => $c_title,
+            c_description => $c_description,
+            _admin        => $_admin,
+            _view         => $_view,
+            _edit         => $_edit,
+            _publish      => $_publish,
+        });
+        $m->redirect("edit_c_list.html");
+        return;
+    }
+
+    my $roles = $zaapt->get_model('Account')->sel_all_roles();
+    my @options = map { { value => $_->{r_id}, text => $_->{r_name} } } @$roles;
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Add a Content Section</h1>
+
+<p><a href="edit_c_list.html">&laquo; Back to Content List</a></p>
+
+<h2>Content: ?</h2>
+
+<&  /zaapt/common/form.mhtml, action => 'edit_c_ins.html', elements => [
+        { type => 'text', field => 'Name', name => 'c_name', size => 40, value => $c_name },
+        { type => 'text', field => 'Title', name => 'c_title', size => 40, value => $c_title },
+        { type => 'textarea', field => 'Description', name => 'c_description', rows => 10, cols => 40, value => $c_description },
+        { type => 'select', field => 'Admin Role', name => '_admin', options => \@options, selected => $_admin },
+        { type => 'select', field => 'View Role', name => '_view', options => \@options, selected => $_view },
+        { type => 'select', field => 'Edit Role', name => '_edit', options => \@options, selected => $_edit },
+        { type => 'select', field => 'Publish Role', name => '_publish', options => \@options, selected => $_publish },
+        { type => 'submit', field => 'Actions', value => 'Add Content Section', cancel => 'edit_c_list.html' },
+    ]
+&>
+
+%# ----------------------------------------------------------------------------

@@ -1,0 +1,74 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $my_roles
+    $f_id
+    $q_question => ''
+    $q_answer   => ''
+    $t_id
+</%args>
+%# ----------------------------------------------------------------------------
+<%once>
+    use URI::Escape;
+</%once>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Faq');
+    my $faq = $model->sel_faq({ f_id => $f_id });
+
+    # check the error conditions first - we need to recover
+
+    # this content section firstly needs to exist to be able to add a page
+    $m->redirect('edit_f_list.html') unless defined $faq;
+
+    # to insert a question, '_admin' is required
+    $m->redirect('edit_f_list.html') unless exists $my_roles->{$faq->{_admin}};
+
+    # check this type exists
+    unless ( $zaapt->get_model('Common')->sel_type({ t_id => $t_id }) ) {
+        $m->redirect('edit_f_list.html');
+    }
+
+    # now we're into the normal user errors
+
+    my $err = [];
+
+    if ( $q_question eq '' ) {
+        push @$err, "Please specify the question";
+    }
+
+    $q_answer =~ s{\r}{}gxms;
+
+    unless ( @$err ) {
+        $model->ins_question({
+            f_id       => $f_id,
+            q_question => $q_question,
+            q_answer   => $q_answer,
+            t_id       => $t_id,
+        });
+        $m->redirect("edit_q_list.html?f_id=" . uri_escape($f_id));
+        return;
+    }
+
+    my $page_types = $zaapt->get_model('Common')->sel_all_types();
+    my @options = map { { value => $_->{t_id}, text => $_->{t_name} } } @$page_types;
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Add a Question</h1>
+
+<p><a href="edit_f_list.html?f_id=<% $f_id | u %>">&laquo; Back to Question List</a></p>
+
+<h2>Add a Question to '<% $faq->{f_title} | h %>' (<% $faq->{f_name} | h %>)</h2>
+
+<& /zaapt/common/err.mhtml, err => $err &>
+
+<& /zaapt/common/form.mhtml, action => 'edit_q_ins.html', elements => [
+        { type => 'hidden', name => 'f_id', value => $f_id },
+        { type => 'text', field => 'Question', name => 'q_question', size => 40, value => $q_question },
+        { type => 'textarea', field => 'Answer', name => 'q_answer', rows => 10, cols => 40, value => $q_answer },
+        { type => 'select', field => 'Type', name => 't_id', options => \@options, selected => $t_id },
+        { type => 'submit', field => 'Actions', value => 'Add Page', cancel => 'edit_f_list.html?f_id=' . uri_escape($f_id) },
+    ]
+&>
+
+%# ----------------------------------------------------------------------------

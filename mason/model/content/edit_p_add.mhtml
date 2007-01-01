@@ -5,7 +5,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $roles
+    $my_roles
     $c_id
 </%args>
 %# ----------------------------------------------------------------------------
@@ -41,7 +41,7 @@
         { type => 'text', field => 'Name', name => 'p_name', size => 40, value => '' },
         { type => 'textarea', field => 'Content', name => 'p_content', rows => 10, cols => 40, value => '' },
         { type => 'select', field => 'Type', name => 't_id', options => \@options },
-        { type => 'submit', field => 'Actions', value => 'Add Page', cancel => "edit_c_list.html?c_id=$c_id" },
+        { type => 'submit', field => 'Actions', value => 'Add', cancel => "edit_c_list.html?c_id=$c_id" },
     ]
 &>
 

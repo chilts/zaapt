@@ -5,7 +5,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $roles
+    $my_roles
     $c_id
     $p_name
     $p_content
@@ -20,7 +20,7 @@
     $m->redirect('edit.html') unless defined $content;
 
     # to insert this page, the user needs the '_admin' role on this content section
-    $m->redirect('edit.html') unless exists $roles->{$content->{_edit}};
+    $m->redirect('edit.html') unless exists $my_roles->{$content->{_admin}};
 
     my $err = [];
 

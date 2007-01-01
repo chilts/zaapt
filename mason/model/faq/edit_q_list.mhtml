@@ -1,0 +1,67 @@
+%# --- ARGS -------------------------------------------------------------------
+<%args>
+    $zaapt
+    $my_roles
+    $f_id
+</%args>
+%# --- INIT -------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Faq');
+    my $faq = $model->sel_faq({ f_id => $f_id });
+    unless ( defined $faq ) {
+        $m->redirect('edit_f_list.html');
+        return;
+    }
+    $m->redirect('edit_f_list.html') unless exists $my_roles->{$faq->{_view}};
+    my $questions = $model->sel_all_questions_in({ f_id => $f_id });
+</%init>
+%# --- HTML -------------------------------------------------------------------
+<h1>Question List</h1>
+
+<p><a href="edit_f_list.html">&laquo; Back to FAQ List</a></p>
+
+<h2>FAQ: <% $faq->{f_name} | h %> - <% $faq->{f_title} | h %></h2>
+
+% if ( exists $my_roles->{$faq->{_admin}} ) {
+<p>
+    * <a href="edit_q_add.html?f_id=<% $faq->{f_id} | u %>">Add Question &raquo;</a>
+</p>
+% }
+
+<table class="edit">
+    <thead>
+        <tr>
+            <th class="list">Question</th>
+            <th class="action">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+% my $row = 1;
+% foreach my $question ( @$questions ) {
+        <tr class="r<% $row=1-$row %>">
+            <td><% $question->{q_question} | h %></td>
+            <td>
+%         if ( exists $my_roles->{$faq->{_edit}} ) {
+                * <a href="edit_q_edit.html?q_id=<% $question->{q_id} | u %>">Edit Question</a><br />
+                * Move <a href="/todo.html">Up</a> / <a href="/todo.html">Down</a><br />
+%             if ( exists $my_roles->{$faq->{_admin}} ) {
+                * <a href="edit_q_del.html?q_id=<% $question->{q_id} | u %>">Delete</a><br />
+%             }
+%         } else {
+                -
+%         }
+            </td>
+        </tr>
+% }
+% unless ( @$questions ) {
+        <tr class="r0">
+            <td>No questions here!</td>
+            <td>
+                * <a href="edit_q_add.html?f_id=<% $faq->{f_id} | u %>">Add Question</a>
+            </td>
+        </tr>
+% }
+    </tbody>
+</table>
+
+%# --- END --------------------------------------------------------------------

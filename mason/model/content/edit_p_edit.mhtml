@@ -5,7 +5,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $roles
+    $my_roles
     $p_id
 </%args>
 %# ----------------------------------------------------------------------------
@@ -21,7 +21,7 @@
     $m->redirect('edit.html') unless defined $page;
 
     # to edit this page, the user needs the '_edit' role
-    $m->redirect('edit.html') unless exists $roles->{$page->{_edit}};
+    $m->redirect('edit.html') unless exists $my_roles->{$page->{_edit}};
 
     my $page_types = $model->sel_all_types();
     my @options = map { { value => $_->{t_id}, text => $_->{t_name} } } @$page_types;

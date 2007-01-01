@@ -1,0 +1,27 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $t_name
+    $content
+</%args>
+%# ----------------------------------------------------------------------------
+<%once>
+    use Text::Phliky;
+</%once>
+%# ----------------------------------------------------------------------------
+% if ( $t_name eq 'text' ) {
+%     my @paras = split /\n\n+/, $content;
+%     foreach my $para ( @paras ) {
+<p><% $para | h %></p>
+%     }
+% } elsif ( $t_name eq 'html' ) {
+    <% $content %>
+% } elsif ( $t_name eq 'code' ) {
+<pre>
+<% $content %>
+</pre>
+% } elsif ( $t_name eq 'phliky' ) {
+    <% Text::Phliky->text2html( $content ) %>
+% } else {
+    <p>Unknown content type: '<% $t_name | h %>'
+% }
+%# ----------------------------------------------------------------------------

@@ -7,6 +7,8 @@ CREATE SEQUENCE content.content_id_seq;
 CREATE TABLE content.content (
     id              INTEGER NOT NULL DEFAULT nextval('content.content_id_seq'::TEXT) PRIMARY KEY,
     name            TEXT NOT NULL,
+    title           TEXT NOT NULL,
+    description     TEXT,
     admin_id        INTEGER NOT NULL REFERENCES account.role,
     view_id         INTEGER NOT NULL REFERENCES account.role,
     edit_id         INTEGER NOT NULL REFERENCES account.role,

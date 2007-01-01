@@ -1,0 +1,73 @@
+%# ----------------------------------------------------------------------------
+<%once>
+    use Zaapt::Utils::Valid;
+</%once>
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $my_roles
+    $f_name        => undef
+    $f_title       => undef
+    $f_description => undef
+    $_admin        => undef
+    $_view         => undef
+    $_edit         => undef
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Faq');
+
+    # to insert this page, the user needs the '_admin' role on this content section
+    $m->redirect('edit_f_list.html') unless exists $my_roles->{super};
+
+    my $err = [];
+
+    unless ( Zaapt::Utils::Valid::is_valid_name($f_name) ) {
+        push @$err, Zaapt::Utils::Valid::err();
+    }
+
+    # no Faq of this name should exist
+    unless ( @$err ) {
+        my $faq = $model->sel_faq_using_name({ f_name => $f_name });
+        push @$err, "Faq name '$f_name' already exists." if defined $faq;
+    }
+
+    $f_description =~ s{\r}{}gxms;
+
+    unless ( @$err ) {
+        $model->ins_faq({
+            f_name        => $f_name,
+            f_title       => $f_title,
+            f_description => $f_description,
+            _admin        => $_admin,
+            _view         => $_view,
+            _edit         => $_edit,
+        });
+        $m->redirect("edit_f_list.html");
+        return;
+    }
+
+    my $roles = $zaapt->get_model('Account')->sel_all_roles();
+    my @options = map { { value => $_->{r_id}, text => $_->{r_name} } } @$roles;
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Add an FAQ</h1>
+
+<p><a href="edit_f_list.html">&laquo; Back to FAQ List</a></p>
+
+<h2>Enter details...</h2>
+
+<& /zaapt/common/err.mhtml, err => $err &>
+
+<& /zaapt/common/form.mhtml, action => 'edit_f_ins.html', elements => [
+        { type => 'text', field => 'Name', name => 'f_name', size => 40, value => $f_name },
+        { type => 'text', field => 'Title', name => 'f_title', size => 40, value => $f_title },
+        { type => 'textarea', field => 'Description', name => 'f_description', rows => 10, cols => 40, value => $f_description },
+        { type => 'select', field => 'Admin Role', name => '_admin', options => \@options, selected => $_admin },
+        { type => 'select', field => 'View Role', name => '_view', options => \@options, selected => $_view },
+        { type => 'select', field => 'Edit Role', name => '_edit', options => \@options, selected => $_edit },
+        { type => 'submit', field => 'Actions', value => 'Add FAQ', cancel => 'edit_f_list.html' },
+    ]
+&>
+
+%# ----------------------------------------------------------------------------

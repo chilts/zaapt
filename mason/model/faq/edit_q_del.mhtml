@@ -1,0 +1,25 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $my_roles
+    $q_id
+</%args>
+%# ----------------------------------------------------------------------------
+<%once>
+    use URI::Escape;
+</%once>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Faq');
+    my $question = $model->sel_question({ q_id => $q_id });
+
+    # check the error conditions first - we need to recover
+    $m->redirect('edit_f_list.html') unless defined $question;
+    $m->redirect("edit_q_list.html?q_id=" . uri_escape($q_id)) unless exists $my_roles->{$question->{_admin}};
+
+    $model->del_question({ q_id => $q_id });
+
+    $m->redirect("edit_q_list.html?f_id=" . uri_escape($question->{f_id}));
+    return;
+</%init>
+%# ----------------------------------------------------------------------------

@@ -55,6 +55,7 @@
             b_name        => $b_name,
             b_title       => $b_title,
             b_description => $b_description,
+            b_show        => $b_show,
             b_trackback   => $b_trackback,
             b_comment     => $b_comment,
             _admin        => $_admin,

@@ -14,7 +14,7 @@ my $entry_tablename = "blog.entry e";
 my $type_tablename = "common.type t";
 
 # helper
-my $blog_cols = __PACKAGE__->_mk_cols( 'b', qw(id name title description comment trackback r:admin_id r:view_id r:edit_id r:publish_id) );
+my $blog_cols = __PACKAGE__->_mk_cols( 'b', qw(id name title description show comment trackback r:admin_id r:view_id r:edit_id r:publish_id) );
 my $entry_cols = __PACKAGE__->_mk_cols( 'e', qw(id blog_id type_id name title intro article draft comment trackback ts:inserted ts:updated) );
 my $type_cols = __PACKAGE__->_mk_cols( 't', qw(id name) );
 
@@ -23,7 +23,7 @@ my $b_e_join = "JOIN $entry_tablename ON (b.id = e.blog_id)";
 my $e_t_join = "JOIN $type_tablename ON (t.id = e.type_id)";
 
 # blog
-my $ins_blog = __PACKAGE__->_mk_ins( 'blog.blog', qw(name title description comment trackback admin_id view_id edit_id publish_id) );
+my $ins_blog = __PACKAGE__->_mk_ins( 'blog.blog', qw(name title description show comment trackback admin_id view_id edit_id publish_id) );
 my $sel_blog = "SELECT $blog_cols FROM $blog_tablename WHERE b.id = ?";
 my $sel_blog_using_name = "SELECT $blog_cols FROM $blog_tablename WHERE b.name = ?";
 my $sel_blog_all = "SELECT $blog_cols FROM $blog_tablename ORDER BY b.name";
@@ -44,7 +44,7 @@ my $sel_archive_entries = "SELECT $blog_cols, $entry_cols, $type_cols FROM $blog
 
 sub ins_blog {
     my ($self, $hr) = @_;
-    $self->_do( $ins_blog, $hr->{b_name}, $hr->{b_title}, $hr->{b_description}, $hr->{b_comment}, $hr->{b_trackback}, $hr->{_admin}, $hr->{_view}, $hr->{_edit}, $hr->{_publish} );
+    $self->_do( $ins_blog, $hr->{b_name}, $hr->{b_title}, $hr->{b_description}, $hr->{b_show}, $hr->{b_comment}, $hr->{b_trackback}, $hr->{_admin}, $hr->{_view}, $hr->{_edit}, $hr->{_publish} );
 }
 
 sub del_blog {

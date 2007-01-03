@@ -16,6 +16,8 @@ CREATE TABLE blog.blog (
     publish_id      INTEGER NOT NULL REFERENCES account.role,
 --    comment_id      INTEGER NOT NULL REFERENCES account.role,
 --    trackback_id    INTEGER NOT NULL REFERENCES account.role,
+    comment         BOOLEAN NOT NULL DEFAULT False,
+    trackback       BOOLEAN NOT NULL DEFAULT False,
 
     UNIQUE(name),
     LIKE base       INCLUDING DEFAULTS

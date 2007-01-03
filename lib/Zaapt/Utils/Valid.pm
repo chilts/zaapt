@@ -35,6 +35,35 @@ sub is_valid_name {
     return 1;
 }
 
+sub is_non_negative_integer {
+    my ($num, $name) = @_;
+
+    $err = undef;
+
+    # check that the FAQ name has been given
+    unless ( defined $num ) {
+        $err = "'$name' is undefined";
+        return;
+    }
+
+    if ( $num eq '' ) {
+        $err = "No '$name' given";
+        return;
+    }
+
+    unless ( $num =~ m{ \A \d+ \z }xms ) {
+        $err = "'$name' must contain only digits.";
+        return;
+    }
+
+    unless ( $num > 0 ) {
+        $err = "'$name' must be greater than 0";
+        return;
+    }
+
+    return 1;
+}
+
 ## ----------------------------------------------------------------------------
 1;
 ## ----------------------------------------------------------------------------

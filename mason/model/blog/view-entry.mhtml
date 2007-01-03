@@ -21,6 +21,22 @@
         $m->abort(404);
         return;
     }
+
+    my $comments;
+    if ( $blog->{b_comment} ) {
+        $comments = $model->sel_comments_for({ e_id => $entry->{e_id} });
+    }
+    else {
+        $comments = [];
+    }
+
+    my $trackbacks;
+    if ( $blog->{b_trackback} ) {
+        $trackbacks = $model->sel_trackbacks_for({ e_id => $entry->{e_id} });
+    }
+    else {
+        $trackbacks = [];
+    }
 </%init>
 %# ----------------------------------------------------------------------------
 <div class="z_blog">

@@ -1,4 +1,4 @@
-# ----------------------------------------------------------------------------
+%# ----------------------------------------------------------------------------
 <%once>
     use Zaapt::Utils::Valid;
     use Zaapt::Utils::Conv;
@@ -8,16 +8,22 @@
 <%args>
     $zaapt
     $my_roles
-    $b_name        => undef
-    $b_title       => undef
-    $b_description => undef
-    $b_comment     => undef
-    $b_trackback   => undef
-    $_admin        => undef
-    $_view         => undef
-    $_edit         => undef
-    $_publish      => undef
+    $b_name        => ''
+    $b_title       => ''
+    $b_description => ''
+    $b_show        => ''
+    $b_comment     => ''
+    $b_trackback   => ''
+    $_admin        => ''
+    $_view         => ''
+    $_edit         => ''
+    $_publish      => ''
 </%args>
+%# ----------------------------------------------------------------------------
+<%once>
+    use Zaapt::Utils::Valid;
+    use Zaapt::Utils::Conv;
+</%once>
 %# ----------------------------------------------------------------------------
 <%init>
     my $model = $zaapt->get_model('Blog');
@@ -27,6 +33,10 @@
     my $err = [];
 
     unless ( Zaapt::Utils::Valid::is_valid_name($b_name) ) {
+        push @$err, Zaapt::Utils::Valid::err();
+    }
+
+    unless ( Zaapt::Utils::Valid::is_non_negative_integer($b_show, 'Show') ) {
         push @$err, Zaapt::Utils::Valid::err();
     }
 
@@ -72,6 +82,7 @@
         { type => 'text', field => 'Name', name => 'b_name', size => 40, value => $b_name },
         { type => 'text', field => 'Title', name => 'b_title', size => 40, value => $b_title },
         { type => 'textarea', field => 'Description', name => 'b_description', rows => 10, cols => 40, value => $b_description },
+        { type => 'text', field => 'Show', name => 'b_show', size => 3, value => $b_show },
         { type => 'check', field => 'Comment', name => 'b_comment', checked => $b_comment },
         { type => 'check', field => 'Trackback', name => 'b_trackback', checked => $b_trackback },
         { type => 'select', field => 'Admin Role', name => '_admin', options => \@options, selected => $_admin },

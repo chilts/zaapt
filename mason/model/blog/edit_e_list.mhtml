@@ -1,0 +1,66 @@
+%# --- ARGS -------------------------------------------------------------------
+<%args>
+    $zaapt
+    $my_roles
+    $b_id
+</%args>
+%# --- INIT -------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Blog');
+    my $blog = $model->sel_blog({ b_id => $b_id });
+    unless ( defined $blog ) {
+        $m->redirect('edit_b_list.html');
+        return;
+    }
+    $m->redirect('edit_b_list.html') unless exists $my_roles->{$blog->{_view}};
+    my $entries = $model->sel_all_entries_in({ b_id => $b_id });
+</%init>
+%# --- HTML -------------------------------------------------------------------
+<h1>Entry List</h1>
+
+<p><a href="edit_b_list.html">&laquo; Back to Blog List</a></p>
+
+<h2>Blog: '<% $blog->{b_title} | h %>'</h2>
+
+% if ( exists $my_roles->{$blog->{_admin}} ) {
+<p>
+    * <a href="edit_e_add.html?b_id=<% $blog->{b_id} | u %>">Add Entry &raquo;</a>
+</p>
+% }
+
+<table class="edit">
+    <thead>
+        <tr>
+            <th class="list">Entry</th>
+            <th class="action">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+% my $row = 1;
+% foreach my $entry ( @$entries ) {
+        <tr class="r<% $row=1-$row %>">
+            <td><% $entry->{e_name} | h %> (<% $entry->{e_inserted} | h %>)</td>
+            <td>
+%         if ( exists $my_roles->{$blog->{_edit}} ) {
+                * <a href="edit_e_edit.html?e_id=<% $entry->{e_id} | u %>">Edit Entry</a><br />
+%             if ( exists $my_roles->{$blog->{_admin}} ) {
+                * <a href="edit_e_del.html?e_id=<% $entry->{e_id} | u %>">Delete</a><br />
+%             }
+%         } else {
+                -
+%         }
+            </td>
+        </tr>
+% }
+% unless ( @$entries ) {
+        <tr class="r0">
+            <td>No entries in this blog!</td>
+            <td>
+                * <a href="edit_e_add.html?b_id=<% $blog->{b_id} | u %>">Add Entry</a>
+            </td>
+        </tr>
+% }
+    </tbody>
+</table>
+
+%# --- END --------------------------------------------------------------------

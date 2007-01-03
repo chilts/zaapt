@@ -1,0 +1,37 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $my_roles
+</%args>
+%# ----------------------------------------------------------------------------
+<%once>
+    use URI::Escape;
+</%once>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Blog');
+    my $roles = $zaapt->get_model('Account')->sel_all_roles();
+    my @options = map { { value => $_->{r_id}, text => $_->{r_name} } } @$roles;
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Add a Blog</h1>
+
+<p><a href="edit_b_list.html">&laquo; Back to Blog List</a></p>
+
+<h2>Blog: ?</h2>
+
+<& /zaapt/common/form.mhtml, action => 'edit_b_ins.html', elements => [
+        { type => 'text', field => 'Name', name => 'b_name', size => 40, value => '' },
+        { type => 'text', field => 'Title', name => 'b_title', size => 40, value => '' },
+        { type => 'textarea', field => 'Description', name => 'b_description', rows => 10, cols => 40, value => '' },
+        { type => 'check', field => 'Comment', name => 'b_comment', checked => 0 },
+        { type => 'check', field => 'Trackback', name => 'b_trackback', checked => 0 },
+        { type => 'select', field => 'Admin Role', name => '_admin', options => \@options },
+        { type => 'select', field => 'View Role', name => '_view', options => \@options },
+        { type => 'select', field => 'Edit Role', name => '_edit', options => \@options },
+        { type => 'select', field => 'Publish Role', name => '_publish', options => \@options },
+        { type => 'submit', field => 'Actions', value => 'Add Blog', cancel => 'edit_b_list.html' },
+    ]
+&>
+
+%# ----------------------------------------------------------------------------

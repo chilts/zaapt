@@ -32,7 +32,7 @@ sub _mk_cols {
     my $cols = "$letter.$first AS ${letter}_$first";
 
     foreach ( @colnames ) {
-        if ( m{ \A dt: (.*) \z }xms ) {
+        if ( m{ \A ts: (.*) \z }xms ) {
             $cols .= ", to_char($letter.$1, '$datetime') AS ${letter}_$1";
         } elsif ( m{ \A d: (.*) \z }xms ) {
             $cols .= ", to_char($letter.$1, '$date') AS ${letter}_$1_date";

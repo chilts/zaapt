@@ -5,15 +5,15 @@
 </%args>
 %# --- INIT -------------------------------------------------------------------
 <%init>
-    my $model = $zaapt->get_model('Faq');
-    my $faqs = $model->sel_faq_all();
+    my $model = $zaapt->get_model('Blog');
+    my $blogs = $model->sel_blog_all();
 </%init>
 %# --- HTML -------------------------------------------------------------------
-<h1>FAQ List</h1>
+<h1>Blog List</h1>
 
 % if ( exists $my_roles->{super} ) {
 <p>
-    * <a href="edit_f_add.html">Add FAQ &raquo;</a><br />
+    * <a href="edit_b_add.html">Add Blog &raquo;</a><br />
 </p>
 % }
 
@@ -26,18 +26,18 @@
     </thead>
     <tbody>
 % my $row = 1;
-% foreach my $faq ( @$faqs ) {
-%     next unless exists $my_roles->{$faq->{_view}};
+% foreach my $blog ( @$blogs ) {
+%     next unless exists $my_roles->{$blog->{_view}};
         <tr class="r<% $row=1-$row %>">
             <td>
-                <% $faq->{f_name} | h %>
+                <% $blog->{b_name} | h %>
             </td>
             <td>
-%         if ( exists $my_roles->{$faq->{_edit}} ) {
-                * <a href="edit_q_add.html?f_id=<% $faq->{f_id} | u %>">Add Question</a><br />
-                * <a href="edit_q_list.html?f_id=<% $faq->{f_id} | u %>">Question List</a><br />
-%             if ( exists $my_roles->{$faq->{_admin}} ) {
-                * <a href="edit_f_del.html?f_id=<% $faq->{f_id} | u %>">Delete</a><br />
+%         if ( exists $my_roles->{$blog->{_edit}} ) {
+                * <a href="edit_e_add.html?b_id=<% $blog->{b_id} | u %>">Add Entry</a><br />
+                * <a href="edit_e_list.html?b_id=<% $blog->{b_id} | u %>">Entry List</a><br />
+%             if ( exists $my_roles->{$blog->{_admin}} ) {
+                * <a href="edit_b_del.html?b_id=<% $blog->{b_id} | u %>">Delete</a><br />
 %             }
 %         } else {
                 -

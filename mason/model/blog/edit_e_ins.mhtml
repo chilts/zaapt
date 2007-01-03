@@ -1,0 +1,106 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $my_roles
+    $b_id
+    $e_name      => ''
+    $e_title     => ''
+    $e_intro     => ''
+    $e_article   => ''
+    $t_id
+    $e_draft     => 0
+    $e_comment   => 0
+    $e_trackback => 0
+</%args>
+%# ----------------------------------------------------------------------------
+<%once>
+    use URI::Escape;
+    use Zaapt::Utils::Valid;
+    use Zaapt::Utils::Conv;
+</%once>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Blog');
+    my $blog = $model->sel_blog({ b_id => $b_id });
+
+    # check the error conditions first - we need to recover
+
+    # this content section firstly needs to exist to be able to add a page
+    $m->redirect('edit_b_list.html') unless defined $blog;
+
+    # to insert a question, '_admin' is required
+    $m->redirect('edit_b_list.html') unless exists $my_roles->{$blog->{_admin}};
+
+    # check this type exists
+    unless ( $zaapt->get_model('Common')->sel_type({ t_id => $t_id }) ) {
+        $m->redirect('edit_b_list.html');
+    }
+
+    # now we're into the normal user errors
+
+    my $err = [];
+
+    if ( $e_name eq '' ) {
+        push @$err, "Please specify a name";
+    }
+
+    unless ( @$err ) {
+        unless ( Zaapt::Utils::Valid::is_valid_name($e_name) ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+    }
+
+    # some data manipulation
+    $e_intro = Zaapt::Utils::Conv::remove_cr( $e_intro );
+    $e_article = Zaapt::Utils::Conv::remove_cr( $e_article );
+    $e_draft = Zaapt::Utils::Conv::to_bool( $e_draft );
+    $e_comment = Zaapt::Utils::Conv::to_bool( $e_comment );
+    $e_trackback = Zaapt::Utils::Conv::to_bool( $e_trackback );
+
+    unless ( @$err ) {
+        $model->ins_entry({
+            b_id        => $b_id,
+            e_name      => $e_name,
+            e_title     => $e_title,
+            e_intro     => $e_intro,
+            e_article   => $e_article,
+            t_id        => $t_id,
+            e_draft     => $e_draft,
+            e_comment   => $e_comment,
+            e_trackback => $e_trackback,
+        });
+        $m->redirect('edit_e_list.html?b_id=' . uri_escape($b_id));
+        return;
+    }
+
+    my $page_types = $zaapt->get_model('Common')->sel_all_types();
+    my @options = map { { value => $_->{t_id}, text => $_->{t_name} } } @$page_types;
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Add an Entry</h1>
+
+<p><a href="edit_e_list.html?b_id=<% $b_id | u %>">&laquo; Back to Entry List</a></p>
+
+<h2>Blog: '<% $blog->{b_title} | h %>'</h2>
+
+d=<% $e_draft | h %>
+
+<& /zaapt/common/err.mhtml, err => $err &>
+
+<& /zaapt/common/form.mhtml, action => 'edit_e_ins.html', elements => [
+        { type => 'hidden', name => 'b_id', value => $b_id },
+        { type => 'read', field => 'Blog', name => 'b_name', value => $blog->{b_name} },
+        { type => 'text', field => 'Name', name => 'e_name', size => 40, value => $e_name },
+        { type => 'text', field => 'Title', name => 'e_title', size => 40, value => $e_title },
+        { type => 'textarea', field => 'Intro', name => 'e_intro', rows => 10, cols => 40, value => $e_intro },
+        { type => 'read', value => 'Note: The intro field is always plain text.' },
+        { type => 'textarea', field => 'Article', name => 'e_article', rows => 10, cols => 40, value => $e_article },
+        { type => 'select', field => 'Type', name => 't_id', options => \@options, selected => $t_id },
+        { type => 'check', field => 'Draft', name => 'e_draft', checked => $e_draft },
+        { type => 'check', field => 'Comment', name => 'e_comment', checked => $e_comment },
+        { type => 'check', field => 'Trackback', name => 'e_trackback', checked => $e_trackback },
+        { type => 'submit', field => 'Actions', value => 'Add Entry', cancel => 'edit_e_list.html?b_id=' . uri_escape($b_id) },
+    ]
+&>
+
+%# ----------------------------------------------------------------------------

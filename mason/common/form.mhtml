@@ -38,7 +38,7 @@
             <input type="hidden" name="<% $e->{name} | h %>" value="<% $e->{value} | h %>" />\
 
 %     } elsif ( $e->{type} eq 'read' ) {
-            <input type="hidden" name="<% $e->{name} | h %>" value="<% $e->{value} | h %>" /><% $e->{value} | h %>\
+            <% $e->{value} | h %>\
 
 %     } elsif ( $e->{type} eq 'check' ) {
             <input type="checkbox" name="<% $e->{name} | h %>"<% $e->{checked} && ' checked="checked"' %> />\

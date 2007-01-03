@@ -27,12 +27,12 @@ my $ins_content = __PACKAGE__->_mk_ins( 'content.content', qw(name title descrip
 my $sel_content = "SELECT $content_cols FROM $content_tablename WHERE c.id = ?";
 my $sel_content_using_name = "SELECT $content_cols FROM $content_tablename WHERE c.name = ?";
 my $sel_content_all = "SELECT $content_cols FROM $content_tablename ORDER BY c.name";
-my $del_content = __PACKAGE__->_mk_del('content.content', 'id');
+my $del_content = __PACKAGE__->_mk_del( 'content.content', 'id' );
 
 # page
 my $ins_page = __PACKAGE__->_mk_ins( 'content.page', 'content_id', 'type_id', 'name', 'content' );
 my $upd_page = __PACKAGE__->_mk_upd( 'content.page', 'id', qw(content_id type_id name content));
-my $del_page = __PACKAGE__->_mk_del( 'content.page', 'id');
+my $del_page = __PACKAGE__->_mk_del( 'content.page', 'id' );
 my $sel_page = "SELECT $content_cols, $page_cols, $type_cols FROM $content_tablename $c_p_join $p_t_join WHERE p.id = ?";
 my $sel_page_using_name = "SELECT $content_cols, $page_cols, $type_cols FROM $content_tablename $c_p_join $p_t_join WHERE c.id = ? AND p.name = ?";
 my $sel_all_pages_in = "SELECT $content_cols, $page_cols, $type_cols FROM $content_tablename $c_p_join $p_t_join WHERE c.id = ? ORDER BY p.name";

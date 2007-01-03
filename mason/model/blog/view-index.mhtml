@@ -1,0 +1,24 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $b_name
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Blog');
+    my $blog = $model->sel_blog_using_name({ b_name => $b_name });
+    unless ( defined $blog ) {
+        $m->redirect('edit_b_list.html');
+        return;
+    }
+    my $entries = $model->sel_latest_entries({ b_id => $blog->{b_id}, _limit => $blog->{b_show} });
+</%init>
+%# ----------------------------------------------------------------------------
+% if ( @$entries ) {
+%     foreach my $entry ( @$entries ) {
+<& render-entry-summary.mhtml, entry => $entry &>
+%     }
+% } else {
+<p>Currently, there are no entries in this blog.</p>
+% }
+%# ----------------------------------------------------------------------------

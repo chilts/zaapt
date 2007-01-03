@@ -1,0 +1,24 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $entry
+    $trackbacks
+    $comments
+</%args>
+%# ----------------------------------------------------------------------------
+<h1><% $entry->{e_title} | h %></h1>
+
+<& /zaapt/common/render.mhtml, t_name => $entry->{t_name}, content => $entry->{e_intro} &>
+<& /zaapt/common/render.mhtml, t_name => $entry->{t_name}, content => $entry->{e_article} &>
+
+% if ( $entry->{b_trackback} ) {
+<h2>Trackbacks</h2>
+<p>Coming soon</p>
+% }
+
+% if ( $entry->{b_comment} ) {
+<h2>Comments</h2>
+<p>Coming soon</p>
+% }
+
+<p class="footnote"><% $entry->{e_inserted} | h %></p>
+%# ----------------------------------------------------------------------------

@@ -1,0 +1,85 @@
+# ----------------------------------------------------------------------------
+<%once>
+    use Zaapt::Utils::Valid;
+    use Zaapt::Utils::Conv;
+    # use Zaapt::Utils::Conv qw(to_bool remove_cr);
+</%once>
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $my_roles
+    $b_name        => undef
+    $b_title       => undef
+    $b_description => undef
+    $b_comment     => undef
+    $b_trackback   => undef
+    $_admin        => undef
+    $_view         => undef
+    $_edit         => undef
+    $_publish      => undef
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Blog');
+
+    $m->redirect('edit_b_list.html') unless exists $my_roles->{super};
+
+    my $err = [];
+
+    unless ( Zaapt::Utils::Valid::is_valid_name($b_name) ) {
+        push @$err, Zaapt::Utils::Valid::err();
+    }
+
+    # no Blog of this name should exist
+    unless ( @$err ) {
+        my $blog = $model->sel_blog_using_name({ b_name => $b_name });
+        push @$err, "Blog name '$b_name' already exists." if defined $blog;
+    }
+
+    $b_comment = Zaapt::Utils::Conv::to_bool( $b_comment );
+    $b_trackback = Zaapt::Utils::Conv::to_bool( $b_trackback );
+    $b_description = Zaapt::Utils::Conv::remove_cr( $b_description );
+
+    unless ( @$err ) {
+        $model->ins_blog({
+            b_name        => $b_name,
+            b_title       => $b_title,
+            b_description => $b_description,
+            b_trackback   => $b_trackback,
+            b_comment     => $b_comment,
+            _admin        => $_admin,
+            _view         => $_view,
+            _edit         => $_edit,
+            _publish      => $_publish,
+        });
+        $m->redirect("edit_b_list.html");
+        return;
+    }
+
+    my $roles = $zaapt->get_model('Account')->sel_all_roles();
+    my @options = map { { value => $_->{r_id}, text => $_->{r_name} } } @$roles;
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Add a Blog</h1>
+
+<p><a href="edit_b_list.html">&laquo; Back to Blog List</a></p>
+
+<h2>Blog: ?</h2>
+
+<& /zaapt/common/err.mhtml, err => $err &>
+
+<& /zaapt/common/form.mhtml, action => 'edit_b_ins.html', elements => [
+        { type => 'text', field => 'Name', name => 'b_name', size => 40, value => $b_name },
+        { type => 'text', field => 'Title', name => 'b_title', size => 40, value => $b_title },
+        { type => 'textarea', field => 'Description', name => 'b_description', rows => 10, cols => 40, value => $b_description },
+        { type => 'check', field => 'Comment', name => 'b_comment', checked => $b_comment },
+        { type => 'check', field => 'Trackback', name => 'b_trackback', checked => $b_trackback },
+        { type => 'select', field => 'Admin Role', name => '_admin', options => \@options, selected => $_admin },
+        { type => 'select', field => 'View Role', name => '_view', options => \@options, selected => $_view },
+        { type => 'select', field => 'Edit Role', name => '_edit', options => \@options, selected => $_edit },
+        { type => 'select', field => 'Publish Role', name => '_publish', options => \@options, selected => $_publish },
+        { type => 'submit', field => 'Actions', value => 'Add Blog', cancel => 'edit_b_list.html' },
+    ]
+&>
+
+%# ----------------------------------------------------------------------------

@@ -83,8 +83,6 @@
 
 <h2>Blog: '<% $blog->{b_title} | h %>'</h2>
 
-d=<% $e_draft | h %>
-
 <& /zaapt/common/err.mhtml, err => $err &>
 
 <& /zaapt/common/form.mhtml, action => 'edit_e_ins.html', elements => [

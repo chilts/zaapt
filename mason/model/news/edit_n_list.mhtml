@@ -1,0 +1,51 @@
+%# --- ARGS -------------------------------------------------------------------
+<%args>
+    $zaapt
+    $my_roles
+</%args>
+%# --- INIT -------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('News');
+    my $sections = $model->sel_news_all();
+</%init>
+%# --- HTML -------------------------------------------------------------------
+<h1>News List</h1>
+
+% if ( exists $my_roles->{super} ) {
+<p>
+    * <a href="edit_n_add.html">Add News &raquo;</a><br />
+</p>
+% }
+
+<table class="edit">
+    <thead>
+        <tr>
+            <th class="list">Name</th>
+            <th class="action">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+% my $row = 1;
+% foreach my $news ( @$sections ) {
+%     next unless exists $my_roles->{$news->{_view}};
+        <tr class="r<% $row=1-$row %>">
+            <td>
+                <% $news->{n_name} | h %>
+            </td>
+            <td>
+%         if ( exists $my_roles->{$news->{_edit}} ) {
+                * <a href="edit_a_add.html?n_id=<% $news->{n_id} | u %>">Add Article</a><br />
+                * <a href="edit_a_list.html?n_id=<% $news->{n_id} | u %>">Article List</a><br />
+%             if ( exists $my_roles->{$news->{_admin}} ) {
+                * <a href="edit_n_del.html?n_id=<% $news->{n_id} | u %>">Delete</a><br />
+%             }
+%         } else {
+                -
+%         }
+            </td>
+        </tr>
+% }
+    </tbody>
+</table>
+
+%# --- END --------------------------------------------------------------------

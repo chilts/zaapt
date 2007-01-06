@@ -1,0 +1,19 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $n_name
+    $page
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    if ( $page =~ m{ \A index \z}xms ) {
+        # main index page
+        $m->comp('/zaapt/model/news/view-index.mhtml', zaapt => $ZAAPT, n_name => $n_name);
+    }
+    else {
+        # this is a named article
+        $m->comp('/zaapt/model/news/view-article.mhtml', zaapt => $ZAAPT, n_name => $n_name, a_id => $page);
+    }
+    return;
+</%init>
+%# ----------------------------------------------------------------------------

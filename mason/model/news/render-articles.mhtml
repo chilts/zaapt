@@ -1,0 +1,13 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $articles
+</%args>
+%# ----------------------------------------------------------------------------
+% if ( @$articles ) {
+%     foreach my $article ( @$articles ) {
+<& render-article-summary.mhtml, article => $article &>
+%     }
+% } else {
+<p>Currently, there are no articles in this news section.</p>
+% }
+%# ----------------------------------------------------------------------------

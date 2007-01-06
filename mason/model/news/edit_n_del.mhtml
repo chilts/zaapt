@@ -1,0 +1,21 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $my_roles
+    $n_id
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('News');
+    my $news = $model->sel_news({ n_id => $n_id });
+
+    $m->redirect('edit_n_list.html') unless defined $news;
+
+    $m->redirect('edit_n_list.html') unless exists $my_roles->{$news->{_admin}};
+
+    $model->del_news({ n_id => $n_id });
+
+    $m->redirect("edit_n_list.html");
+    return;
+</%init>
+%# ----------------------------------------------------------------------------

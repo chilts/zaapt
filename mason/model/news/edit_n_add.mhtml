@@ -1,0 +1,36 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $my_roles
+</%args>
+%# ----------------------------------------------------------------------------
+<%once>
+    use URI::Escape;
+</%once>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('News');
+    my $roles = $zaapt->get_model('Account')->sel_all_roles();
+    my @options = map { { value => $_->{r_id}, text => $_->{r_name} } } @$roles;
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Add a News</h1>
+
+<p><a href="edit_n_list.html">&laquo; Back to News List</a></p>
+
+<h2>News: ?</h2>
+
+<& /zaapt/common/form.mhtml, action => 'edit_n_ins.html', elements => [
+        { type => 'text', field => 'Name', name => 'n_name', size => 40, value => '' },
+        { type => 'text', field => 'Title', name => 'n_title', size => 40, value => '' },
+        { type => 'textarea', field => 'Description', name => 'n_description', rows => 10, cols => 40, value => '' },
+        { type => 'text', field => 'Show', name => 'n_show', size => 3, value => 7 },
+        { type => 'select', field => 'Admin Role', name => '_admin', options => \@options },
+        { type => 'select', field => 'View Role', name => '_view', options => \@options },
+        { type => 'select', field => 'Edit Role', name => '_edit', options => \@options },
+        { type => 'select', field => 'Publish Role', name => '_publish', options => \@options },
+        { type => 'submit', field => 'Actions', value => 'Add News', cancel => 'edit_n_list.html' },
+    ]
+&>
+
+%# ----------------------------------------------------------------------------

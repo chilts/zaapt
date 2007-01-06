@@ -1,0 +1,47 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $my_roles
+    $n_id
+</%args>
+%# ----------------------------------------------------------------------------
+<%once>
+    use URI::Escape;
+</%once>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('News');
+    my $news = $model->sel_news({ n_id => $n_id });
+    unless ( defined $news ) {
+        $m->redirect('edit_n_list.html');
+        return;
+    }
+    my $paga_types = $zaapt->get_model('Common')->sel_all_types();
+    my @options = map { { value => $_->{t_id}, text => $_->{t_name} } } @$paga_types;
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Add an Article</h1>
+
+<p><a href="edit_a_list.html?n_id=<% $n_id | u %>">&laquo; Back to Article List</a></p>
+
+<h2>News: '<% $news->{n_title} | h %>'</h2>
+
+<& /zaapt/common/form.mhtml, action => 'edit_a_ins.html', elements => [
+        { type => 'hidden', name => 'n_id', value => $n_id },
+        { type => 'read', field => 'News', name => 'n_name', value => $news->{n_name} },
+        { type => 'text', field => 'Title', name => 'a_title', size => 40, value => '' },
+        { type => 'textarea', field => 'Intro', name => 'a_intro', rows => 5, cols => 40, value => '' },
+        { type => 'read', value => 'Note: The intro field is always plain text.' },
+        { type => 'textarea', field => 'Article', name => 'a_article', rows => 10, cols => 40, value => '' },
+        { type => 'select', field => 'Type', name => 't_id', options => \@options },
+        { type => 'submit', field => 'Actions', value => 'Add', cancel => 'edit_a_list.html?n_id=' . uri_escape($n_id) },
+    ]
+&>
+
+% if ( 0 ) {
+<pre>
+% print Data::Dumper->Dump([\@options], ['o']);
+</pre>
+% }
+
+%# ----------------------------------------------------------------------------

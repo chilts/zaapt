@@ -1,0 +1,89 @@
+%# ----------------------------------------------------------------------------
+<%once>
+    use Zaapt::Utils::Valid;
+    use Zaapt::Utils::Conv;
+    # use Zaapt::Utils::Conv qw(to_bool remove_cr);
+</%once>
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $my_roles
+    $n_name        => ''
+    $n_title       => ''
+    $n_description => ''
+    $n_show        => ''
+    $_admin        => ''
+    $_view         => ''
+    $_edit         => ''
+    $_publish      => ''
+</%args>
+%# ----------------------------------------------------------------------------
+<%once>
+    use Zaapt::Utils::Valid;
+    use Zaapt::Utils::Conv;
+</%once>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('News');
+
+    $m->redirect('edit_n_list.html') unless exists $my_roles->{super};
+
+    my $err = [];
+
+    unless ( Zaapt::Utils::Valid::is_valid_name($n_name) ) {
+        push @$err, Zaapt::Utils::Valid::err();
+    }
+
+    unless ( Zaapt::Utils::Valid::is_non_negative_integer($n_show, 'Show') ) {
+        push @$err, Zaapt::Utils::Valid::err();
+    }
+
+    # no News of this name should exist
+    unless ( @$err ) {
+        my $news = $model->sel_news_using_name({ n_name => $n_name });
+        push @$err, "News name '$n_name' already exists." if defined $news;
+    }
+
+    $n_description = Zaapt::Utils::Conv::remove_cr( $n_description );
+
+    unless ( @$err ) {
+        $model->ins_news({
+            n_name        => $n_name,
+            n_title       => $n_title,
+            n_description => $n_description,
+            n_show        => $n_show,
+            _admin        => $_admin,
+            _view         => $_view,
+            _edit         => $_edit,
+            _publish      => $_publish,
+        });
+        $m->redirect("edit_n_list.html");
+        return;
+    }
+
+    my $roles = $zaapt->get_model('Account')->sel_all_roles();
+    my @options = map { { value => $_->{r_id}, text => $_->{r_name} } } @$roles;
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Add a News</h1>
+
+<p><a href="edit_n_list.html">&laquo; Back to News List</a></p>
+
+<h2>News: ?</h2>
+
+<& /zaapt/common/err.mhtml, err => $err &>
+
+<& /zaapt/common/form.mhtml, action => 'edit_n_ins.html', elements => [
+        { type => 'text', field => 'Name', name => 'n_name', size => 40, value => $n_name },
+        { type => 'text', field => 'Title', name => 'n_title', size => 40, value => $n_title },
+        { type => 'textarea', field => 'Description', name => 'n_description', rows => 10, cols => 40, value => $n_description },
+        { type => 'text', field => 'Show', name => 'n_show', size => 3, value => $n_show },
+        { type => 'select', field => 'Admin Role', name => '_admin', options => \@options, selected => $_admin },
+        { type => 'select', field => 'View Role', name => '_view', options => \@options, selected => $_view },
+        { type => 'select', field => 'Edit Role', name => '_edit', options => \@options, selected => $_edit },
+        { type => 'select', field => 'Publish Role', name => '_publish', options => \@options, selected => $_publish },
+        { type => 'submit', field => 'Actions', value => 'Add News', cancel => 'edit_n_list.html' },
+    ]
+&>
+
+%# ----------------------------------------------------------------------------

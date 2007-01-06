@@ -1,0 +1,13 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $article
+</%args>
+%# ----------------------------------------------------------------------------
+<h1><% $article->{a_title} | h %></H1>
+
+<p><strong><% $article->{a_intro} | h %></strong></p>
+
+<& /zaapt/common/render.mhtml, t_name => $article->{t_name}, content => $article->{a_article} &>
+
+<p class="footnote">Updated: <% $article->{a_updated} | h %></p>
+%# ----------------------------------------------------------------------------

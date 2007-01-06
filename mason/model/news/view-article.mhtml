@@ -1,0 +1,31 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $n_name
+    $a_id
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('News');
+
+    my $news = $model->sel_news_using_name({ n_name => $n_name });
+    unless ( defined $news ) {
+        $m->clear_buffer();
+        $m->abort(404);
+        return;
+    }
+
+    my $article = $model->sel_article_in_news({ n_id => $news->{n_id}, a_id => $a_id });
+    unless ( defined $article ) {
+        $m->clear_buffer();
+        $m->abort(404);
+        return;
+    }
+</%init>
+%# ----------------------------------------------------------------------------
+<div class="z_news">
+
+<& render-article.mhtml, article => $article &>
+
+</div>
+%# ----------------------------------------------------------------------------

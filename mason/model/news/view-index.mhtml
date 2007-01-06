@@ -1,0 +1,26 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $n_name
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('News');
+    my $news = $model->sel_news_using_name({ n_name => $n_name });
+    unless ( defined $news ) {
+        $m->redirect('edit_n_list.html');
+        return;
+    }
+    my $articles = $model->sel_latest_articles({ n_id => $news->{n_id}, _limit => $news->{n_show} });
+</%init>
+%# ----------------------------------------------------------------------------
+<div class="z_news">
+% if ( @$articles ) {
+%     foreach my $article ( @$articles ) {
+<& render-article-summary.mhtml, article => $article &>
+%     }
+% } else {
+<p>Currently, there are no articles in this news section.</p>
+% }
+</div>
+%# ----------------------------------------------------------------------------

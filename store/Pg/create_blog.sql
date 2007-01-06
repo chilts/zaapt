@@ -30,7 +30,7 @@ COMMENT ON COLUMN blog.blog.admin_id IS
 COMMENT ON COLUMN blog.blog.view_id IS
     'View allows the user to see the blog and it\'s entries';
 COMMENT ON COLUMN blog.blog.edit_id IS
-    'Entry allows the user manipulate the entries (add/edit/del/tags)';
+    'Edit allows the user manipulate the entries (add/edit/del/tags)';
 COMMENT ON COLUMN blog.blog.publish_id IS
     'Publish allows the user to publish or revoke any entries';
 -- COMMENT ON COLUMN blog.blog.comment_id IS

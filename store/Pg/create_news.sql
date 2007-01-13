@@ -43,7 +43,6 @@ CREATE TABLE news.article (
     comment         BOOLEAN NOT NULL DEFAULT False,
     trackback       BOOLEAN NOT NULL DEFAULT False,
 
-    UNIQUE(news_id, name),
     LIKE base       INCLUDING DEFAULTS
 );
 CREATE TRIGGER article_updated BEFORE UPDATE ON news.article

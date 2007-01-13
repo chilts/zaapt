@@ -158,7 +158,7 @@ Page:
         <td class="center"><& /zaapt/common/a_username.mhtml, a_username => $topic->{a_username} &><br /></td>
         <td class="center"><% $topic->{tp_posts} | h %></td>
         <td class="right">
-            <& /zaapt/common/a_username.mhtml, a_username => $topic->{a_username} &>
+            <& /zaapt/common/a_username.mhtml, a_username => $topic->{po_username} &>
             <br style="clear: both;" />
             <span class="footnote"><% $topic->{tp_updated} %></span>
         </td>

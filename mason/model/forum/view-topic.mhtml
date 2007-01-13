@@ -1,0 +1,130 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $a         => ''
+    $f_name
+    $tp_id
+    $a_id      => undef
+    $p_message => undef
+    $t_id      => undef
+    $p          => 1
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Forum');
+
+    my $forum = $model->sel_forum_using_name({ f_name => $f_name} );
+    unless ( defined $forum ) {
+        $m->clear_buffer();
+        $m->abort(404);
+        return;
+    }
+
+    my $topic = $model->sel_topic({ tp_id => $tp_id} );
+    unless ( defined $topic and $topic->{f_id} == $forum->{f_id} ) {
+        $m->clear_buffer();
+        $m->abort(404);
+        return;
+    }
+
+    $p = 1 unless $p =~ m{ \A \d+ \z }xms;
+
+    # see if we want to insert a post
+    my $err = [];
+    if ( $a eq 'reply' ) {
+        # firstly, check the error cases
+        unless ( $SESS->{roles}{$forum->{_moderator}} or !$topic->{tp_locked} ) {
+            $m->clear_buffer();
+            $m->abort(404);
+            return;
+        }
+
+        unless ( defined $a_id and defined $t_id ) {
+            $m->clear_buffer();
+            $m->redirect('?');
+            return;
+        }
+        if ( $p_message =~ m{ \S }xms ) {
+            $model->ins_post({ tp_id => $tp_id, a_id => $a_id, p_message => $p_message, t_id => $t_id });
+            $p_message = '';
+            $m->clear_buffer();
+            $m->redirect('?');
+            return;
+        }
+        else {
+            push @$err, "Please type something into your reply";
+        }
+    }
+
+    my $posts = $model->sel_all_posts_in({ tp_id => $tp_id, _offset => ($p-1) * $forum->{f_show}, _limit => $forum->{f_show} });
+</%init>
+%# ----------------------------------------------------------------------------
+<div class="z_forum">
+<h1><% $forum->{f_title} | h %></h1>
+
+<p>
+    <span class="floatright">
+% if ( $SESS->{roles}{$forum->{_moderator}} or !$topic->{tp_locked} ) {
+        <a href="#" onclick="removeElementClass('reply', 'hide');"><& /zaapt/common/icon.mhtml, name => 'script_add' &> Reply &raquo;&raquo;</a>
+% } else {
+        <& /zaapt/common/icon.mhtml, name => 'script_link' &> Locked
+% }
+    </span>
+    <a href="./">&laquo; Back to Topic List</a>
+</p>
+
+<& /zaapt/common/err.mhtml, err => $err &>
+
+% if ( $SESS->{roles}{$forum->{_moderator}} or !$topic->{tp_locked} ) {
+<div id="reply"<% @$err ? '' : ' class="hide"' %>>
+<& /zaapt/common/form.mhtml, action => '?', elements => [
+        { type => 'hidden', name => 'a', value => 'reply' },
+        { type => 'textarea', field => 'Message', name => 'p_message', rows => 10, cols => 40, value => $p_message || '' },
+        { type => 'submit', field => 'Actions', value => 'Post', cancel_js => "addElementClass('reply', 'hide');" },
+    ]
+&>
+</div>
+% }
+
+<h2><% $topic->{tp_subject} | h %></h2>
+
+<p class="center">
+Page:
+% foreach my $page ( 1..(($topic->{tp_posts}-1)/$forum->{f_show} + 1) ) {
+%     if ( $p == $page ) {
+    <% $page | h %>
+%     } else {
+    <a href="<% $tp_id | u %>.html?p=<% $page | u %>"><% $page | h %></a>
+%     }
+% }
+</p>
+
+% if ( @$posts ) {
+
+<table>
+    <tr>
+        <th>Poster</th>
+        <th>Message</th>
+    </tr>
+%     my $r = 0;
+%     foreach my $post ( @$posts ) {
+    <tr class="r<% $r=1-$r %>">
+        <td class="top">
+            <& /zaapt/common/a_username.mhtml, a_username => $post->{a_username} &><br />
+            <span class="small soft nw">
+            Joined: <% $post->{a_inserted} | h %><br />
+            Posts: ToDo<br />
+            </span>
+        </td>
+        <td class="top">
+            <& /zaapt/common/render.mhtml, t_name => $post->{t_name}, content => $post->{p_message} &>
+            <p class="footnote"><% $post->{p_inserted} | h %></p>
+        </td>
+    </tr>
+%     }
+</table>
+% } else {
+<p>There are currently no topics here.</p>
+% }
+</div>
+%# ----------------------------------------------------------------------------

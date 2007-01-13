@@ -1,0 +1,21 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $my_roles
+    $f_id
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Forum');
+    my $forum = $model->sel_forum({ f_id => $f_id });
+
+    $m->redirect('edit_f_list.html') unless defined $forum;
+
+    $m->redirect('edit_f_list.html') unless exists $my_roles->{$forum->{_admin}};
+
+    $model->del_forum({ f_id => $f_id });
+
+    $m->redirect("edit_f_list.html");
+    return;
+</%init>
+%# ----------------------------------------------------------------------------

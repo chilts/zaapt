@@ -1,0 +1,49 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $a          => ''
+    $f_name
+    $page       => ''
+    $a_id       => undef
+    $tp_subject => ''
+    $p_message  => ''
+    $t_id       => undef
+    $p          => 1
+    $tp_id      => undef
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    if ( $page =~ m{ \A index \z}xms ) {
+        # main index page
+        $m->comp('/zaapt/model/forum/view-forum.mhtml',
+            zaapt      => $zaapt,
+            a          => $a,
+            f_name     => $f_name,
+            a_id       => $a_id,
+            tp_subject => $tp_subject,
+            p_message  => $p_message,
+            t_id       => $t_id,
+            p          => $p,
+            tp_id      => $tp_id,
+        );
+    }
+    else {
+        if ( $page eq '' ) {
+            $m->clear_buffer();
+            $m->abort(404);
+            return;
+        }
+        $m->comp( '/zaapt/model/forum/view-topic.mhtml',
+            zaapt     => $zaapt,
+            a         => $a,
+            f_name    => $f_name,
+            tp_id     => $page,
+            a_id      => $a_id,
+            p_message => $p_message,
+            t_id      => $t_id,
+            p         => $p,
+        );
+    }
+    return;
+</%init>
+%# ----------------------------------------------------------------------------

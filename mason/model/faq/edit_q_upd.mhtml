@@ -16,7 +16,7 @@
     my $model = $zaapt->get_model('Faq');
     my $question = $model->sel_question({ q_id => $q_id });
 
-    # check the error conditions first - we need to recover
+    # program errors
     $m->redirect('edit_f_list.html') unless defined $question;
     $m->redirect("edit_q_list.html?q_id=" . uri_escape($q_id)) unless exists $my_roles->{$question->{_edit}};
 
@@ -25,10 +25,8 @@
         $m->redirect("edit_q_list.html?q_id=" . uri_escape($q_id));
     }
 
-    # now we're into the normal user errors
-
+    # user errors
     my $err = [];
-
     if ( $q_question eq '' ) {
         push @$err, "Please specify the question";
     }

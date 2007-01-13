@@ -1,0 +1,4 @@
+<%args>
+    $a_name
+</%args>
+<% $a_name | h %>\

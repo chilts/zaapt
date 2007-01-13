@@ -126,6 +126,12 @@ sub _mk_del {
     return "DELETE FROM $table WHERE $query";
 }
 
+sub _currval {
+    my ($self, $seqname) = @_;
+    my ($id) = $self->dbh()->selectrow_array( "SELECT currval(?)", undef, $seqname );
+    return $id;
+}
+
 sub _do {
     my ($self, $stm, @bind_values) = @_;
     return $self->dbh()->do( $stm, undef, @bind_values );

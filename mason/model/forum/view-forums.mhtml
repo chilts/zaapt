@@ -1,0 +1,49 @@
+%# ----------------------------------------------------------------------------
+<%doc>
+
+    This shows a list of ALL forums contained in the database (unlike other
+    components which specifically show something from 1 particular forum).
+
+</%doc>
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Forum');
+    my $forums = $model->sel_forums_all();
+</%init>
+%# ----------------------------------------------------------------------------
+<div class="z_forum">
+<h1>Forums</h1>
+
+% if ( @$forums ) {
+<table>
+    <tr>
+        <th colspan="2">Forum</th>
+        <th>Topics</th>
+        <th>Posts</th>
+        <th>Last Post</th>
+    </tr>
+%     foreach my $forum ( @$forums ) {
+    <tr>
+        <td><& /zaapt/common/icon.mhtml, name => 'script' &></td>
+        <td>
+            <a href="view-forum.html?id=<% $forum->{f_name} | u %>"><% $forum->{f_title} | h %></a>
+            <p><% $forum->{f_description} | h %></p>
+        </td>
+        <td><% $forum->{f_topics} | h %></td>
+        <td><% $forum->{f_posts} | h %></td>
+        <td>
+            <% $forum->{f_poster_id} | h %><br />
+            <& /zaapt/common/a_username.mhtml, a_username => $forum->{a_username} &>
+        </td>
+    </tr>
+%     }
+</table>
+% } else {
+<p>There are currently no forums here.</p>
+% }
+</div>
+%# ----------------------------------------------------------------------------

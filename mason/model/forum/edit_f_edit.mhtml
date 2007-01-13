@@ -1,0 +1,43 @@
+%# ----------------------------------------------------------------------------
+<%once>
+    use Zaapt::Utils::Valid;
+</%once>
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $my_roles
+    $f_id => undef
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Forum');
+    my $forum = $model->sel_forum({ f_id => $f_id });
+
+    # check the error conditions first - we need to recover
+    $m->redirect('edit_f_list.html') unless defined $forum;
+    $m->redirect('edit_f_list.html?f_id=$forum->{f_id}') unless exists $my_roles->{$forum->{_admin}};
+
+    my $roles = $zaapt->get_model('Account')->sel_all_roles();
+    my @options = map { { value => $_->{r_id}, text => $_->{r_name} } } @$roles;
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Edit a Forum</h1>
+
+<p><a href="edit_f_list.html">&laquo; Back to Forum List</a></p>
+
+<h2>Forum: <% $forum->{f_name} | h %> - <% $forum->{f_title} | h %></h2>
+
+<& /zaapt/common/form.mhtml, action => 'edit_f_upd.html', elements => [
+        { type => 'hidden', name => 'f_id', value => $f_id },
+        { type => 'text', field => 'Name', name => 'f_name', size => 40, value => $forum->{f_name} },
+        { type => 'text', field => 'Title', name => 'f_title', size => 40, value => $forum->{f_title} },
+        { type => 'textarea', field => 'Description', name => 'f_description', rows => 10, cols => 40, value => $forum->{f_description} },
+        { type => 'text', field => 'Show', name => 'f_show', size => 3, value => $forum->{f_show} },
+        { type => 'select', field => 'Admin Role', name => '_admin', options => \@options, selected => $forum->{_admin} },
+        { type => 'select', field => 'View Role', name => '_view', options => \@options, selected => $forum->{_view} },
+        { type => 'select', field => 'Moderator Role', name => '_moderator', options => \@options, selected => $forum->{_moderator} },
+        { type => 'submit', field => 'Actions', value => 'Save', cancel => 'edit_f_list.html' },
+    ]
+&>
+
+%# ----------------------------------------------------------------------------

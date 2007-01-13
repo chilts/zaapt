@@ -1,0 +1,51 @@
+%# --- ARGS -------------------------------------------------------------------
+<%args>
+    $zaapt
+    $my_roles
+</%args>
+%# --- INIT -------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Forum');
+    my $forums = $model->sel_forums_all();
+</%init>
+%# --- HTML -------------------------------------------------------------------
+<h1>Forum List</h1>
+
+% if ( exists $my_roles->{super} ) {
+<p>
+    * <a href="edit_f_add.html">Add Forum &raquo;</a><br />
+</p>
+% }
+
+<table class="edit">
+    <thead>
+        <tr>
+            <th class="list">Name</th>
+            <th class="action">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+% my $row = 1;
+% foreach my $forum ( @$forums ) {
+%     next unless exists $my_roles->{$forum->{_view}};
+        <tr class="r<% $row=1-$row %>">
+            <td>
+                <% $forum->{f_name} | h %>
+            </td>
+            <td>
+%         if ( exists $my_roles->{$forum->{_admin}} ) {
+                * <a href="edit_f_edit.html?f_id=<% $forum->{f_id} | u %>">Edit Details</a><br />
+%         }
+%         if ( exists $my_roles->{$forum->{_moderator}} ) {
+                * <a href="edit_t_list.html?f_id=<% $forum->{f_id} | u %>">Moderate</a><br />
+%         }
+%         if ( exists $my_roles->{$forum->{_admin}} ) {
+                * <a href="edit_f_del.html?f_id=<% $forum->{f_id} | u %>">Delete</a><br />
+%         }
+            </td>
+        </tr>
+% }
+    </tbody>
+</table>
+
+%# --- END --------------------------------------------------------------------

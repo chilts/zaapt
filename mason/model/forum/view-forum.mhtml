@@ -1,0 +1,172 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $a          => ''
+    $f_name
+    $a_id       => undef
+    $tp_subject => undef
+    $p_message  => undef
+    $t_id       => undef
+    $p          => 1
+    $tp_id      => undef
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Forum');
+    my $forum = $model->sel_forum_using_name({ f_name => $f_name} );
+    unless ( defined $forum ) {
+        $m->clear_buffer();
+        $m->abort(404);
+        return;
+    }
+
+    $p = 1 unless $p =~ m{ \A \d+ \z }xms;
+
+    # see if we want to insert a new topic
+    my $err = [];
+    if ( $a eq 'topic' ) {
+        # firstly, check the error cases
+        unless ( defined $a_id and defined $t_id ) {
+            $m->clear_buffer();
+            $m->redirect('?');
+            return;
+        }
+
+        # normal user errors
+        unless ( $tp_subject =~ m{ \S }xms ) {
+           push @$err, "Please enter a subject line";
+        }
+        unless ( $p_message =~ m{ \S }xms ) {
+           push @$err, "Please type something into your post";
+        }
+
+        unless ( @$err ) {
+            $model->ins_new_topic({
+                f_id       => $forum->{f_id},
+                a_id       => $a_id,
+                tp_subject => $tp_subject,
+                p_message  => $p_message,
+                t_id       => $t_id
+            });
+            $tp_subject = '';
+            $p_message = '';
+        }
+    }
+    elsif ( $a eq 'sticky-remove' ) {
+        # check they have moderator on this forum
+        if ( exists $SESS->{roles}{$forum->{_moderator}} ) {
+            $model->upd_topic({ tp_id => $tp_id, tp_sticky => 0 });
+        }
+    }
+    elsif ( $a eq 'sticky-add' ) {
+        # check they have moderator on this forum
+        if ( exists $SESS->{roles}{$forum->{_moderator}} ) {
+            $model->upd_topic({ tp_id => $tp_id, tp_sticky => 1 });
+        }
+    }
+    elsif ( $a eq 'locked-remove' ) {
+        # check they have moderator on this forum
+        if ( exists $SESS->{roles}{$forum->{_moderator}} ) {
+            $model->upd_topic({ tp_id => $tp_id, tp_locked => 0 });
+        }
+    }
+    elsif ( $a eq 'locked-add' ) {
+        # check they have moderator on this forum
+        if ( exists $SESS->{roles}{$forum->{_moderator}} ) {
+            $model->upd_topic({ tp_id => $tp_id, tp_locked => 1 });
+        }
+    }
+    elsif ( $a eq 'del' ) {
+        # check they have moderator on this forum
+        if ( exists $SESS->{roles}{$forum->{_moderator}} ) {
+            $model->del_topic({ tp_id => $tp_id });
+        }
+    }
+
+    my $topics = $model->sel_all_topics_in({ f_id => $forum->{f_id}, _offset => ($p-1) * $forum->{f_show}, _limit => $forum->{f_show} });
+</%init>
+%# ----------------------------------------------------------------------------
+<div class="z_forum">
+<h1><% $forum->{f_title} | h %></h1>
+
+<p>
+    <span class="floatright"><a href="#" onclick="removeElementClass('topic', 'hide');"><& /zaapt/common/icon.mhtml, name => 'script_add' &> New Topic &raquo;&raquo;</a></span>
+    <a href="../">&laquo; Back to Forum List</a>
+</p>
+
+<& /zaapt/common/err.mhtml, err => $err &>
+
+<div id="topic"<% @$err ? '' : ' class="hide"' %>>
+<& /zaapt/common/form.mhtml, action => '?', elements => [
+        { type => 'hidden', name => 'a', value => 'topic' },
+        { type => 'text', field => 'Subject', name => 'tp_subject', size => 40, value => $tp_subject || '' },
+        { type => 'textarea', field => 'Message', name => 'p_message', rows => 10, cols => 40, value => $p_message || '' },
+        { type => 'submit', field => 'Actions', value => 'Add Topic', cancel_js => "addElementClass('topic', 'hide');" },
+    ]
+&>
+</div>
+
+<p class="center">
+Page:
+% foreach my $page ( 1..($forum->{f_topics}/$forum->{f_show} + 1) ) {
+%     if ( $p == $page ) {
+    <% $page | h %>
+%     } else {
+    <a href="?p=<% $page | u %>"><% $page | h %></a>
+%     }
+% }
+</p>
+
+% if ( @$topics ) {
+
+<table width="100%">
+    <tr class="r0">
+        <th colspan="2">Topics</th>
+        <th>Poster</th>
+        <th>Posts</th>
+        <th>Last Post</th>
+    </tr>
+%     foreach my $topic ( @$topics ) {
+    <tr class="r1">
+        <td class="center">
+%         if ( $topic->{tp_sticky} ) {
+            <& /zaapt/common/icon.mhtml, name => 'script_key' &>
+%         } else {
+            <& /zaapt/common/icon.mhtml, name => 'script' &>
+%         }
+%         if ( $topic->{tp_locked} ) {
+            <& /zaapt/common/icon.mhtml, name => 'script_link' &>
+%         }
+        </td>
+        <td class="left">
+            <a href="<% $topic->{tp_id} | u %>.html"><% $topic->{tp_subject} | h %></a>
+%         if ( exists $SESS->{roles}{$forum->{_moderator}} ) {
+              <br />
+%             if ( $topic->{tp_sticky} ) {
+                  <a href="?a=sticky-remove&amp;tp_id=<% $topic->{tp_id} | u %>&amp;p=<% $p | u %>" title="Remove Stickiness"><& /zaapt/common/icon.mhtml, name => 'script' &></a>
+%             } else {
+                  <a href="?a=sticky-add&amp;tp_id=<% $topic->{tp_id} | u %>&amp;p=<% $p | u %>" title="Make Sticky"><& /zaapt/common/icon.mhtml, name => 'script_key' &></a>
+%             }
+%             if ( $topic->{tp_locked} ) {
+                  <a href="?a=locked-remove&amp;tp_id=<% $topic->{tp_id} | u %>&amp;p=<% $p | u %>" title="Remove Lock"><& /zaapt/common/icon.mhtml, name => 'script_go' &></a>
+%             } else {
+                  <a href="?a=locked-add&amp;tp_id=<% $topic->{tp_id} | u %>&amp;p=<% $p | u %>" title="Add Lock"><& /zaapt/common/icon.mhtml, name => 'script_link' &></a>
+%             }
+              <a href="?a=del&amp;tp_id=<% $topic->{tp_id} | u %>&amp;p=<% $p | u %>" title="Delete Topic"><& /zaapt/common/icon.mhtml, name => 'script_delete' &></a>
+%         }
+        </td>
+        <td class="center"><& /zaapt/common/a_username.mhtml, a_username => $topic->{a_username} &><br /></td>
+        <td class="center"><% $topic->{tp_posts} | h %></td>
+        <td class="right">
+            <& /zaapt/common/a_username.mhtml, a_username => $topic->{a_username} &>
+            <br style="clear: both;" />
+            <span class="footnote"><% $topic->{tp_updated} %></span>
+        </td>
+    </tr>
+%     }
+</table>
+% } else {
+<p>There are currently no topics here.</p>
+% }
+</div>
+%# ----------------------------------------------------------------------------

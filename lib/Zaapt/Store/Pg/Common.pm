@@ -17,6 +17,7 @@ my $type_cols = __PACKAGE__->_mk_cols( 't', qw(id name) );
 # type
 my $sel_all_types = "SELECT $type_cols FROM $type_tablename ORDER BY name";
 my $sel_type = __PACKAGE__->_mk_sel( 'common.type', 't', qw(id name) );
+my $sel_type_using_name = "SELECT $type_cols FROM $type_tablename WHERE t.name = ?";
 
 ## ----------------------------------------------------------------------------
 # methods
@@ -32,6 +33,11 @@ sub sel_all_types {
 sub sel_type {
     my ($self, $hr) = @_;
     return $self->_row( $sel_type, $hr->{t_id} );
+}
+
+sub sel_type_using_name {
+    my ($self, $hr) = @_;
+    return $self->_row( $sel_type_using_name, $hr->{t_name} );
 }
 
 sub _nuke {

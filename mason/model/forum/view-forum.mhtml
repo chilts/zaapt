@@ -120,14 +120,15 @@ Page:
 % if ( @$topics ) {
 
 <table width="100%">
-    <tr class="r0">
+    <tr>
         <th colspan="2">Topics</th>
-        <th>Poster</th>
+        <th>Author</th>
         <th>Posts</th>
         <th>Last Post</th>
     </tr>
+%     my $r = 0;
 %     foreach my $topic ( @$topics ) {
-    <tr class="r1">
+    <tr class="r<% $r=1-$r %>">
         <td class="center">
 %         if ( $topic->{tp_sticky} ) {
             <& /zaapt/common/icon.mhtml, name => 'script_key' &>
@@ -158,9 +159,13 @@ Page:
         <td class="center"><& /zaapt/common/a_username.mhtml, a_username => $topic->{a_username} &><br /></td>
         <td class="center"><% $topic->{tp_posts} | h %></td>
         <td class="right">
+%         if ( defined $topic->{po_username} ) {
             <& /zaapt/common/a_username.mhtml, a_username => $topic->{po_username} &>
             <br style="clear: both;" />
             <span class="footnote"><% $topic->{tp_updated} %></span>
+%         } else {
+            No Posts
+%         }
         </td>
     </tr>
 %     }

@@ -15,7 +15,7 @@ my $privilege_tablename = "account.privilege p";
 my $confirm_tablename = "account.confirm c";
 
 # helper
-my $account_cols = __PACKAGE__->_mk_cols( 'a', qw(id username firstname lastname email salt password confirmed admin) );
+my $account_cols = __PACKAGE__->_mk_cols( 'a', qw(id username firstname lastname email salt password confirmed admin ts:inserted ts:updated) );
 my $role_cols = __PACKAGE__->_mk_cols( 'r', qw(id name description) );
 my $privilege_cols = __PACKAGE__->_mk_cols( 'p', qw(account_id privilege_id) );
 my $confirm_cols = __PACKAGE__->_mk_cols( 'c', qw(account_id code) );

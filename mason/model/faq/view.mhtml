@@ -2,43 +2,20 @@
 <%args>
     $zaapt
     $f_name
+    $page
 </%args>
 %# ----------------------------------------------------------------------------
 <%init>
-    my $model = $zaapt->get_model('Faq');
-    my $faq = $model->sel_faq_using_name({ f_name => $f_name });
-
-    unless ( defined $faq ) {
+    if ( $page eq 'index' ) {
+        # main index page
+        $m->comp('/zaapt/model/faq/view-index.mhtml', zaapt => $ZAAPT, f_name => $f_name);
+    }
+    else {
+        # we do not know what this is
         $m->clear_buffer();
         $m->abort(404);
         return;
     }
-
-    my $questions = $model->sel_all_questions_in({ f_id => $faq->{f_id} });
+    return;
 </%init>
-%# ----------------------------------------------------------------------------
-<div class="z_faq">
-<h1><% $faq->{f_title} | h %></h1>
-% if ( @$questions ) {
-<ol>
-%     foreach my $q ( @$questions ) {
-    <li><a href="#<% $q->{f_name} | h %>_<% $q->{q_id} | h %>"><% $q->{q_question} | h %></a></li>
-%     }
-</ol>
-
-%     foreach my $q ( @$questions ) {
-<a name="<% $q->{f_name} | h %>_<% $q->{q_id} | h %>"></a>
-<p><strong>Q: <% $q->{q_question} | h %></strong></p>
-<& /zaapt/common/render.mhtml, t_name => $q->{t_name}, content => $q->{q_answer} &>
-%     }
-% } else {
-<p>There are currently no questions in this section.</p>
-% }
-</div>
-
-% if ( 0 ) {
-<pre>
-<% Data::Dumper->Dump([$faq, $questions], ['faq', 'questions']) | h %>
-</pre>
-% }
 %# ----------------------------------------------------------------------------

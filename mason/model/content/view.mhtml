@@ -2,7 +2,7 @@
 <%args>
     $zaapt
     $c_name
-    $p_name
+    $page
 </%args>
 %# ----------------------------------------------------------------------------
 <%init>
@@ -15,21 +15,16 @@
         return;
     }
 
-    my $page = $model->sel_page_using_name({ c_id => $content->{c_id}, p_name => $p_name });
+    my $page_model = $model->sel_page_using_name({ c_id => $content->{c_id}, p_name => $page });
 
-    unless ( defined $page ) {
+    unless ( defined $page_model ) {
         $m->clear_buffer();
         $m->abort(404);
         return;
     }
 </%init>
 %# ----------------------------------------------------------------------------
-% if ( 0 ) {
-<pre>
-<% Data::Dumper->Dump([$page], ['page']) | h %>
-</pre>
-% }
 <div "z_content">
-<& /zaapt/common/render.mhtml, t_name => $page->{t_name}, content => $page->{p_content} &>
+<& /zaapt/common/render.mhtml, t_name => $page_model->{t_name}, content => $page_model->{p_content} &>
 </div>
 %# ----------------------------------------------------------------------------

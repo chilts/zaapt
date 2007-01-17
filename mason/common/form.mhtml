@@ -9,21 +9,29 @@
 % foreach my $e ( @$elements ) {
 %     if ( defined $e->{field} ) {
     <tr>
-        <td class="r"><% $e->{field} | h %> :</td>
-        <td>
+        <td class="key"><% $e->{field} | h %><% $e->{field} eq '' ? '&nbsp;' : ' :' %></td>
+        <td class="val">
 %     }
 %     if ( $e->{type} eq 'text' ) {
             <input type="text" name="<% $e->{name} | h %>" value="<% $e->{value} | h %>"<% $e->{size} ? " size=\"$e->{size}\"" : ''%><% $e->{maxlength} && " maxlength=\"$e->{maxlength}\"" %> />\
+
+%     } elsif ( $e->{type} eq 'password' ) {
+            <input type="password" name="<% $e->{name} | h %>" value=""<% $e->{size} ? " size=\"$e->{size}\"" : ''%><% $e->{maxlength} && " maxlength=\"$e->{maxlength}\"" %> />\
 
 %     } elsif ( $e->{type} eq 'textarea' ) {
             <textarea name="<% $e->{name} | h %>"<% $e->{rows} && " rows=\"$e->{rows}\"" %><% $e->{cols} && " cols=\"$e->{cols}\"" %>><% $e->{value} | h %></textarea>\
 
 %     } elsif ( $e->{type} eq 'select' ) {
             <select name="<% $e->{name} | h %>">
-%         foreach ( @{$e->{options}} ) {
-                <option value="<% $_->{value} | h %>"<% $e->{selected} eq $_->{value} ? ' selected="selected"' : '' %>><% $_->{text} | h %></option>
+%         foreach my $o ( @{$e->{options}} ) {
+                <option value="<% $o->{value} | h %>"<% $e->{selected} eq $o->{value} ? ' selected="selected"' : '' %>><% $o->{text} | h %></option>
 %         }
             </select>
+
+%     } elsif ( $e->{type} eq 'radio' ) {
+%         foreach my $o ( @{$e->{options}} ) {
+                <input type="radio" name="<% $e->{name} | h %>" value="<% $o->{value} | h %>"<% $e->{checked} eq $o->{value} ? ' checked="checked"' : '' %> /><% $o->{name} | h %>
+%         }
 
 %     } elsif ( $e->{type} eq 'info' ) {
             <% $e->{value} | h %>\

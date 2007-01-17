@@ -10,6 +10,7 @@ CREATE TABLE account.account (
     firstname       TEXT NOT NULL,
     lastname        TEXT NOT NULL,
     email           TEXT NOT NULL,
+    notify          BOOLEAN NOT NULL DEFAULT False,
     salt            VARCHAR(8) NOT NULL,
     password        VARCHAR(32) NOT NULL,
     confirmed       BOOLEAN NOT NULL DEFAULT False,

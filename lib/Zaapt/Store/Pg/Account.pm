@@ -15,16 +15,16 @@ my $privilege_tablename = "account.privilege p";
 my $confirm_tablename = "account.confirm c";
 
 # helper
-my $account_cols = __PACKAGE__->_mk_cols( 'a', qw(id username firstname lastname email salt password confirmed admin ts:inserted ts:updated) );
+my $account_cols = __PACKAGE__->_mk_cols( 'a', qw(id username firstname lastname email notify salt password confirmed admin ts:inserted ts:updated) );
 my $role_cols = __PACKAGE__->_mk_cols( 'r', qw(id name description) );
 my $privilege_cols = __PACKAGE__->_mk_cols( 'p', qw(account_id privilege_id) );
 my $confirm_cols = __PACKAGE__->_mk_cols( 'c', qw(account_id code) );
 
 # account
-my $ins_account = "INSERT INTO account.account(username, firstname, lastname, email, salt, password, admin, confirmed) VALUES(?, ?, ?, ?, ?, md5(? || ?), COALESCE(?, False), COALESCE(?, False))";
+my $ins_account = "INSERT INTO account.account(username, firstname, lastname, email, notify, salt, password, admin, confirmed) VALUES(?, ?, ?, ?, ?, ?, md5(? || ?), COALESCE(?, False), COALESCE(?, False))";
 my $sel_account = "SELECT $account_cols FROM $account_tablename WHERE id = ?";
 my $sel_account_using_username = "SELECT $account_cols FROM $account_tablename WHERE username = ?";
-my $upd_account = __PACKAGE__->_mk_upd( 'account.account', 'id', qw(username firstname lastname email confirmed admin));
+my $upd_account = __PACKAGE__->_mk_upd( 'account.account', 'id', qw(username firstname lastname email notify confirmed admin));
 
 # role
 my $ins_role = __PACKAGE__->_mk_ins( 'account.role', qw(name description) );
@@ -49,7 +49,7 @@ my $sel_roles_for_account = "SELECT a.username AS a_username, r.id AS r_id, r.na
 
 sub ins_account {
     my ($self, $hr) = @_;
-    $self->_do( $ins_account, $hr->{a_username}, $hr->{a_firstname}, $hr->{a_lastname}, $hr->{a_email}, $hr->{a_salt}, $hr->{a_salt}, $hr->{a_password}, $hr->{a_admin}, $hr->{a_confirmed} );
+    $self->_do( $ins_account, $hr->{a_username}, $hr->{a_firstname}, $hr->{a_lastname}, $hr->{a_email}, $hr->{a_notify}, $hr->{a_salt}, $hr->{a_salt}, $hr->{a_password}, $hr->{a_admin}, $hr->{a_confirmed} );
 }
 
 sub ins_privilege {
@@ -67,6 +67,11 @@ sub sel_roles_for_account {
     return $self->_rows( $sel_roles_for_account, $hr->{a_id} );
 }
 
+sub sel_account {
+    my ($self, $hr) = @_;
+    return $self->_row( $sel_account, $hr->{a_id} );
+}
+
 sub sel_account_using_username {
     my ($self, $hr) = @_;
     return $self->_row( $sel_account_using_username, $hr->{a_username} );
@@ -79,7 +84,7 @@ sub sel_account_for_authentication {
 
 sub upd_account {
     my ($self, $hr) = @_;
-    $self->_do( $upd_account, $hr->{a_username}, $hr->{a_firstname}, $hr->{a_lastname}, $hr->{a_email}, $hr->{a_confirmed}, $hr->{a_admin}, $hr->{a_id} );
+    $self->_do( $upd_account, $hr->{a_username}, $hr->{a_firstname}, $hr->{a_lastname}, $hr->{a_email}, $hr->{a_notify}, $hr->{a_confirmed}, $hr->{a_admin}, $hr->{a_id} );
 }
 
 sub ins_confirm {

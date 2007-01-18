@@ -34,6 +34,9 @@
             </td>
             <td>
 %         if ( exists $my_roles->{$faq->{_edit}} ) {
+%             if ( exists $my_roles->{$faq->{_admin}} ) {
+                * <a href="edit_f_edit.html?f_id=<% $faq->{f_id} | u %>">Edit Details</a><br />
+%             }
                 * <a href="edit_q_add.html?f_id=<% $faq->{f_id} | u %>">Add Question</a><br />
                 * <a href="edit_q_list.html?f_id=<% $faq->{f_id} | u %>">Question List</a><br />
 %             if ( exists $my_roles->{$faq->{_admin}} ) {

@@ -24,7 +24,7 @@ my $q_t_join = "JOIN $type_tablename ON (q.type_id = t.id)";
 
 # faq
 my $ins_faq = __PACKAGE__->_mk_ins( 'faq.faq', 'name', 'title', 'description', 'admin_id', 'view_id', 'edit_id' );
-my $upd_faq = __PACKAGE__->_mk_upd( 'faq.faq', 'id', qw(name title) ); # TODO: the privilege cols
+my $upd_faq = __PACKAGE__->_mk_upd( 'faq.faq', 'id', qw(name title description admin_id view_id edit_id) );
 my $del_faq = __PACKAGE__->_mk_del('faq.faq', 'id');
 my $sel_faq = "SELECT $faq_cols FROM $faq_tablename WHERE f.id = ?";
 my $sel_faq_all = "SELECT $faq_cols FROM $faq_tablename ORDER BY f.name";
@@ -52,7 +52,7 @@ sub ins_faq {
 
 sub upd_faq {
     my ($self, $hr) = @_;
-    $self->_do( $upd_faq, $hr->{f_name}, $hr->{f_title}, $hr->{f_id} );
+    $self->_do( $upd_faq, $hr->{f_name}, $hr->{f_title}, $hr->{f_description}, $hr->{_admin}, $hr->{_view}, $hr->{_edit}, $hr->{f_id} );
 }
 
 sub del_faq {

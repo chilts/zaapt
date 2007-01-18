@@ -1,0 +1,42 @@
+%# ----------------------------------------------------------------------------
+<%once>
+    use Zaapt::Utils::Valid;
+</%once>
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $my_roles
+    $f_id => undef
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Faq');
+    my $faq = $model->sel_faq({ f_id => $f_id });
+
+    # check the error conditions first - we need to recover
+    $m->redirect('edit_f_list.html') unless defined $faq;
+    $m->redirect('edit_f_list.html?f_id=$faq->{f_id}') unless exists $my_roles->{$faq->{_admin}};
+
+    my $roles = $zaapt->get_model('Account')->sel_all_roles();
+    my @options = map { { value => $_->{r_id}, text => $_->{r_name} } } @$roles;
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Edit a Faq</h1>
+
+<p><a href="edit_f_list.html">&laquo; Back to Faq List</a></p>
+
+<h2>FAQ: <% $faq->{f_name} | h %> - <% $faq->{f_title} | h %></h2>
+
+<& /zaapt/common/form.mhtml, action => 'edit_f_upd.html', elements => [
+        { type => 'hidden', name => 'f_id', value => $f_id },
+        { type => 'text', field => 'Name', name => 'f_name', size => 40, value => $faq->{f_name} },
+        { type => 'text', field => 'Title', name => 'f_title', size => 40, value => $faq->{f_title} },
+        { type => 'textarea', field => 'Description', name => 'f_description', rows => 10, cols => 40, value => $faq->{f_description} },
+        { type => 'select', field => 'Admin Role', name => '_admin', options => \@options, selected => $faq->{_admin} },
+        { type => 'select', field => 'View Role', name => '_view', options => \@options, selected => $faq->{_view} },
+        { type => 'select', field => 'Edit Role', name => '_edit', options => \@options, selected => $faq->{_moderator} },
+        { type => 'submit', field => 'Actions', value => 'Save', cancel => 'edit_f_list.html' },
+    ]
+&>
+
+%# ----------------------------------------------------------------------------

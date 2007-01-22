@@ -49,13 +49,13 @@ my $sel_topic = "SELECT $forum_cols, $topic_cols FROM $forum_tablename $f_tp_joi
 my $sel_topic_if_forum = "SELECT $forum_cols, $topic_cols FROM $forum_tablename $f_tp_join $f_tp_join WHERE f.id = ? AND tp.id = ?";
 my $sel_all_topics_in = "SELECT $forum_cols, $topic_cols, $account_cols, $poster_cols FROM $forum_tablename $f_tp_join $tp_a_join $tp_po_join WHERE f.id = ? ORDER BY tp.sticky DESC, tp.updated DESC";
 my $sel_all_topics_in_offset = "SELECT $forum_cols, $topic_cols, $account_cols, $poster_cols FROM $forum_tablename $f_tp_join $tp_a_join $tp_po_join WHERE f.id = ? ORDER BY tp.sticky DESC, tp.updated DESC LIMIT ? OFFSET ?";
-my $sel_latest_topics = "SELECT $forum_cols, $topic_cols FROM $forum_tablename $f_tp_join $f_tp_join WHERE f.id = ? ORDER BY tp.inserted LIMIT ?";
-my $sel_archive_topics = "SELECT $forum_cols, $topic_cols FROM $forum_tablename $f_tp_join $f_tp_join WHERE f.id = ? AND tp.inserted >= ?::DATE AND tp.inserted <= ?::DATE + ?::INTERVAL ORDER BY tp.inserted";
+my $sel_latest_topics = "SELECT $forum_cols, $topic_cols FROM $forum_tablename $f_tp_join $f_tp_join WHERE f.id = ? ORDER BY tp.inserted DESC LIMIT ?";
+my $sel_archive_topics = "SELECT $forum_cols, $topic_cols FROM $forum_tablename $f_tp_join $f_tp_join WHERE f.id = ? AND tp.inserted >= ?::DATE AND tp.inserted <= ?::DATE + ?::INTERVAL ORDER BY tp.inserted DESC";
 
 # posts
 my $ins_post = __PACKAGE__->_mk_ins( 'forum.post', qw(topic_id account_id message type_id) );
-my $sel_all_posts_in = "SELECT $forum_cols, $topic_cols, $post_cols, $type_cols, $account_cols FROM $forum_tablename $f_tp_join $tp_p_join $p_t_join $p_a_join WHERE tp.id = ? ORDER BY p.inserted DESC";
-my $sel_all_posts_in_offset = "SELECT $forum_cols, $topic_cols, $post_cols, $type_cols, $account_cols FROM $forum_tablename $f_tp_join $tp_p_join $p_t_join $p_a_join WHERE tp.id = ? ORDER BY p.inserted DESC LIMIT ? OFFSET ?";
+my $sel_all_posts_in = "SELECT $forum_cols, $topic_cols, $post_cols, $type_cols, $account_cols FROM $forum_tablename $f_tp_join $tp_p_join $p_t_join $p_a_join WHERE tp.id = ? ORDER BY p.inserted";
+my $sel_all_posts_in_offset = "SELECT $forum_cols, $topic_cols, $post_cols, $type_cols, $account_cols FROM $forum_tablename $f_tp_join $tp_p_join $p_t_join $p_a_join WHERE tp.id = ? ORDER BY p.inserted LIMIT ? OFFSET ?";
 my $del_posts_for_topic = __PACKAGE__->_mk_del( 'forum.post', 'topic_id' );
 
 ## ----------------------------------------------------------------------------

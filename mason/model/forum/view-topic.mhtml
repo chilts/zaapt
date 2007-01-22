@@ -7,7 +7,7 @@
     $a_id      => undef
     $p_message => undef
     $t_id      => undef
-    $p          => 1
+    $p         => 1
 </%args>
 %# ----------------------------------------------------------------------------
 <%init>
@@ -90,7 +90,8 @@
 
 <p class="center">
 Page:
-% foreach my $page ( 1..(($topic->{tp_posts}-1)/$forum->{f_show} + 1) ) {
+% my $last_page_number = ( ($topic->{tp_posts}-1) / $forum->{f_show} ) + 1;
+% foreach my $page ( 1..$last_page_number ) {
 %     if ( $p == $page ) {
     <% $page | h %>
 %     } else {

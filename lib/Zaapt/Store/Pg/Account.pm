@@ -25,6 +25,7 @@ my $ins_account = "INSERT INTO account.account(username, firstname, lastname, em
 my $sel_account = "SELECT $account_cols FROM $account_tablename WHERE id = ?";
 my $sel_account_using_username = "SELECT $account_cols FROM $account_tablename WHERE username = ?";
 my $upd_account = __PACKAGE__->_mk_upd( 'account.account', 'id', qw(username firstname lastname email notify confirmed admin));
+my $upd_password = "UPDATE account.account SET password = md5(salt || ?) WHERE id = ?";
 
 # role
 my $ins_role = __PACKAGE__->_mk_ins( 'account.role', qw(name description) );
@@ -85,6 +86,11 @@ sub sel_account_for_authentication {
 sub upd_account {
     my ($self, $hr) = @_;
     $self->_do( $upd_account, $hr->{a_username}, $hr->{a_firstname}, $hr->{a_lastname}, $hr->{a_email}, $hr->{a_notify}, $hr->{a_confirmed}, $hr->{a_admin}, $hr->{a_id} );
+}
+
+sub upd_password {
+    my ($self, $hr) = @_;
+    $self->_do( $upd_password, $hr->{a_password}, $hr->{a_id} );
 }
 
 sub ins_confirm {

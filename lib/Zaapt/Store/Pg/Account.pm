@@ -15,7 +15,7 @@ my $privilege_tablename = "account.privilege p";
 my $confirm_tablename = "account.confirm c";
 
 # helper
-my $account_cols = __PACKAGE__->_mk_cols( 'a', qw(id username firstname lastname email notify salt password confirmed admin ts:inserted ts:updated) );
+my $account_cols = __PACKAGE__->_mk_cols( 'a', qw(id username firstname lastname email notify salt password confirmed admin logins last ts:inserted ts:updated) );
 my $role_cols = __PACKAGE__->_mk_cols( 'r', qw(id name description) );
 my $privilege_cols = __PACKAGE__->_mk_cols( 'p', qw(account_id privilege_id) );
 my $confirm_cols = __PACKAGE__->_mk_cols( 'c', qw(account_id code) );
@@ -26,6 +26,7 @@ my $sel_account = "SELECT $account_cols FROM $account_tablename WHERE id = ?";
 my $sel_account_using_username = "SELECT $account_cols FROM $account_tablename WHERE username = ?";
 my $upd_account = __PACKAGE__->_mk_upd( 'account.account', 'id', qw(username firstname lastname email notify confirmed admin));
 my $upd_password = "UPDATE account.account SET password = md5(salt || ?) WHERE id = ?";
+my $upd_last_login = "UPDATE account.account SET logins = logins + 1, last = CURRENT_TIMESTAMP WHERE id = ?";
 
 # role
 my $ins_role = __PACKAGE__->_mk_ins( 'account.role', qw(name description) );
@@ -91,6 +92,11 @@ sub upd_account {
 sub upd_password {
     my ($self, $hr) = @_;
     $self->_do( $upd_password, $hr->{a_password}, $hr->{a_id} );
+}
+
+sub upd_last_login {
+    my ($self, $hr) = @_;
+    $self->_do( $upd_last_login, $hr->{a_id} );
 }
 
 sub ins_confirm {

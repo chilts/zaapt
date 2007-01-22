@@ -17,7 +17,7 @@ my $account_tablename = "account.account a";
 my $poster_tablename = "account.account po";
 
 # helper
-my $forum_cols = __PACKAGE__->_mk_cols( 'f', qw(id name title description show topics posts poster_id r:admin_id r:view_id r:moderator_id) );
+my $forum_cols = __PACKAGE__->_mk_cols( 'f', qw(id name title description show topics posts poster_id r:admin_id r:view_id r:moderator_id ts:inserted ts:updated) );
 my $topic_cols = __PACKAGE__->_mk_cols( 'tp', qw(id forum_id account_id subject sticky locked posts poster_id ts:inserted ts:updated) );
 my $post_cols = __PACKAGE__->_mk_cols( 'p', qw(id topic_id account_id message type_id ts:inserted ts:updated) );
 my $type_cols = __PACKAGE__->_mk_cols( 't', qw(id name) );

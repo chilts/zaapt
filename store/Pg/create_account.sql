@@ -15,6 +15,8 @@ CREATE TABLE account.account (
     password        VARCHAR(32) NOT NULL,
     confirmed       BOOLEAN NOT NULL DEFAULT False,
     admin           BOOLEAN NOT NULL DEFAULT False,
+    logins          INTEGER NOT NULL DEFAULT 0,
+    last            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     UNIQUE(username),
     LIKE base       INCLUDING DEFAULTS

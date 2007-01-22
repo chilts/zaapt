@@ -63,7 +63,7 @@
 
 <& /zaapt/common/err.mhtml, err => $err &>
 
-<& /zaapt/common/form.mhtml, action => 'edit_f_ins.html', elements => [
+<& /zaapt/common/form.mhtml, action => 'edit_f_upd.html', elements => [
         { type => 'text', field => 'Name', name => 'f_name', size => 40, value => $f_name },
         { type => 'text', field => 'Title', name => 'f_title', size => 40, value => $f_title },
         { type => 'textarea', field => 'Description', name => 'f_description', rows => 10, cols => 40, value => $f_description },

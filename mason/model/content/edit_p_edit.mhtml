@@ -40,7 +40,7 @@
         { type => 'text', field => 'Page', name => 'p_name', value => $page->{p_name} },
         { type => 'textarea', field => 'Content', name => 'p_content', rows => 10, cols => 40, value => $page->{p_content} },
         { type => 'select', field => 'Type', name => 't_id', selected => $page->{t_id}, options => \@options },
-        { type => 'submit', field => 'Actions', value => 'Save Page', cancel => 'edit_c_list.html?c_name=' . uri_escape($page->{c_name}) },
+        { type => 'submit', field => 'Actions', value => 'Save Page', cancel => 'edit_p_list.html?c_id=' . uri_escape($page->{c_id}) },
     ]
 &>
 

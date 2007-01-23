@@ -24,7 +24,7 @@
     }
 </%init>
 %# ----------------------------------------------------------------------------
-<div "z_content">
+<div class="z_content">
 <& /zaapt/common/render.mhtml, t_name => $page_model->{t_name}, content => $page_model->{p_content} &>
 </div>
 %# ----------------------------------------------------------------------------

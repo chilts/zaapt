@@ -5,6 +5,11 @@
 </%args>
 %# ----------------------------------------------------------------------------
 <form action="<% $action || '?' %>" method="post">
+% foreach my $e ( @$elements ) {
+%     if ( $e->{type} eq 'hidden' ) {
+<input type="hidden" name="<% $e->{name} | h %>" value="<% $e->{value} | h %>" />\
+%     }
+% }
 <table>
 % foreach my $e ( @$elements ) {
 %     if ( defined $e->{field} ) {
@@ -43,7 +48,6 @@
             <% $e->{value} %>\
 
 %     } elsif ( $e->{type} eq 'hidden' ) {
-            <input type="hidden" name="<% $e->{name} | h %>" value="<% $e->{value} | h %>" />\
 
 %     } elsif ( $e->{type} eq 'read' ) {
             <% $e->{value} | h %>\

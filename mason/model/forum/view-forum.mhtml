@@ -108,7 +108,8 @@
 
 <p class="center">
 Page:
-% foreach my $page ( 1..($forum->{f_topics}/$forum->{f_show} + 1) ) {
+% my $last_page_number = ( ($forum->{f_topics}-1) / $forum->{f_show} ) + 1;
+% foreach my $page ( 1..$last_page_number ) {
 %     if ( $p == $page ) {
     <% $page | h %>
 %     } else {

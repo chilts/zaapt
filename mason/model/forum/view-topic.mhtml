@@ -111,9 +111,9 @@
 <p>
     <span class="floatright">
 % if ( $SESS->{roles}{$forum->{_moderator}} or !$topic->{tp_locked} ) {
-        <a href="#" onclick="removeElementClass('reply1', 'hide');"><& /zaapt/common/icon.mhtml, name => 'script_add' &> Reply &raquo;&raquo;</a>
+        <a href="#" onclick="removeElementClass('reply1', 'hide');"><& /zaapt/common/icon.mhtml, name => 'script_add', title => 'Reply' &> Reply &raquo;&raquo;</a>
 % } else {
-        <& /zaapt/common/icon.mhtml, name => 'script_link' &> Locked
+        <& /zaapt/common/icon.mhtml, name => 'script_link', title => 'Locked' &> Locked
 % }
 % if ( $SESS->{roles}{$forum->{_moderator}} ) {
         <br />
@@ -201,9 +201,9 @@ Page:
 <p>
     <span class="floatright">
 % if ( $SESS->{roles}{$forum->{_moderator}} or !$topic->{tp_locked} ) {
-        <a href="#" onclick="removeElementClass('reply2', 'hide'); return false;"><& /zaapt/common/icon.mhtml, name => 'script_add' &> Reply &raquo;&raquo;</a>
+        <a href="#" onclick="removeElementClass('reply2', 'hide'); return false;"><& /zaapt/common/icon.mhtml, name => 'script_add', title => 'Reply' &> Reply &raquo;&raquo;</a>
 % } else {
-        <& /zaapt/common/icon.mhtml, name => 'script_link' &> Locked
+        <& /zaapt/common/icon.mhtml, name => 'script_link', title => 'Locked' &> Locked
 % }
     </span>
     &nbsp;

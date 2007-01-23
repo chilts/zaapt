@@ -1,4 +1,10 @@
 %# ----------------------------------------------------------------------------
+<%doc>
+    Args:
+
+    $p - page
+</%doc>
+%# ----------------------------------------------------------------------------
 <%args>
     $zaapt
     $a         => ''
@@ -9,6 +15,18 @@
     $t_id      => undef
     $p         => 1
 </%args>
+%# ----------------------------------------------------------------------------
+<%once>
+    my $allowed = {
+        moderator => {
+            'sticky-remove' => 1,
+            'sticky-add'    => 1,
+            'locked-add'    => 1,
+            'locked-remove' => 1,
+            'del'           => 1,
+        },
+    };
+</%once>
 %# ----------------------------------------------------------------------------
 <%init>
     my $model = $zaapt->get_model('Forum');
@@ -44,16 +62,44 @@
             $m->redirect('?');
             return;
         }
+
         if ( $p_message =~ m{ \S }xms ) {
             $model->ins_post({ tp_id => $tp_id, a_id => $a_id, p_message => $p_message, t_id => $t_id });
             $p_message = '';
             $m->clear_buffer();
-            $m->redirect('?');
+            $m->redirect("?p=$p");
             return;
         }
         else {
             push @$err, "Please type something into your reply";
         }
+    }
+    elsif ( exists $allowed->{moderator}{$a} ) {
+        # these actions are just for moderators, so make sure they are one
+        if ( exists $SESS->{roles}{$forum->{_moderator}} ) {
+            if ( $a eq 'sticky-remove' ) {
+                $model->upd_topic({ tp_id => $tp_id, tp_sticky => 0 });
+            }
+            elsif ( $a eq 'sticky-add' ) {
+                $model->upd_topic({ tp_id => $tp_id, tp_sticky => 1 });
+            }
+            elsif ( $a eq 'locked-remove' ) {
+                $model->upd_topic({ tp_id => $tp_id, tp_locked => 0 });
+            }
+            elsif ( $a eq 'locked-add' ) {
+                $model->upd_topic({ tp_id => $tp_id, tp_locked => 1 });
+            }
+            elsif ( $a eq 'del' ) {
+                $model->del_topic({ tp_id => $tp_id });
+                $m->clear_buffer();
+                $m->redirect('./');
+                return;
+            }
+        }
+        # redirect to the main page whatever happened above
+        $m->clear_buffer();
+        $m->redirect('?');
+        return;
     }
 
     my $posts = $model->sel_all_posts_in({ tp_id => $tp_id, _offset => ($p-1) * $forum->{f_show}, _limit => $forum->{f_show} });
@@ -65,22 +111,39 @@
 <p>
     <span class="floatright">
 % if ( $SESS->{roles}{$forum->{_moderator}} or !$topic->{tp_locked} ) {
-        <a href="#" onclick="removeElementClass('reply', 'hide');"><& /zaapt/common/icon.mhtml, name => 'script_add' &> Reply &raquo;&raquo;</a>
+        <a href="#" onclick="removeElementClass('reply1', 'hide');"><& /zaapt/common/icon.mhtml, name => 'script_add' &> Reply &raquo;&raquo;</a>
 % } else {
         <& /zaapt/common/icon.mhtml, name => 'script_link' &> Locked
 % }
+% if ( $SESS->{roles}{$forum->{_moderator}} ) {
+        <br />
+%     if ( $topic->{tp_sticky} ) {
+        <a href="?a=sticky-remove&amp;tp_id=<% $topic->{tp_id} | u %>&amp;p=<% $p | u %>" title="Remove Stickiness"><& /zaapt/common/icon.mhtml, name => 'script', title => 'Remove Stickiness' &></a>
+%     } else {
+        <a href="?a=sticky-add&amp;tp_id=<% $topic->{tp_id} | u %>&amp;p=<% $p | u %>" title="Make Sticky"><& /zaapt/common/icon.mhtml, name => 'script_key', title => 'Make Sticky' &></a>
+%     }
+%     if ( $topic->{tp_locked} ) {
+        <a href="?a=locked-remove&amp;tp_id=<% $topic->{tp_id} | u %>&amp;p=<% $p | u %>" title="Remove Lock"><& /zaapt/common/icon.mhtml, name => 'script_go', title => 'Remove Lock' &></a>
+%     } else {
+        <a href="?a=locked-add&amp;tp_id=<% $topic->{tp_id} | u %>&amp;p=<% $p | u %>" title="Add Lock"><& /zaapt/common/icon.mhtml, name => 'script_link', title => 'Add Lock' &></a>
+%     }
+      <a href="?a=del&amp;tp_id=<% $topic->{tp_id} | u %>&amp;p=<% $p | u %>" title="Delete Topic"><& /zaapt/common/icon.mhtml, name => 'script_delete', title => 'Delete Topic' &></a>
+% }
     </span>
+    <a href="../">&laquo; Back to Main Forums</a>
+    <br />
     <a href="./">&laquo; Back to Topic List</a>
 </p>
 
 <& /zaapt/common/err.mhtml, err => $err &>
 
 % if ( $SESS->{roles}{$forum->{_moderator}} or !$topic->{tp_locked} ) {
-<div id="reply"<% @$err ? '' : ' class="hide"' %>>
+<div id="reply1"<% @$err ? '' : ' class="hide"' %>>
 <& /zaapt/common/form.mhtml, action => '?', elements => [
         { type => 'hidden', name => 'a', value => 'reply' },
+        { type => 'hidden', name => 'p', value => $p },
         { type => 'textarea', field => 'Message', name => 'p_message', rows => 10, cols => 40, value => $p_message || '' },
-        { type => 'submit', field => 'Actions', value => 'Post', cancel_js => "addElementClass('reply', 'hide');" },
+        { type => 'submit', field => 'Actions', value => 'Post', cancel_js => "addElementClass('reply1', 'hide');" },
     ]
 &>
 </div>
@@ -116,6 +179,13 @@ Page:
             Joined: <% $post->{a_inserted} | h %><br />
             Posts: ToDo<br />
             </span>
+
+%         if ( $SESS->{roles}{$forum->{_moderator}} ) {
+            <a href="moderator-edit-post.html?p_id=<% $post->{p_id} | u %>&amp;p=<% $p | u %>" title="Edit Post"><& /zaapt/common/icon.mhtml, name => 'script_edit', title => 'Edit Post' &> Edit Post</a>
+            <br />
+            <a href="moderator-del-post.html?p_id=<% $post->{p_id} | u %>&amp;p=<% $p | u %>" title="Del Post"><& /zaapt/common/icon.mhtml, name => 'script_delete', title => 'Del Post' &> Del Post</a>
+%         }
+
         </td>
         <td class="top">
             <& /zaapt/common/render.mhtml, t_name => $post->{t_name}, content => $post->{p_message} &>
@@ -127,5 +197,29 @@ Page:
 % } else {
 <p>There are currently no topics here.</p>
 % }
+
+<p>
+    <span class="floatright">
+% if ( $SESS->{roles}{$forum->{_moderator}} or !$topic->{tp_locked} ) {
+        <a href="#" onclick="removeElementClass('reply2', 'hide'); return false;"><& /zaapt/common/icon.mhtml, name => 'script_add' &> Reply &raquo;&raquo;</a>
+% } else {
+        <& /zaapt/common/icon.mhtml, name => 'script_link' &> Locked
+% }
+    </span>
+    &nbsp;
+</p>
+
+% if ( $SESS->{roles}{$forum->{_moderator}} or !$topic->{tp_locked} ) {
+<div id="reply2"<% @$err ? '' : ' class="hide"' %>>
+<& /zaapt/common/form.mhtml, action => '?', elements => [
+        { type => 'hidden', name => 'a', value => 'reply' },
+        { type => 'hidden', name => 'p', value => $p },
+        { type => 'textarea', field => 'Message', name => 'p_message', rows => 10, cols => 40, value => $p_message || '' },
+        { type => 'submit', field => 'Actions', value => 'Post', cancel_js => "addElementClass('reply2', 'hide');" },
+    ]
+&>
+</div>
+% }
+
 </div>
 %# ----------------------------------------------------------------------------

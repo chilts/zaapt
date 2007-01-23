@@ -91,7 +91,7 @@
 
 <p>
     <span class="floatright"><a href="#" onclick="removeElementClass('topic', 'hide');"><& /zaapt/common/icon.mhtml, name => 'script_add' &> New Topic &raquo;&raquo;</a></span>
-    <a href="../">&laquo; Back to Forum List</a>
+    <a href="../">&laquo; Back to Main Forums</a>
 </p>
 
 <& /zaapt/common/err.mhtml, err => $err &>
@@ -144,16 +144,16 @@ Page:
 %         if ( exists $SESS->{roles}{$forum->{_moderator}} ) {
               <br />
 %             if ( $topic->{tp_sticky} ) {
-                  <a href="?a=sticky-remove&amp;tp_id=<% $topic->{tp_id} | u %>&amp;p=<% $p | u %>" title="Remove Stickiness"><& /zaapt/common/icon.mhtml, name => 'script' &></a>
+                  <a href="?a=sticky-remove&amp;tp_id=<% $topic->{tp_id} | u %>&amp;p=<% $p | u %>" title="Remove Stickiness"><& /zaapt/common/icon.mhtml, name => 'script', title => 'Remove Stickiness' &></a>
 %             } else {
-                  <a href="?a=sticky-add&amp;tp_id=<% $topic->{tp_id} | u %>&amp;p=<% $p | u %>" title="Make Sticky"><& /zaapt/common/icon.mhtml, name => 'script_key' &></a>
+                  <a href="?a=sticky-add&amp;tp_id=<% $topic->{tp_id} | u %>&amp;p=<% $p | u %>" title="Make Sticky"><& /zaapt/common/icon.mhtml, name => 'script_key', title => 'Make Sticky' &></a>
 %             }
 %             if ( $topic->{tp_locked} ) {
-                  <a href="?a=locked-remove&amp;tp_id=<% $topic->{tp_id} | u %>&amp;p=<% $p | u %>" title="Remove Lock"><& /zaapt/common/icon.mhtml, name => 'script_go' &></a>
+                  <a href="?a=locked-remove&amp;tp_id=<% $topic->{tp_id} | u %>&amp;p=<% $p | u %>" title="Remove Lock"><& /zaapt/common/icon.mhtml, name => 'script_go', title => 'Remove Lock' &></a>
 %             } else {
-                  <a href="?a=locked-add&amp;tp_id=<% $topic->{tp_id} | u %>&amp;p=<% $p | u %>" title="Add Lock"><& /zaapt/common/icon.mhtml, name => 'script_link' &></a>
+                  <a href="?a=locked-add&amp;tp_id=<% $topic->{tp_id} | u %>&amp;p=<% $p | u %>" title="Add Lock"><& /zaapt/common/icon.mhtml, name => 'script_link', title => 'Add Lock' &></a>
 %             }
-              <a href="?a=del&amp;tp_id=<% $topic->{tp_id} | u %>&amp;p=<% $p | u %>" title="Delete Topic"><& /zaapt/common/icon.mhtml, name => 'script_delete' &></a>
+              <a href="?a=del&amp;tp_id=<% $topic->{tp_id} | u %>&amp;p=<% $p | u %>" title="Delete Topic"><& /zaapt/common/icon.mhtml, name => 'script_delete', title => 'Delete Topic' &></a>
 %         }
         </td>
         <td class="center"><& /zaapt/common/a_username.mhtml, a_username => $topic->{a_username} &><br /></td>
@@ -162,7 +162,7 @@ Page:
 %         if ( defined $topic->{po_username} ) {
             <& /zaapt/common/a_username.mhtml, a_username => $topic->{po_username} &>
             <br style="clear: both;" />
-            <span class="footnote"><% $topic->{tp_updated} %></span>
+            <span class="footnote"><% $topic->{f_updated} %></span>
 %         } else {
             No Posts
 %         }

@@ -1,0 +1,78 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $my_roles
+    $a         => ''
+    $f_name
+    $p_id      => undef
+    $p_message => undef
+    $p         => 1
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Forum');
+
+    my $post = $model->sel_post({ p_id => $p_id });
+
+    # check this post exists
+    unless ( defined $post ) {
+        $m->clear_buffer();
+        $m->abort(404);
+        return;
+    }
+
+    # check they are allowed to moderate this post
+    unless ( exists $my_roles->{$post->{_moderator}} ) {
+        $m->clear_buffer();
+        $m->abort(403);
+        return;
+    }
+
+    # now user errors
+    my $err = [];
+
+    if ( $a eq 'upd' ) {
+        # firstly, check the error cases
+        unless ( defined $p_message ) {
+            $m->clear_buffer();
+            $m->redirect('?');
+            return;
+        }
+
+        # normal user errors
+        unless ( $p_message =~ m{ \S }xms ) {
+           push @$err, "please type something into the post";
+        }
+
+        unless ( @$err ) {
+            # save the post
+            $model->upd_post({
+                p_message => $p_message,
+                p_id      => $p_id,
+            });
+            $m->clear_buffer();
+            $m->redirect("$post->{tp_id}.html?p=$p");
+            return;
+        }
+    }
+</%init>
+%# ----------------------------------------------------------------------------
+<div class="z_forum">
+
+<h1><% $post->{f_title} | h %></h1>
+
+<& /zaapt/common/err.mhtml, err => $err &>
+
+<h2><% $post->{tp_subject} | h %></h2>
+
+<& /zaapt/common/form.mhtml, action => '?', elements => [
+        { type => 'hidden', name => 'a', value => 'upd' },
+        { type => 'hidden', name => 'p_id', value => $p_id },
+        { type => 'hidden', name => 'p', value => $p },
+        { type => 'textarea', field => 'Message', name => 'p_message', rows => 10, cols => 40, value => $post->{p_message} },
+        { type => 'submit', field => 'Actions', value => 'Save', cancel_href => "$post->{tp_id}.html?p=$p" },
+    ]
+&>
+
+</div>
+%# ----------------------------------------------------------------------------

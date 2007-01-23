@@ -54,6 +54,9 @@ my $sel_archive_topics = "SELECT $forum_cols, $topic_cols FROM $forum_tablename 
 
 # posts
 my $ins_post = __PACKAGE__->_mk_ins( 'forum.post', qw(topic_id account_id message type_id) );
+my $upd_post = __PACKAGE__->_mk_upd( 'forum.post', 'id', qw(topic_id account_id message type_id));
+my $del_post = __PACKAGE__->_mk_del( 'forum.post', 'id' );
+my $sel_post = "SELECT $forum_cols, $topic_cols, $post_cols FROM $forum_tablename $f_tp_join $tp_p_join WHERE p.id = ?";
 my $sel_all_posts_in = "SELECT $forum_cols, $topic_cols, $post_cols, $type_cols, $account_cols FROM $forum_tablename $f_tp_join $tp_p_join $p_t_join $p_a_join WHERE tp.id = ? ORDER BY p.inserted";
 my $sel_all_posts_in_offset = "SELECT $forum_cols, $topic_cols, $post_cols, $type_cols, $account_cols FROM $forum_tablename $f_tp_join $tp_p_join $p_t_join $p_a_join WHERE tp.id = ? ORDER BY p.inserted LIMIT ? OFFSET ?";
 my $del_posts_for_topic = __PACKAGE__->_mk_del( 'forum.post', 'topic_id' );
@@ -154,9 +157,25 @@ sub ins_post {
     $self->_do( $ins_post, $hr->{tp_id}, $hr->{a_id}, $hr->{p_message}, $hr->{t_id} );
 }
 
+sub upd_post {
+    my ($self, $hr) = @_;
+    $self->_do( $upd_post, $hr->{tp_id}, $hr->{a_id}, $hr->{p_message}, $hr->{t_id}, $hr->{p_id} );
+}
+
+sub sel_post {
+    my ($self, $hr) = @_;
+    return $self->_row( $sel_post, $hr->{p_id} );
+}
+
+sub del_post {
+    my ($self, $hr) = @_;
+    $self->_do( $del_post, $hr->{p_id} );
+}
+
 sub _nuke {
     my ($self) = @_;
     $self->dbh()->begin_work();
+    $self->_do("DELETE FROM forum.post");
     $self->_do("DELETE FROM forum.topic");
     $self->_do("DELETE FROM forum.forum");
     $self->dbh()->commit();

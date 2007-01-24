@@ -66,10 +66,10 @@
 
 <& /zaapt/common/form.mhtml, action => 'edit_a_ins.html', elements => [
         { type => 'hidden', name => 'n_id', value => $n_id },
-        { type => 'read', field => 'News', name => 'n_name', value => $news->{n_name} },
+        { type => 'note', field => 'News', value => $news->{n_name} },
         { type => 'text', field => 'Title', name => 'a_title', size => 40, value => $a_title },
         { type => 'textarea', field => 'Intro', name => 'a_intro', rows => 10, cols => 40, value => $a_intro },
-        { type => 'read', value => 'Note: The intro field is always plain text.' },
+        { type => 'note', value => 'Note: The intro field is plain text' },
         { type => 'textarea', field => 'Article', name => 'a_article', rows => 10, cols => 40, value => $a_article },
         { type => 'select', field => 'Type', name => 't_id', options => \@options, selected => $t_id },
         { type => 'submit', field => 'Actions', value => 'Add Article', cancel => 'edit_a_list.html?n_id=' . uri_escape($n_id) },

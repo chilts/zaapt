@@ -25,7 +25,7 @@
     $m->redirect('edit_n_list.html') unless defined $news;
 
     # to insert a question, '_admin' is required
-    $m->redirect('edit_n_list.html') unless exists $my_roles->{$news->{_admin}};
+    $m->redirect('edit_n_list.html') unless exists $my_roles->{$news->{_edit}};
 
     # check this type exists
     unless ( $zaapt->get_model('Common')->sel_type({ t_id => $t_id }) ) {

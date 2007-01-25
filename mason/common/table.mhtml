@@ -1,0 +1,24 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $rows
+</%args>
+%# ----------------------------------------------------------------------------
+<table>
+% foreach my $r ( @$rows ) {
+    <tr>
+        <td class="key"><% $r->{field} | h %><% length($r->{field}) ? ' :' : '&nbsp;' %></td>
+        <td class="val">
+%     if ( $r->{type} eq 'url' ) {
+            <a href="<% $r->{value} | h %>"><% $r->{value} | h %></a>
+
+%     } elsif ( $r->{type} eq 'bbcode' ) {
+            <& /zaapt/common/render.mhtml, t_name => 'bbcode', content => $r->{value} &>
+
+%     } else {
+            <% $r->{value} | h %>
+%     }
+        </td>
+    </tr>
+% }
+</table>
+%# ----------------------------------------------------------------------------

@@ -1,14 +1,14 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $a_username
+    $a_id
     $page
 </%args>
 %# ----------------------------------------------------------------------------
 <%init>
     # see if this looks like a date
     if ( $page =~ m{ \A index \z}xms ) {
-        $m->comp('/zaapt/model/account/view-index.mhtml', zaapt => $zaapt, a_username => $a_username);
+        $m->comp('/zaapt/model/account/view-index.mhtml', zaapt => $zaapt, a_id => $a_id);
     }
     else {
         $m->clear_buffer();

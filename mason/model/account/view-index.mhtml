@@ -1,71 +1,28 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $a_username
+    $a_id
 </%args>
 %# ----------------------------------------------------------------------------
 <%init>
     my $model = $zaapt->get_model('Account');
 
-    my $account = $model->sel_account_using_username({ a_username => $a_username });
+    my $account = $model->sel_account({ a_id => $a_id });
     unless ( defined $account ) {
         $m->clear_buffer();
         $m->abort(404);
         return;
     }
-
-    # TODO:
-    # When you override this component, you might want to put in things like
-    # - profile information
-    # - number of forum posts
-    # - info you have gathered from other parts of the site
-    # (but make sure it is all PUBLIC information only)
 </%init>
 %# ----------------------------------------------------------------------------
-<h1>User Info for <% $account->{a_username} | h %></h1>
+<div class="z_profile">
+<h1>Account Info</h1>
 
-<table>
-    <tr>
-        <td width="30%" class="r">Joined :</td>
-        <td width="70%"><% $account->{a_inserted} | h %></td>
-    </th>
-    <tr>
-        <td class="r">Total Posts :</td>
-        <td>...</td>
-    </th>
-    <tr>
-        <td class="r">Website :</td>
-        <td>...</td>
-    </th>
-    <tr>
-        <td class="r">Favourite Novelists :</td>
-        <td>...</td>
-    </th>
-    <tr>
-        <td class="r">Favourite Music :</td>
-        <td>...</td>
-    </th>
-    <tr>
-        <td class="r">Other Interests :</td>
-        <td>...</td>
-    </th>
-    <tr>
-        <td class="r">Home Location :</td>
-        <td>...</td>
-    </th>
-    <tr>
-        <td class="r">Friends :</td>
-        <td>
-            ...<br />
-            ...<br />
-            ...<br />
-            ...<br />
-            ...<br />
-            ...<br />
-        </td>
-    </th>
-</table>
-
-<p class="footnote">Come back for more details later!</p>
+<&  /zaapt/common/table.mhtml, rows => [
+        { field => 'Username', value => $account->{a_username} },
+        { field => 'Joined', value => $account->{a_inserted} },
+    ]
+&>
+</div>
 
 %# ----------------------------------------------------------------------------

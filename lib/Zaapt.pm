@@ -31,8 +31,17 @@ sub get_model {
     return $self->{models}{$model} if exists $self->{models}{$model};
 
     # or create one, save it and return that
-    eval "use Zaapt::Store::$self->{store}::$model";
-    $self->{models}{$model} = "Zaapt::Store::$self->{store}::$model"->new( $self->{args} );
+    if ( $model =~ m{ \A \w+ \z }xms ) {
+        eval "use Zaapt::Store::$self->{store}::$model";
+        $self->{models}{$model} = "Zaapt::Store::$self->{store}::$model"->new( $self->{args} );
+    }
+    elsif ( $model =~ m{ \A \w+(::\w+)* \z }xms ) {
+        eval "use $model";
+        $self->{models}{$model} = $model->new( $self->{args} );
+    }
+    else {
+        warn "Unknown model: '$model'";
+    }
     return $self->{models}{$model};
 }
 

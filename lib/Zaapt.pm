@@ -14,7 +14,7 @@ sub new {
     bless $self, ref $class || $class;
 
     # remember the store separately and then all the other args
-    $self->{store} = $args->{store};
+    $self->{store} = $args->{store}; # store is the actual store, like 'Pg', 'MySQL' etc
     $self->{args} = $args;
     delete $self->{args}{store};
 

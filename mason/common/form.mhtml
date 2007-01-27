@@ -34,7 +34,13 @@
 
 %     } elsif ( $e->{type} eq 'radio' ) {
 %         foreach my $o ( @{$e->{options}} ) {
-                <input type="radio" name="<% $e->{name} | h %>" value="<% $o->{value} | h %>"<% $e->{checked} eq $o->{value} ? ' checked="checked"' : '' %> /><% $o->{name} | h %>
+                <input type="radio" name="<% $e->{name} | h %>" value="<% $o->{value} | h %>"<% $e->{checked} eq $o->{value} ? ' checked="checked"' : '' %> />
+%             if ( $e->{noesc}) {
+                <% $o->{name}  %>
+%             } else {
+                <% $o->{name} | h %>
+%             }
+                <% $e->{br} && '<br />' %>
 %         }
 
 %     } elsif ( $e->{type} eq 'info' ) {

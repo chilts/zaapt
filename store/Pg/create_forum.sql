@@ -32,6 +32,7 @@ COMMENT ON COLUMN forum.forum.admin_id IS
 COMMENT ON COLUMN forum.forum.view_id IS
     'View allows the user to see the forum details';
 
+-- table: topic
 CREATE SEQUENCE forum.topic_id_seq;
 CREATE TABLE forum.topic (
     id              INTEGER NOT NULL DEFAULT nextval('forum.topic_id_seq'::TEXT) PRIMARY KEY,
@@ -51,6 +52,7 @@ CREATE TRIGGER topic_updated BEFORE UPDATE ON forum.topic
 COMMENT ON COLUMN forum.topic.posts IS
     'Shows the number of posts in this topic';
 
+-- table: post
 CREATE SEQUENCE forum.post_id_seq;
 CREATE TABLE forum.post (
     id              INTEGER NOT NULL DEFAULT nextval('forum.post_id_seq'::TEXT) PRIMARY KEY,
@@ -65,7 +67,17 @@ CREATE TRIGGER post_updated BEFORE UPDATE ON forum.post
     FOR EACH ROW EXECUTE PROCEDURE updated();
 CREATE INDEX post_inserted ON forum.post(inserted);
 
+-- table: count
+CREATE TABLE forum.count (
+    account_id      INTEGER NOT NULL REFERENCES account.account PRIMARY KEY,
+    total           INTEGER NOT NULL DEFAULT 0,
+
+    LIKE base       INCLUDING DEFAULTS
+);
+
 -- functions
+
+-- function: newtopic
 CREATE FUNCTION newtopic() RETURNS trigger as '
     BEGIN
         UPDATE forum.forum SET topics = topics + 1 WHERE id = NEW.forum_id;
@@ -75,6 +87,7 @@ CREATE FUNCTION newtopic() RETURNS trigger as '
 CREATE TRIGGER newtopic_inserted BEFORE INSERT ON forum.topic
     FOR EACH ROW EXECUTE PROCEDURE newtopic();
 
+-- function: deltopic
 CREATE FUNCTION deltopic() RETURNS trigger as '
     BEGIN
         UPDATE forum.forum SET topics = topics - 1 WHERE id = OLD.forum_id;
@@ -84,24 +97,39 @@ CREATE FUNCTION deltopic() RETURNS trigger as '
 CREATE TRIGGER deltopic_deleted AFTER DELETE ON forum.topic
     FOR EACH ROW EXECUTE PROCEDURE deltopic();
 
+-- function: newpost
 CREATE FUNCTION newpost() RETURNS trigger as '
+    DECLARE
+        -- to hold the account id of the person posting
+        found_id INTEGER;
     BEGIN
         UPDATE forum.topic SET posts = posts + 1, poster_id = NEW.account_id WHERE id = NEW.topic_id;
         UPDATE forum.forum SET posts = posts + 1, poster_id = NEW.account_id WHERE id = (SELECT forum_id FROM forum.topic WHERE id = NEW.topic_id);
+
+        -- now update this users number of posts
+        SELECT INTO found_id account_id FROM forum.count WHERE account_id = NEW.account_id;
+        IF NOT FOUND THEN
+            INSERT INTO forum.count(account_id) VALUES(NEW.account_id);
+            SELECT INTO found_id account_id FROM forum.count WHERE account_id = NEW.account_id;
+        END IF;
+        UPDATE forum.count SET total = total + 1 WHERE account_id = found_id;
+
         RETURN NEW;
     END;
 ' LANGUAGE plpgsql;
 CREATE TRIGGER newpost_inserted BEFORE INSERT ON forum.post
     FOR EACH ROW EXECUTE PROCEDURE newpost();
 
+-- function: delpost
 CREATE FUNCTION delpost() RETURNS trigger as '
     BEGIN
         UPDATE forum.topic SET posts = posts - 1 WHERE id = OLD.topic_id;
         UPDATE forum.forum SET posts = posts - 1 WHERE id = (SELECT forum_id FROM forum.topic WHERE id = OLD.topic_id);
+        UPDATE forum.count SET total = total - 1 WHERE account_id = OLD.account_id;
         RETURN NEW;
     END;
 ' LANGUAGE plpgsql;
-CREATE TRIGGER delpost_inserted AFTER DELETE ON forum.post
+CREATE TRIGGER delpost_deleted AFTER DELETE ON forum.post
     FOR EACH ROW EXECUTE PROCEDURE delpost();
 
 -- ----------------------------------------------------------------------------

@@ -15,6 +15,7 @@ my $post_tablename = "forum.post p";
 my $type_tablename = "common.type t";
 my $account_tablename = "account.account a";
 my $poster_tablename = "account.account po";
+my $count_tablename = "forum.count c";
 
 # helper
 my $forum_cols = __PACKAGE__->_mk_cols( 'f', qw(id name title description show topics posts poster_id r:admin_id r:view_id r:moderator_id ts:inserted ts:updated) );
@@ -23,6 +24,7 @@ my $post_cols = __PACKAGE__->_mk_cols( 'p', qw(id topic_id account_id message ty
 my $type_cols = __PACKAGE__->_mk_cols( 't', qw(id name) );
 my $account_cols = __PACKAGE__->_mk_cols( 'a', qw(id username ts:inserted ts:updated) );
 my $poster_cols = __PACKAGE__->_mk_cols( 'po', qw(id username ts:inserted ts:updated) );
+my $count_cols = __PACKAGE__->_mk_cols( 'c', qw(account_id total ts:inserted ts:updated) );
 
 # joins
 my $f_tp_join = "JOIN $topic_tablename ON (tp.forum_id = f.id)";
@@ -32,6 +34,7 @@ my $tp_a_join = "JOIN $account_tablename ON (tp.account_id = a.id)";
 my $tp_po_join = "LEFT JOIN $poster_tablename ON (tp.poster_id = po.id)";
 my $p_a_join = "JOIN $account_tablename ON (p.account_id = a.id)";
 my $f_po_join = "JOIN $poster_tablename ON (f.poster_id = po.id)";
+my $p_c_join = "LEFT JOIN $count_tablename ON (p.account_id = c.account_id)";
 
 # forum
 my $ins_forum = __PACKAGE__->_mk_ins( 'forum.forum', qw(name title description show admin_id view_id moderator_id) );
@@ -57,8 +60,8 @@ my $ins_post = __PACKAGE__->_mk_ins( 'forum.post', qw(topic_id account_id messag
 my $upd_post = __PACKAGE__->_mk_upd( 'forum.post', 'id', qw(topic_id account_id message type_id));
 my $del_post = __PACKAGE__->_mk_del( 'forum.post', 'id' );
 my $sel_post = "SELECT $forum_cols, $topic_cols, $post_cols FROM $forum_tablename $f_tp_join $tp_p_join WHERE p.id = ?";
-my $sel_all_posts_in = "SELECT $forum_cols, $topic_cols, $post_cols, $type_cols, $account_cols FROM $forum_tablename $f_tp_join $tp_p_join $p_t_join $p_a_join WHERE tp.id = ? ORDER BY p.inserted";
-my $sel_all_posts_in_offset = "SELECT $forum_cols, $topic_cols, $post_cols, $type_cols, $account_cols FROM $forum_tablename $f_tp_join $tp_p_join $p_t_join $p_a_join WHERE tp.id = ? ORDER BY p.inserted LIMIT ? OFFSET ?";
+my $sel_all_posts_in = "SELECT $forum_cols, $topic_cols, $post_cols, $type_cols, $account_cols, $count_cols FROM $forum_tablename $f_tp_join $tp_p_join $p_t_join $p_a_join $p_c_join WHERE tp.id = ? ORDER BY p.inserted";
+my $sel_all_posts_in_offset = "SELECT $forum_cols, $topic_cols, $post_cols, $type_cols, $account_cols, $count_cols FROM $forum_tablename $f_tp_join $tp_p_join $p_t_join $p_a_join $p_c_join WHERE tp.id = ? ORDER BY p.inserted LIMIT ? OFFSET ?";
 my $del_posts_for_topic = __PACKAGE__->_mk_del( 'forum.post', 'topic_id' );
 
 ## ----------------------------------------------------------------------------

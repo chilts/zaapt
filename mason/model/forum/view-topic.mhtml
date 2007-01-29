@@ -177,7 +177,7 @@ Page:
             <& /zaapt/common/a_username.mhtml, a_username => $post->{a_username} &><br />
             <span class="small soft nw">
             Joined: <% $post->{a_inserted} | h %><br />
-            Posts: ToDo<br />
+            Posts: <% $post->{c_total} | h %><br />
             </span>
 
 %         if ( $SESS->{roles}{$forum->{_moderator}} ) {

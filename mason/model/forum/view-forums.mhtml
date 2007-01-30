@@ -8,6 +8,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
+    $last       => '9999-99-99 99:99:99'
 </%args>
 %# ----------------------------------------------------------------------------
 <%init>
@@ -28,7 +29,13 @@
     </tr>
 %     foreach my $forum ( @$forums ) {
     <tr>
-        <td><& /zaapt/common/icon.mhtml, name => 'script' &></td>
+        <td>
+%         if ( $last lt $forum->{f_updated} ) {
+            <& /zaapt/common/icon.mhtml, name => 'script_add', title => 'Forum with New Posts' &>
+%         } else {
+            <& /zaapt/common/icon.mhtml, name => 'script', title => 'Forum' &>
+%         }
+        </td>
         <td>
             <a href="view-forum.html?id=<% $forum->{f_name} | u %>"><% $forum->{f_title} | h %></a>
             <p><% $forum->{f_description} | h %></p>

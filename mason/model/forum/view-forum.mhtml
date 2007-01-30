@@ -9,6 +9,7 @@
     $t_id       => undef
     $p          => 1
     $tp_id      => undef
+    $last       => '9999-99-99 99:99:99'
 </%args>
 %# ----------------------------------------------------------------------------
 <%init>
@@ -137,25 +138,30 @@ Page:
 %         if ( $topic->{tp_locked} ) {
             <& /zaapt/common/icon.mhtml, name => 'script_link', title => 'Locked' &>
 %         }
-%         if ( !$topic->{tp_sticky} and !$topic->{tp_locked} ) {
+%         if ( $last lt $topic->{tp_updated} ) {
+            <& /zaapt/common/icon.mhtml, name => 'script_add', title => 'New Posts' &>
+%         } else {
             <& /zaapt/common/icon.mhtml, name => 'bullet_blue', title => 'Normal Topic' &>
 %         }
         </td>
         <td class="left">
             <a href="<% $topic->{tp_id} | u %>.html"><% $topic->{tp_subject} | h %></a>
 %         if ( exists $SESS->{roles}{$forum->{_moderator}} ) {
-              <br />
+            <hr />
 %             if ( $topic->{tp_sticky} ) {
-                  <a href="?a=sticky-remove&amp;tp_id=<% $topic->{tp_id} | u %>&amp;p=<% $p | u %>" title="Remove Stickiness"><& /zaapt/common/icon.mhtml, name => 'script', title => 'Remove Stickiness' &></a>
+            <a href="?a=sticky-remove&amp;tp_id=<% $topic->{tp_id} | u %>&amp;p=<% $p | u %>" title="Remove Stickiness"><& /zaapt/common/icon.mhtml, name => 'script', title => 'Remove Stickiness' &> Remove Stickiness</a>
 %             } else {
-                  <a href="?a=sticky-add&amp;tp_id=<% $topic->{tp_id} | u %>&amp;p=<% $p | u %>" title="Make Sticky"><& /zaapt/common/icon.mhtml, name => 'script_key', title => 'Make Sticky' &></a>
+            <a href="?a=sticky-add&amp;tp_id=<% $topic->{tp_id} | u %>&amp;p=<% $p | u %>" title="Make Sticky"><& /zaapt/common/icon.mhtml, name => 'script_key', title => 'Make Sticky' &> Make Sticky</a>
 %             }
+            <br />
 %             if ( $topic->{tp_locked} ) {
-                  <a href="?a=locked-remove&amp;tp_id=<% $topic->{tp_id} | u %>&amp;p=<% $p | u %>" title="Remove Lock"><& /zaapt/common/icon.mhtml, name => 'script', title => 'Remove Lock' &></a>
+            <a href="?a=locked-remove&amp;tp_id=<% $topic->{tp_id} | u %>&amp;p=<% $p | u %>" title="Remove Lock"><& /zaapt/common/icon.mhtml, name => 'script', title => 'Remove Lock' &> Remove Lock</a>
 %             } else {
-                  <a href="?a=locked-add&amp;tp_id=<% $topic->{tp_id} | u %>&amp;p=<% $p | u %>" title="Add Lock"><& /zaapt/common/icon.mhtml, name => 'script_link', title => 'Add Lock' &></a>
+            <a href="?a=locked-add&amp;tp_id=<% $topic->{tp_id} | u %>&amp;p=<% $p | u %>" title="Add Lock"><& /zaapt/common/icon.mhtml, name => 'script_link', title => 'Add Lock' &> Add Lock</a>
 %             }
-              <a href="?a=del&amp;tp_id=<% $topic->{tp_id} | u %>&amp;p=<% $p | u %>" title="Delete Topic"><& /zaapt/common/icon.mhtml, name => 'script_delete', title => 'Delete Topic' &></a>
+            <br />
+            <a href="?a=del&amp;tp_id=<% $topic->{tp_id} | u %>&amp;p=<% $p | u %>" title="Delete Topic"><& /zaapt/common/icon.mhtml, name => 'script_delete', title => 'Delete Topic' &> Delete Topic</a>
+            <br />
 %         }
         </td>
         <td class="center"><& /zaapt/common/a_username.mhtml, a_username => $topic->{a_username} &><br /></td>
@@ -175,5 +181,10 @@ Page:
 % } else {
 <p>There are currently no topics here.</p>
 % }
+<h2>Key</h2>
+<& /zaapt/common/icon.mhtml, name => 'script_key', title => 'Sticky' &> Sticky Topic<br />
+<& /zaapt/common/icon.mhtml, name => 'script_link', title => 'Locked' &> Locked Topic<br />
+<& /zaapt/common/icon.mhtml, name => 'script_add', title => 'New Posts' &> New Posts<br />
+<& /zaapt/common/icon.mhtml, name => 'bullet_blue', title => 'Normal Topic' &> No New Posts<br />
 </div>
 %# ----------------------------------------------------------------------------

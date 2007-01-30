@@ -12,6 +12,7 @@
     $p_id       => undef
     $p          => 1
     $tp_id      => undef
+    $last       => undef
 </%args>
 %# ----------------------------------------------------------------------------
 <%init>
@@ -36,6 +37,7 @@
             t_id       => $t_id,
             p          => $p,
             tp_id      => $tp_id,
+            last       => $last,
         );
     }
     elsif ( $page eq 'moderator-edit-post' ) {
@@ -72,6 +74,7 @@
             p_message => $p_message,
             t_id      => $t_id,
             p         => $p,
+            last       => $last,
         );
     }
     return;

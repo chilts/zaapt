@@ -14,6 +14,7 @@
     $p_message => undef
     $t_id      => undef
     $p         => 1
+    $last       => '9999-99-99 99:99:99'
 </%args>
 %# ----------------------------------------------------------------------------
 <%once>
@@ -174,6 +175,11 @@ Page:
 %     foreach my $post ( @$posts ) {
     <tr class="r<% $r=1-$r %>">
         <td class="top">
+%         if ( $last lt $post->{p_inserted} ) {
+            <& /zaapt/common/icon.mhtml, name => 'script_add', title => 'New Post' &>
+%         } else {
+            <& /zaapt/common/icon.mhtml, name => 'script', title => 'Post' &>
+%         }
             <& /zaapt/common/a_username.mhtml, a_username => $post->{a_username} &><br />
             <span class="small soft nw">
             Joined: <% $post->{a_inserted} | h %><br />
@@ -181,6 +187,7 @@ Page:
             </span>
 
 %         if ( $SESS->{roles}{$forum->{_moderator}} ) {
+            <hr />
             <a href="moderator-edit-post.html?p_id=<% $post->{p_id} | u %>&amp;p=<% $p | u %>" title="Edit Post"><& /zaapt/common/icon.mhtml, name => 'script_edit', title => 'Edit Post' &> Edit Post</a>
             <br />
             <a href="moderator-del-post.html?p_id=<% $post->{p_id} | u %>&amp;p=<% $p | u %>" title="Del Post"><& /zaapt/common/icon.mhtml, name => 'script_delete', title => 'Del Post' &> Del Post</a>
@@ -220,6 +227,10 @@ Page:
 &>
 </div>
 % }
+
+<h2>Key</h2>
+<& /zaapt/common/icon.mhtml, name => 'script_add', title => 'New Post' &> New Post<br />
+<& /zaapt/common/icon.mhtml, name => 'bullet_blue', title => 'Old Post' &> Old Post<br />
 
 </div>
 %# ----------------------------------------------------------------------------

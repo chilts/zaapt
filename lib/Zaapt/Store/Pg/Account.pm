@@ -26,7 +26,8 @@ my $sel_account = "SELECT $account_cols FROM $account_tablename WHERE id = ?";
 my $sel_account_using_username = "SELECT $account_cols FROM $account_tablename WHERE username = ?";
 my $upd_account = __PACKAGE__->_mk_upd( 'account.account', 'id', qw(username firstname lastname email notify confirmed admin));
 my $upd_password = "UPDATE account.account SET password = md5(salt || ?) WHERE id = ?";
-my $upd_last_login = "UPDATE account.account SET logins = logins + 1, last = CURRENT_TIMESTAMP WHERE id = ?";
+my $upd_logins = "UPDATE account.account SET logins = logins + 1 WHERE id = ?";
+my $upd_last = "UPDATE account.account SET last = CURRENT_TIMESTAMP WHERE id = ?";
 
 # role
 my $ins_role = __PACKAGE__->_mk_ins( 'account.role', qw(name description) );
@@ -94,9 +95,14 @@ sub upd_password {
     $self->_do( $upd_password, $hr->{a_password}, $hr->{a_id} );
 }
 
-sub upd_last_login {
+sub upd_logins {
     my ($self, $hr) = @_;
-    $self->_do( $upd_last_login, $hr->{a_id} );
+    $self->_do( $upd_logins, $hr->{a_id} );
+}
+
+sub upd_last {
+    my ($self, $hr) = @_;
+    $self->_do( $upd_last, $hr->{a_id} );
 }
 
 sub ins_confirm {

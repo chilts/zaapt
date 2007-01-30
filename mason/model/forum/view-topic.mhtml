@@ -230,7 +230,7 @@ Page:
 
 <h2>Key</h2>
 <& /zaapt/common/icon.mhtml, name => 'script_add', title => 'New Post' &> New Post<br />
-<& /zaapt/common/icon.mhtml, name => 'bullet_blue', title => 'Old Post' &> Old Post<br />
+<& /zaapt/common/icon.mhtml, name => 'script', title => 'Old Post' &> Old Post<br />
 
 </div>
 %# ----------------------------------------------------------------------------

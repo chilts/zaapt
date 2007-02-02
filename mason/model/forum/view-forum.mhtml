@@ -1,0 +1,96 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $f_name
+    $t_id       => undef
+    $p          => 1
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Forum');
+    my $forum = $model->sel_forum_using_name({ f_name => $f_name} );
+    unless ( defined $forum ) {
+        $m->clear_buffer();
+        $m->abort(404);
+        return;
+    }
+
+    $p = 1 unless $p =~ m{ \A \d+ \z }xms;
+
+    my $topics = $model->sel_all_topics_in({ f_id => $forum->{f_id}, _offset => ($p-1) * $forum->{f_show}, _limit => $forum->{f_show} });
+</%init>
+%# ----------------------------------------------------------------------------
+<div class="z_forum">
+<h1><% $forum->{f_title} | h %></h1>
+
+<p class="right"><& widget-stats.mhtml, zaapt => $zaapt &></p>
+<p>
+    <span class="floatright">You must be <& /zaapt/common/sign-in-url.mhtml, text => 'signed in' &> to post.</span>
+    <a href="../">&laquo; Back to Main Forums</a>
+</p>
+
+<p class="center">
+Page:
+% my $last_page_number = ( ($forum->{f_topics}-1) / $forum->{f_show} ) + 1;
+% foreach my $page ( 1..$last_page_number ) {
+%     if ( $p == $page ) {
+    <% $page | h %>
+%     } else {
+    <a href="?p=<% $page | u %>"><% $page | h %></a>
+%     }
+% }
+</p>
+
+% if ( @$topics ) {
+
+<table width="100%">
+    <tr>
+        <th colspan="2">Topics</th>
+        <th>Author</th>
+        <th>Posts</th>
+        <th>Last Post</th>
+    </tr>
+%     my $r = 0;
+%     foreach my $topic ( @$topics ) {
+    <tr class="r<% $r=1-$r %>">
+        <td class="center">
+%         if ( $topic->{tp_sticky} ) {
+            <& /zaapt/common/icon.mhtml, name => 'script_key', title => 'Sticky' &>
+%         }
+%         if ( $topic->{tp_locked} ) {
+            <& /zaapt/common/icon.mhtml, name => 'script_link', title => 'Locked' &>
+%         }
+          <& /zaapt/common/icon.mhtml, name => 'bullet_blue', title => 'Normal Topic' &>
+        </td>
+        <td class="left">
+            <a href="<% $topic->{tp_id} | u %>.html"><% $topic->{tp_subject} | h %></a>
+        </td>
+        <td class="center"><& /zaapt/common/a_username.mhtml, a_username => $topic->{a_username} &><br /></td>
+        <td class="center"><% $topic->{tp_posts} | h %></td>
+        <td class="right">
+%         if ( defined $topic->{po_username} ) {
+            <& /zaapt/common/a_username.mhtml, a_username => $topic->{po_username} &>
+            <br style="clear: both;" />
+            <span class="footnote nw"><% $topic->{tp_updated} %></span>
+%         } else {
+            No Posts
+%         }
+        </td>
+    </tr>
+%     }
+</table>
+% } else {
+<p>There are currently no topics here.</p>
+% }
+
+<p>
+    <span class="floatright">You must be <& /zaapt/common/sign-in-url.mhtml, text => 'signed in' &> to post.</span>
+    <a href="../">&laquo; Back to Main Forums</a>
+</p>
+
+<h2>Key</h2>
+<& /zaapt/common/icon.mhtml, name => 'script_key', title => 'Sticky' &> Sticky Topic<br />
+<& /zaapt/common/icon.mhtml, name => 'script_link', title => 'Locked' &> Locked Topic<br />
+<& /zaapt/common/icon.mhtml, name => 'bullet_blue', title => 'Normal Topic' &> No New Posts<br />
+</div>
+%# ----------------------------------------------------------------------------

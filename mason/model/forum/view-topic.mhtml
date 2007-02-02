@@ -1,0 +1,107 @@
+%# ----------------------------------------------------------------------------
+<%doc>
+    Args:
+
+    $p - page
+</%doc>
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $f_name
+    $tp_id
+    $t_id
+    $p         => 1
+</%args>
+%# ----------------------------------------------------------------------------
+<%once>
+    my $allowed = {
+        moderator => {
+            'sticky-remove' => 1,
+            'sticky-add'    => 1,
+            'locked-add'    => 1,
+            'locked-remove' => 1,
+            'del'           => 1,
+        },
+    };
+</%once>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Forum');
+
+    my $forum = $model->sel_forum_using_name({ f_name => $f_name} );
+    unless ( defined $forum ) {
+        $m->clear_buffer();
+        $m->abort(404);
+        return;
+    }
+
+    my $topic = $model->sel_topic({ tp_id => $tp_id} );
+    unless ( defined $topic and $topic->{f_id} == $forum->{f_id} ) {
+        $m->clear_buffer();
+        $m->abort(404);
+        return;
+    }
+
+    $p = 1 unless $p =~ m{ \A \d+ \z }xms;
+
+    my $posts = $model->sel_all_posts_in({ tp_id => $tp_id, _offset => ($p-1) * $forum->{f_show}, _limit => $forum->{f_show} });
+</%init>
+%# ----------------------------------------------------------------------------
+<div class="z_forum">
+<h1><% $forum->{f_title} | h %></h1>
+
+<p>
+    <span class="floatright">You must be <& /zaapt/common/sign-in-url.mhtml, text => 'signed in' &> to post.</span>
+    <a href="../">&laquo; Back to Main Forums</a>
+    <br />
+    <a href="./">&laquo; Back to Topic List</a>
+</p>
+
+<h2><% $topic->{tp_subject} | h %></h2>
+
+<p class="center">
+Page:
+% my $last_page_number = ( ($topic->{tp_posts}-1) / $forum->{f_show} ) + 1;
+% foreach my $page ( 1..$last_page_number ) {
+%     if ( $p == $page ) {
+    <% $page | h %>
+%     } else {
+    <a href="<% $tp_id | u %>.html?p=<% $page | u %>"><% $page | h %></a>
+%     }
+% }
+</p>
+
+% if ( @$posts ) {
+
+<table>
+    <tr>
+        <th>Poster</th>
+        <th>Message</th>
+    </tr>
+%     my $r = 0;
+%     foreach my $post ( @$posts ) {
+    <tr class="r<% $r=1-$r %>">
+        <td class="top">
+            <& /zaapt/common/icon.mhtml, name => 'script', title => 'A Post' &>
+            <& /zaapt/common/a_username.mhtml, a_username => $post->{a_username} &><br />
+            <span class="small soft nw">
+            Joined: <% $post->{a_inserted} | h %><br />
+            Posts: <% $post->{c_total} | h %><br />
+            </span>
+        </td>
+        <td class="top">
+            <& /zaapt/common/render.mhtml, t_name => $post->{t_name}, content => $post->{p_message} &>
+            <p class="footnote"><% $post->{p_inserted} | h %></p>
+        </td>
+    </tr>
+%     }
+</table>
+% } else {
+<p>There are currently no topics here.</p>
+% }
+
+<h2>Key</h2>
+<& /zaapt/common/icon.mhtml, name => 'script', title => 'A Post' &> A Post<br />
+
+</div>
+%# ----------------------------------------------------------------------------

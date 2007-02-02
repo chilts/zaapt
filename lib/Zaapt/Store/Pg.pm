@@ -126,6 +126,11 @@ sub _mk_del {
     return "DELETE FROM $table WHERE $query";
 }
 
+sub _mk_count {
+    my ($class, $table) = @_;
+    return "SELECT count(*) AS count FROM $table";
+}
+
 sub _currval {
     my ($self, $seqname) = @_;
     my ($id) = $self->dbh()->selectrow_array( "SELECT currval(?)", undef, $seqname );
@@ -160,6 +165,14 @@ sub _row {
 
 ## ----------------------------------------------------------------------------
 # methods
+
+sub get_sth {
+    my ($self, $stm) = @_;
+    return $self->{dbh}->prepare_cached( $stm );
+}
+
+## ----------------------------------------------------------------------------
+# db helper methods
 
 sub get_sth {
     my ($self, $stm) = @_;

@@ -43,6 +43,7 @@ my $sel_forum = "SELECT $forum_cols FROM $forum_tablename WHERE f.id = ?";
 my $del_forum = __PACKAGE__->_mk_del('forum.forum', 'id');
 my $sel_forum_using_name = "SELECT $forum_cols FROM $forum_tablename WHERE f.name = ?";
 my $sel_forums_all = "SELECT $forum_cols, $poster_cols FROM $forum_tablename LEFT $f_po_join ORDER BY f.name";
+my $sel_forum_count = __PACKAGE__->_mk_count( 'forum.forum' );
 
 # topic
 my $ins_topic = __PACKAGE__->_mk_ins( 'forum.topic', qw(forum_id account_id subject) );
@@ -54,6 +55,7 @@ my $sel_all_topics_in = "SELECT $forum_cols, $topic_cols, $account_cols, $poster
 my $sel_all_topics_in_offset = "SELECT $forum_cols, $topic_cols, $account_cols, $poster_cols FROM $forum_tablename $f_tp_join $tp_a_join $tp_po_join WHERE f.id = ? ORDER BY tp.sticky DESC, tp.updated DESC LIMIT ? OFFSET ?";
 my $sel_latest_topics = "SELECT $forum_cols, $topic_cols FROM $forum_tablename $f_tp_join $f_tp_join WHERE f.id = ? ORDER BY tp.inserted DESC LIMIT ?";
 my $sel_archive_topics = "SELECT $forum_cols, $topic_cols FROM $forum_tablename $f_tp_join $f_tp_join WHERE f.id = ? AND tp.inserted >= ?::DATE AND tp.inserted <= ?::DATE + ?::INTERVAL ORDER BY tp.inserted DESC";
+my $sel_topic_count = __PACKAGE__->_mk_count( 'forum.topic' );
 
 # posts
 my $ins_post = __PACKAGE__->_mk_ins( 'forum.post', qw(topic_id account_id message type_id) );
@@ -63,6 +65,7 @@ my $sel_post = "SELECT $forum_cols, $topic_cols, $post_cols FROM $forum_tablenam
 my $sel_all_posts_in = "SELECT $forum_cols, $topic_cols, $post_cols, $type_cols, $account_cols, $count_cols FROM $forum_tablename $f_tp_join $tp_p_join $p_t_join $p_a_join $p_c_join WHERE tp.id = ? ORDER BY p.inserted";
 my $sel_all_posts_in_offset = "SELECT $forum_cols, $topic_cols, $post_cols, $type_cols, $account_cols, $count_cols FROM $forum_tablename $f_tp_join $tp_p_join $p_t_join $p_a_join $p_c_join WHERE tp.id = ? ORDER BY p.inserted LIMIT ? OFFSET ?";
 my $del_posts_for_topic = __PACKAGE__->_mk_del( 'forum.post', 'topic_id' );
+my $sel_post_count = __PACKAGE__->_mk_count( 'forum.post' );
 
 ## ----------------------------------------------------------------------------
 # methods
@@ -90,6 +93,11 @@ sub sel_forum {
 sub sel_forums_all {
     my ($self) = @_;
     return $self->_rows( $sel_forums_all );
+}
+
+sub sel_forum_count {
+    my ($self) = @_;
+    return $self->_row( $sel_forum_count );
 }
 
 sub sel_forum_using_name {
@@ -147,6 +155,11 @@ sub sel_latest_topics {
     return $self->_rows( $sel_latest_topics, $hr->{f_id}, $hr->{_limit} );
 }
 
+sub sel_topic_count {
+    my ($self) = @_;
+    return $self->_row( $sel_topic_count );
+}
+
 sub sel_all_posts_in {
     my ($self, $hr) = @_;
     if ( defined $hr->{_limit} and defined $hr->{_offset} ) {
@@ -173,6 +186,11 @@ sub sel_post {
 sub del_post {
     my ($self, $hr) = @_;
     $self->_do( $del_post, $hr->{p_id} );
+}
+
+sub sel_post_count {
+    my ($self) = @_;
+    return $self->_row( $sel_post_count );
 }
 
 sub _nuke {

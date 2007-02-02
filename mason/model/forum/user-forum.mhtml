@@ -90,6 +90,7 @@
 <div class="z_forum">
 <h1><% $forum->{f_title} | h %></h1>
 
+<p class="right"><& widget-stats.mhtml, zaapt => $zaapt &></p>
 <p>
     <span class="floatright"><a href="#" onclick="removeElementClass('topic', 'hide');"><& /zaapt/common/icon.mhtml, name => 'script_add', title => 'New Topic' &> New Topic &raquo;&raquo;</a></span>
     <a href="../">&laquo; Back to Main Forums</a>
@@ -181,6 +182,7 @@ Page:
 % } else {
 <p>There are currently no topics here.</p>
 % }
+
 <h2>Key</h2>
 <& /zaapt/common/icon.mhtml, name => 'script_key', title => 'Sticky' &> Sticky Topic<br />
 <& /zaapt/common/icon.mhtml, name => 'script_link', title => 'Locked' &> Locked Topic<br />

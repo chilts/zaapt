@@ -1,0 +1,4 @@
+<%args>
+    $text
+</%args>
+<a href="/sign-in.html"><% $text | h %></a>\

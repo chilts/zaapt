@@ -1,0 +1,14 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Forum');
+    my $forum_count = $model->sel_forum_count();
+    my $topic_count = $model->sel_topic_count();
+    my $post_count = $model->sel_post_count();
+</%init>
+%# ----------------------------------------------------------------------------
+There are: <% $forum_count->{count} | h %> forums, <% $topic_count->{count} | h %> topics &amp; <% $post_count->{count} | h %> posts.\
+%# ----------------------------------------------------------------------------

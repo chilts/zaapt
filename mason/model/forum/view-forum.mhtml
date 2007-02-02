@@ -25,7 +25,7 @@
 
 <p class="right"><& widget-stats.mhtml, zaapt => $zaapt &></p>
 <p>
-    <span class="floatright">You must be <& /zaapt/common/sign-in-url.mhtml, text => 'signed in' &> to post.</span>
+    <span class="floatright">Please <& /zaapt/common/sign-in-url.mhtml, text => 'sign in' &> to post.</span>
     <a href="../">&laquo; Back to Main Forums</a>
 </p>
 
@@ -84,7 +84,6 @@ Page:
 % }
 
 <p>
-    <span class="floatright">You must be <& /zaapt/common/sign-in-url.mhtml, text => 'signed in' &> to post.</span>
     <a href="../">&laquo; Back to Main Forums</a>
 </p>
 

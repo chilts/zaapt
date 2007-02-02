@@ -37,7 +37,7 @@
 %         }
         </td>
         <td>
-            <a href="view-forum.html?id=<% $forum->{f_name} | u %>"><% $forum->{f_title} | h %></a>
+            <a href="user-forum.html?id=<% $forum->{f_name} | u %>"><% $forum->{f_title} | h %></a>
             <p><% $forum->{f_description} | h %></p>
         </td>
         <td><% $forum->{f_topics} | h %></td>

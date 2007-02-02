@@ -27,7 +27,7 @@
 
     if ( $page eq 'index' ) {
         # main index page
-        $m->comp('/zaapt/model/forum/view-forum.mhtml',
+        $m->comp('/zaapt/model/forum/user-forum.mhtml',
             zaapt      => $zaapt,
             a          => $a,
             f_name     => $f_name,
@@ -64,7 +64,7 @@
         );
     }
     else {
-        $m->comp( '/zaapt/model/forum/view-topic.mhtml',
+        $m->comp( '/zaapt/model/forum/user-topic.mhtml',
             zaapt     => $zaapt,
             my_roles  => $my_roles,
             a         => $a,

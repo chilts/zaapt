@@ -8,7 +8,8 @@
     my $model = $zaapt->get_model('News');
     my $news = $model->sel_news_using_name({ n_name => $n_name });
     unless ( defined $news ) {
-        $m->redirect('edit_n_list.html');
+        $m->clear_buffer();
+        $m->abort(404);
         return;
     }
     my $articles = $model->sel_latest_articles({ n_id => $news->{n_id}, _limit => $news->{n_show} });

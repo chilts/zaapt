@@ -1,0 +1,37 @@
+%# ----------------------------------------------------------------------------
+<%once>
+    use Zaapt::Utils::UrlSet;
+</%once>
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $c_name
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Content');
+    my $content = $model->sel_content_using_name({ c_name => $c_name });
+
+    unless ( defined $content ) {
+        $m->clear_buffer();
+        $m->abort(404);
+        return;
+    }
+
+    my $pages = $model->sel_all_pages_in({ c_id => $content->{c_id}  });
+
+    unless ( defined $pages ) {
+        $m->clear_buffer();
+        $m->abort(404);
+        return;
+    }
+
+    my $urlset = Zaapt::Utils::UrlSet->new();
+    foreach my $page ( @$pages ) {
+        $urlset->add({ loc => "http://kiwiwriters.org/$page->{p_name}.html" });
+    }
+
+    print $urlset->as_xml();
+    return;
+</%init>
+%# ----------------------------------------------------------------------------

@@ -35,9 +35,9 @@ sub as_xml {
     my $xml = XML::Mini::Document->new();
     my $root = $xml->getRoot();
 
-    my $hdr = $root->header('xml');
-    $hdr->attribute('encoding', 'UTF-8');
-    $hdr->attribute('version', '1.0');
+    #my $hdr = $root->header('xml');
+    #$hdr->attribute('encoding', 'UTF-8');
+    #$hdr->attribute('version', '1.0');
 
     my $sitemapindex = $root->createChild('sitemapindex');
     $sitemapindex->attribute('xmlns', 'http://www.sitemaps.org/schemas/sitemap/0.9');
@@ -49,8 +49,7 @@ sub as_xml {
         }
     }
 
-    # return '<?xml version="1.0" encoding="UTF-8"?>', "\n", $xml->toString(), "\n";
-    return $xml->toString(), "\n";
+    return '<?xml version="1.0" encoding="UTF-8"?>', "\n", $xml->toString(), "\n";
 }
 
 ## ----------------------------------------------------------------------------

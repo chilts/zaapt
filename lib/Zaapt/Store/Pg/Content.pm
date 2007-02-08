@@ -35,8 +35,8 @@ my $upd_page = __PACKAGE__->_mk_upd( 'content.page', 'id', qw(content_id type_id
 my $del_page = __PACKAGE__->_mk_del( 'content.page', 'id' );
 my $sel_page = "SELECT $content_cols, $page_cols, $type_cols FROM $content_tablename $c_p_join $p_t_join WHERE p.id = ?";
 my $sel_page_using_name = "SELECT $content_cols, $page_cols, $type_cols FROM $content_tablename $c_p_join $p_t_join WHERE c.id = ? AND p.name = ?";
-my $sel_all_pages_in = "SELECT $content_cols, $page_cols, $type_cols FROM $content_tablename $c_p_join $p_t_join WHERE c.id = ? ORDER BY p.name";
-my $sel_all_pages = "SELECT $page_cols FROM $page_tablename ORDER BY content_name, name";
+my $sel_all_pages_in = "SELECT $content_cols, $page_cols, $type_cols FROM $content_tablename $c_p_join $p_t_join WHERE c.id = ? ORDER BY p_name";
+my $sel_all_pages = "SELECT $page_cols FROM $page_tablename ORDER BY c_name, p_name";
 
 # type
 my $sel_all_types = "SELECT $type_cols FROM $type_tablename ORDER BY name";
@@ -101,13 +101,7 @@ sub sel_page {
 
 sub sel_all_pages {
     my ($self) = @_;
-    my $content = {};
-    my $sth = $self->{dbh}->prepare( $sel_all_pages );
-    $sth->execute();
-    while ( my $row ) {
-        push @{$content->{$row->{c_name}}}, $row;
-    }
-    return $content;
+    return $self->_rows( $sel_all_pages );
 }
 
 sub sel_all_types {

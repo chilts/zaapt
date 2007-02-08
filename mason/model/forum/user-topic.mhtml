@@ -144,6 +144,7 @@
         { type => 'hidden', name => 'a', value => 'reply' },
         { type => 'hidden', name => 'p', value => $p },
         { type => 'textarea', field => 'Message', name => 'p_message', rows => 10, cols => 40, value => $p_message || '' },
+        { type => 'html', field => 'Help', value => $m->scomp('help-link.mhtml') },
         { type => 'submit', field => 'Actions', value => 'Post', cancel_js => "addElementClass('reply1', 'hide');" },
     ]
 &>
@@ -222,6 +223,7 @@ Page:
         { type => 'hidden', name => 'a', value => 'reply' },
         { type => 'hidden', name => 'p', value => $p },
         { type => 'textarea', field => 'Message', name => 'p_message', rows => 10, cols => 40, value => $p_message || '' },
+        { type => 'html', field => 'Help', value => $m->scomp('help-link.mhtml') },
         { type => 'submit', field => 'Actions', value => 'Post', cancel_js => "addElementClass('reply2', 'hide');" },
     ]
 &>

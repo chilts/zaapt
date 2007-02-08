@@ -103,21 +103,14 @@
         { type => 'hidden', name => 'a', value => 'topic' },
         { type => 'text', field => 'Subject', name => 'tp_subject', size => 40, value => $tp_subject || '' },
         { type => 'textarea', field => 'Message', name => 'p_message', rows => 10, cols => 40, value => $p_message || '' },
+        { type => 'html', field => 'Help', value => $m->scomp('help-link.mhtml') },
         { type => 'submit', field => 'Actions', value => 'Add Topic', cancel_js => "addElementClass('topic', 'hide');" },
     ]
 &>
 </div>
 
 <p class="center">
-Page:
-% my $last_page_number = ( ($forum->{f_topics}-1) / $forum->{f_show} ) + 1;
-% foreach my $page ( 1..$last_page_number ) {
-%     if ( $p == $page ) {
-    <% $page | h %>
-%     } else {
-    <a href="?p=<% $page | u %>"><% $page | h %></a>
-%     }
-% }
+<& /zaapt/common/paginator.mhtml, url => '?', btext => 'Page:', to => $forum->{f_topics}, perpage => $forum->{f_show}, current => $p &>
 </p>
 
 % if ( @$topics ) {
@@ -147,6 +140,10 @@ Page:
         </td>
         <td class="left">
             <a href="<% $topic->{tp_id} | u %>.html"><% $topic->{tp_subject} | h %></a>
+% if ( $topic->{tp_posts} > $forum->{f_show} ) {
+            <br />
+            <& /zaapt/common/paginator.mhtml, url => "$topic->{tp_id}.html?", btext => 'Page:', to => $topic->{tp_posts}, perpage => $forum->{f_show} &>
+% }
 %         if ( exists $SESS->{roles}{$forum->{_moderator}} ) {
             <hr />
 %             if ( $topic->{tp_sticky} ) {

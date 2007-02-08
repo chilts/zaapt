@@ -60,15 +60,7 @@
 <h2><% $topic->{tp_subject} | h %></h2>
 
 <p class="center">
-Page:
-% my $last_page_number = ( ($topic->{tp_posts}-1) / $forum->{f_show} ) + 1;
-% foreach my $page ( 1..$last_page_number ) {
-%     if ( $p == $page ) {
-    <% $page | h %>
-%     } else {
-    <a href="<% $tp_id | u %>.html?p=<% $page | u %>"><% $page | h %></a>
-%     }
-% }
+<& /zaapt/common/paginator.mhtml, url => '?', btext => 'Page:', to => $topic->{tp_posts}, perpage => $forum->{f_show}, current => $p &>
 </p>
 
 % if ( @$posts ) {

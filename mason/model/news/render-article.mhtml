@@ -4,10 +4,12 @@
 </%args>
 %# ----------------------------------------------------------------------------
 <h1><% $article->{a_title} | h %></H1>
+%# <p>By: <& /zaapt/common/a_username.mhtml, a_username => $article->{ac_username} &></p>
 
 <p><strong><% $article->{a_intro} | h %></strong></p>
 
 <& /zaapt/common/render.mhtml, t_name => $article->{t_name}, content => $article->{a_article} &>
 
-<p class="footnote">Updated: <% $article->{a_updated} | h %></p>
+<p class="footnote">Updated: <& /zaapt/common/date.mhtml, date => $article->{a_updated} &></p>
+
 %# ----------------------------------------------------------------------------

@@ -70,6 +70,7 @@
         { type => 'hidden', name => 'p_id', value => $p_id },
         { type => 'hidden', name => 'p', value => $p },
         { type => 'textarea', field => 'Message', name => 'p_message', rows => 10, cols => 40, value => $post->{p_message} },
+        { type => 'html', field => 'Help', value => $m->scomp('help-link.mhtml') },
         { type => 'submit', field => 'Actions', value => 'Save', cancel_href => "$post->{tp_id}.html?p=$p" },
     ]
 &>

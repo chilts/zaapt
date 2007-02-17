@@ -52,6 +52,17 @@
             p          => $p,
         );
     }
+    elsif ( $page eq 'user-edit-post' ) {
+        # the user is editing their own post
+        $m->comp('/zaapt/model/forum/user-edit-post.mhtml',
+            zaapt      => $zaapt,
+            a          => $a,
+            f_name     => $f_name,
+            p_id       => $p_id,
+            p_message  => $p_message,
+            p          => $p,
+        );
+    }
     elsif ( $page eq 'moderator-del-post' ) {
         # main index page
         $m->comp('/zaapt/model/forum/moderator-del-post.mhtml',

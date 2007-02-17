@@ -5,6 +5,39 @@
     $p - page
 </%doc>
 %# ----------------------------------------------------------------------------
+<%once>
+    use POSIX;
+    sub is_editable {
+        my ($posts, $post, $forum, $a_id, $p) = @_;
+
+        # not editable if a new post has been added (ie. this isn't the last post)
+        return 0 unless $post == $posts->[-1];
+
+        # not editable if this isn't your post
+        return 0 unless $post->{p_account_id} == $a_id;
+
+        # not editable unless the database says
+        return 0 unless $post->{p_editable};
+
+        # need to check if this is the last post of a topic
+
+        # if we have less than we can show, then it must be the last post
+        if ( @$posts < $forum->{f_show} ) {
+            return 1;
+        }
+
+        # if we have the same as we can show, then it is either the last on a page or the last in total
+        my $number_of_pages = ($post->{tp_posts}-1) / $forum->{f_show};
+        $number_of_pages = POSIX::floor( $number_of_pages );
+        $number_of_pages++;
+        if ( $p == $number_of_pages ) {
+            return 1;
+        }
+
+        return 0;
+    }
+</%once>
+%# ----------------------------------------------------------------------------
 <%args>
     $zaapt
     $a         => ''
@@ -158,7 +191,6 @@
 </p>
 
 % if ( @$posts ) {
-
 <table>
     <tr>
         <th>Poster</th>
@@ -184,6 +216,11 @@
             <a href="moderator-edit-post.html?p_id=<% $post->{p_id} | u %>&amp;p=<% $p | u %>" title="Edit Post"><& /zaapt/common/icon.mhtml, name => 'script_edit', title => 'Edit Post' &> Edit Post</a>
             <br />
             <a href="moderator-del-post.html?p_id=<% $post->{p_id} | u %>&amp;p=<% $p | u %>" title="Del Post"><& /zaapt/common/icon.mhtml, name => 'script_delete', title => 'Del Post' &> Del Post</a>
+%         } else {
+%             if ( is_editable($posts, $post, $forum, $a_id, $p) ) {
+            <hr />
+            <a href="user-edit-post.html?p_id=<% $post->{p_id} | u %>&amp;p=<% $p | u %>" title="Edit Post"><& /zaapt/common/icon.mhtml, name => 'script_edit', title => 'Edit Post' &> Edit Your Post</a>
+%             }
 %         }
 
         </td>
@@ -195,7 +232,7 @@
 %     }
 </table>
 % } else {
-<p>There are currently no topics here.</p>
+<p>There are currently no posts here.</p>
 % }
 
 <p>

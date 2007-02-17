@@ -62,8 +62,8 @@ my $ins_post = __PACKAGE__->_mk_ins( 'forum.post', qw(topic_id account_id messag
 my $upd_post = __PACKAGE__->_mk_upd( 'forum.post', 'id', qw(topic_id account_id message type_id));
 my $del_post = __PACKAGE__->_mk_del( 'forum.post', 'id' );
 my $sel_post = "SELECT $forum_cols, $topic_cols, $post_cols FROM $forum_tablename $f_tp_join $tp_p_join WHERE p.id = ?";
-my $sel_all_posts_in = "SELECT $forum_cols, $topic_cols, $post_cols, $type_cols, $account_cols, $count_cols FROM $forum_tablename $f_tp_join $tp_p_join $p_t_join $p_a_join $p_c_join WHERE tp.id = ? ORDER BY p.inserted";
-my $sel_all_posts_in_offset = "SELECT $forum_cols, $topic_cols, $post_cols, $type_cols, $account_cols, $count_cols FROM $forum_tablename $f_tp_join $tp_p_join $p_t_join $p_a_join $p_c_join WHERE tp.id = ? ORDER BY p.inserted LIMIT ? OFFSET ?";
+my $sel_all_posts_in = "SELECT $forum_cols, $topic_cols, $post_cols, CASE WHEN current_timestamp < p.inserted + '1 hour'::INTERVAL THEN 1 ELSE 0 END AS p_editable, $type_cols, $account_cols, $count_cols FROM $forum_tablename $f_tp_join $tp_p_join $p_t_join $p_a_join $p_c_join WHERE tp.id = ? ORDER BY p.inserted";
+my $sel_all_posts_in_offset = "SELECT $forum_cols, $topic_cols, $post_cols, CASE WHEN current_timestamp < p.inserted + '1 hour'::INTERVAL THEN 1 ELSE 0 END AS p_editable, $type_cols, $account_cols, $count_cols FROM $forum_tablename $f_tp_join $tp_p_join $p_t_join $p_a_join $p_c_join WHERE tp.id = ? ORDER BY p.inserted LIMIT ? OFFSET ?";
 my $del_posts_for_topic = __PACKAGE__->_mk_del( 'forum.post', 'topic_id' );
 my $sel_post_count = __PACKAGE__->_mk_count( 'forum.post' );
 

@@ -6,6 +6,7 @@
 <%args>
     $zaapt
     $c_name
+    $location
 </%args>
 %# ----------------------------------------------------------------------------
 <%init>
@@ -31,7 +32,7 @@
         # quick fix to not display the Google Sitemaps Page
         # we should have either a draft or non-display column instead
         next if $page->{p_name} =~ m{ \A google }xms;
-        $urlset->add({ loc => "http://kiwiwriters.org/$page->{p_name}.html" });
+        $urlset->add({ loc => $location . "/$page->{p_name}.html" });
     }
 
     print $urlset->as_xml();

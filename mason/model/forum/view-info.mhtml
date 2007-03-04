@@ -1,0 +1,23 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $f_name     => undef
+    $a_id
+    $t_name
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Forum');
+    my $info = $model->sel_info({ a_id => $a_id });
+</%init>
+%# ----------------------------------------------------------------------------
+<div class="z_forum">
+<h1>Forum Settings</h1>
+
+<&  /zaapt/common/table.mhtml, rows => [
+        { field => 'Posts', value => $info->{i_posts} || '0' },
+        { type => $t_name, field => 'Signature', value => $info->{i_signature} || '' },
+    ]
+&>
+</div>
+%# ----------------------------------------------------------------------------

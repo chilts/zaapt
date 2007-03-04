@@ -67,10 +67,11 @@ CREATE TRIGGER post_updated BEFORE UPDATE ON forum.post
     FOR EACH ROW EXECUTE PROCEDURE updated();
 CREATE INDEX post_inserted ON forum.post(inserted);
 
--- table: count
-CREATE TABLE forum.count (
+-- table: info
+CREATE TABLE forum.info (
     account_id      INTEGER NOT NULL REFERENCES account.account PRIMARY KEY,
-    total           INTEGER NOT NULL DEFAULT 0,
+    posts           INTEGER NOT NULL DEFAULT 0,
+    signature       TEXT NOT NULL DEFAULT '',
 
     LIKE base       INCLUDING DEFAULTS
 );
@@ -107,12 +108,12 @@ CREATE FUNCTION newpost() RETURNS trigger as '
         UPDATE forum.forum SET posts = posts + 1, poster_id = NEW.account_id WHERE id = (SELECT forum_id FROM forum.topic WHERE id = NEW.topic_id);
 
         -- now update this users number of posts
-        SELECT INTO found_id account_id FROM forum.count WHERE account_id = NEW.account_id;
+        SELECT INTO found_id account_id FROM forum.info WHERE account_id = NEW.account_id;
         IF NOT FOUND THEN
-            INSERT INTO forum.count(account_id) VALUES(NEW.account_id);
-            SELECT INTO found_id account_id FROM forum.count WHERE account_id = NEW.account_id;
+            INSERT INTO forum.info(account_id) VALUES(NEW.account_id);
+            SELECT INTO found_id account_id FROM forum.info WHERE account_id = NEW.account_id;
         END IF;
-        UPDATE forum.count SET total = total + 1 WHERE account_id = found_id;
+        UPDATE forum.info SET posts = posts + 1 WHERE account_id = found_id;
 
         RETURN NEW;
     END;
@@ -125,7 +126,7 @@ CREATE FUNCTION delpost() RETURNS trigger as '
     BEGIN
         UPDATE forum.topic SET posts = posts - 1 WHERE id = OLD.topic_id;
         UPDATE forum.forum SET posts = posts - 1 WHERE id = (SELECT forum_id FROM forum.topic WHERE id = OLD.topic_id);
-        UPDATE forum.count SET total = total - 1 WHERE account_id = OLD.account_id;
+        UPDATE forum.info SET posts = posts - 1 WHERE account_id = OLD.account_id;
         RETURN NEW;
     END;
 ' LANGUAGE plpgsql;

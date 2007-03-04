@@ -15,7 +15,7 @@ my $post_tablename = "forum.post p";
 my $type_tablename = "common.type t";
 my $account_tablename = "account.account a";
 my $poster_tablename = "account.account po";
-my $count_tablename = "forum.count c";
+my $info_tablename = "forum.info i";
 
 # helper
 my $forum_cols = __PACKAGE__->_mk_cols( 'f', qw(id name title description show topics posts poster_id r:admin_id r:view_id r:moderator_id ts:inserted ts:updated) );
@@ -24,7 +24,7 @@ my $post_cols = __PACKAGE__->_mk_cols( 'p', qw(id topic_id account_id message ty
 my $type_cols = __PACKAGE__->_mk_cols( 't', qw(id name) );
 my $account_cols = __PACKAGE__->_mk_cols( 'a', qw(id username ts:inserted ts:updated) );
 my $poster_cols = __PACKAGE__->_mk_cols( 'po', qw(id username ts:inserted ts:updated) );
-my $count_cols = __PACKAGE__->_mk_cols( 'c', qw(account_id total ts:inserted ts:updated) );
+my $info_cols = __PACKAGE__->_mk_cols( 'i', qw(account_id posts signature ts:inserted ts:updated) );
 
 # joins
 my $f_tp_join = "JOIN $topic_tablename ON (tp.forum_id = f.id)";
@@ -34,7 +34,7 @@ my $tp_a_join = "JOIN $account_tablename ON (tp.account_id = a.id)";
 my $tp_po_join = "LEFT JOIN $poster_tablename ON (tp.poster_id = po.id)";
 my $p_a_join = "JOIN $account_tablename ON (p.account_id = a.id)";
 my $f_po_join = "JOIN $poster_tablename ON (f.poster_id = po.id)";
-my $p_c_join = "LEFT JOIN $count_tablename ON (p.account_id = c.account_id)";
+my $p_i_join = "LEFT JOIN $info_tablename ON (p.account_id = i.account_id)";
 
 # forum
 my $ins_forum = __PACKAGE__->_mk_ins( 'forum.forum', qw(name title description show admin_id view_id moderator_id) );
@@ -62,10 +62,15 @@ my $ins_post = __PACKAGE__->_mk_ins( 'forum.post', qw(topic_id account_id messag
 my $upd_post = __PACKAGE__->_mk_upd( 'forum.post', 'id', qw(topic_id account_id message type_id));
 my $del_post = __PACKAGE__->_mk_del( 'forum.post', 'id' );
 my $sel_post = "SELECT $forum_cols, $topic_cols, $post_cols FROM $forum_tablename $f_tp_join $tp_p_join WHERE p.id = ?";
-my $sel_all_posts_in = "SELECT $forum_cols, $topic_cols, $post_cols, CASE WHEN current_timestamp < p.inserted + '1 hour'::INTERVAL THEN 1 ELSE 0 END AS p_editable, $type_cols, $account_cols, $count_cols FROM $forum_tablename $f_tp_join $tp_p_join $p_t_join $p_a_join $p_c_join WHERE tp.id = ? ORDER BY p.inserted";
-my $sel_all_posts_in_offset = "SELECT $forum_cols, $topic_cols, $post_cols, CASE WHEN current_timestamp < p.inserted + '1 hour'::INTERVAL THEN 1 ELSE 0 END AS p_editable, $type_cols, $account_cols, $count_cols FROM $forum_tablename $f_tp_join $tp_p_join $p_t_join $p_a_join $p_c_join WHERE tp.id = ? ORDER BY p.inserted LIMIT ? OFFSET ?";
+my $sel_all_posts_in = "SELECT $forum_cols, $topic_cols, $post_cols, CASE WHEN current_timestamp < p.inserted + '1 hour'::INTERVAL THEN 1 ELSE 0 END AS p_editable, $type_cols, $account_cols, $info_cols FROM $forum_tablename $f_tp_join $tp_p_join $p_t_join $p_a_join $p_i_join WHERE tp.id = ? ORDER BY p.inserted";
+my $sel_all_posts_in_offset = "SELECT $forum_cols, $topic_cols, $post_cols, CASE WHEN current_timestamp < p.inserted + '1 hour'::INTERVAL THEN 1 ELSE 0 END AS p_editable, $type_cols, $account_cols, $info_cols FROM $forum_tablename $f_tp_join $tp_p_join $p_t_join $p_a_join $p_i_join WHERE tp.id = ? ORDER BY p.inserted LIMIT ? OFFSET ?";
 my $del_posts_for_topic = __PACKAGE__->_mk_del( 'forum.post', 'topic_id' );
 my $sel_post_count = __PACKAGE__->_mk_count( 'forum.post' );
+
+# info
+my $ins_info = __PACKAGE__->_mk_ins( 'forum.info', qw(account_id posts signature) );
+my $upd_info = __PACKAGE__->_mk_upd( 'forum.info', 'account_id', qw(posts signature) );
+my $sel_info = "SELECT $info_cols FROM $info_tablename WHERE i.account_id = ?";
 
 ## ----------------------------------------------------------------------------
 # methods
@@ -191,6 +196,21 @@ sub del_post {
 sub sel_post_count {
     my ($self) = @_;
     return $self->_row( $sel_post_count );
+}
+
+sub ins_info {
+    my ($self, $hr) = @_;
+    return $self->_do( $ins_info, $hr->{a_id}, $hr->{i_posts}, $hr->{i_signature} );
+}
+
+sub upd_info {
+    my ($self, $hr) = @_;
+    $self->_do( $upd_info, $hr->{i_posts}, $hr->{i_signature}, $hr->{a_id} );
+}
+
+sub sel_info {
+    my ($self, $hr) = @_;
+    return $self->_row( $sel_info, $hr->{a_id} );
 }
 
 sub _nuke {

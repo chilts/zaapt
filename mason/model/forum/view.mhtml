@@ -1,10 +1,12 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $f_name
+    $f_name     => undef
     $page       => ''
     $t_id       => undef
+    $t_name     => undef
     $p          => 1
+    $a_id       => undef
 </%args>
 %# ----------------------------------------------------------------------------
 <%init>
@@ -24,6 +26,14 @@
             f_name     => $f_name,
             t_id       => $t_id,
             p          => $p,
+        );
+    }
+    elsif ( $page eq 'info' ) {
+        # main index page
+        $m->comp('/zaapt/model/forum/view-info.mhtml',
+            zaapt      => $zaapt,
+            a_id       => $a_id,
+            t_name     => $t_name,
         );
     }
     else {

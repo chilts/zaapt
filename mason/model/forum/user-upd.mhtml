@@ -1,0 +1,57 @@
+%# ----------------------------------------------------------------------------
+<%doc>
+    Note: $my_roles is not a required arg, so make sure the person editing this
+    is allowed to.
+</%doc>
+%# ----------------------------------------------------------------------------
+<%once>
+    use Zaapt::Utils::Valid;
+</%once>
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $a_id        => undef
+    $i_signature => undef
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Forum');
+    my $info = $model->sel_info({ a_id => $a_id });
+
+    my $err = [];
+    $info->{i_posts} ||= 0;
+    $info->{i_signature} ||= '';
+    $i_signature =~ s{\r}{}gxms;
+
+    unless ( @$err ) {
+        # see if this info already exists
+        if ( defined $info ) {
+            $model->upd_info({
+                i_signature => $i_signature,
+                a_id => $a_id,
+            });
+        }
+        else {
+            $model->ins_info({
+                a_id => $a_id,
+                i_signature => $i_signature,
+            });
+        }
+        $m->redirect(".");
+        return;
+    }
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Edit your Forum Profile</h1>
+
+<& /zaapt/common/err.mhtml, err => $err &>
+
+<& /zaapt/common/form.mhtml, action => 'user-upd.html', elements => [
+        { type => 'hidden', name => 'act', value => 'update' },
+        { type => 'read', field => 'Posts', value => $info->{i_posts} },
+        { type => 'textarea', field => 'Signature', name => 'i_signature', rows => 4, cols => 40, value => $i_signature },
+        { type => 'submit', field => '', value => 'Save Changes' },
+    ]
+&>
+
+%# ----------------------------------------------------------------------------

@@ -1,0 +1,36 @@
+%# ----------------------------------------------------------------------------
+<%doc>
+    Note: $my_roles is not a required arg, so make sure the person editing this
+    is allowed to.
+</%doc>
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $a_id => undef
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Forum');
+    my $info = $model->sel_info({ a_id => $a_id });
+
+    # check to see if this person has any posts/info yet
+    unless ( defined $info ) {
+        $info->{i_posts} = 0;
+        $info->{i_signature} = '';
+    }
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Edit your Forum profile</h1>
+
+<a href="./">&laquo; Back to Forum Profile</a>
+
+<& /zaapt/common/form.mhtml, action => 'user-upd.html', elements => [
+        { type => 'hidden', name => 'act', value => 'update' },
+        { type => 'read', field => 'Posts', value => $info->{i_posts} },
+        { type => 'textarea', field => 'Signature', name => 'i_signature', rows => 4, cols => 40, value => $info->{i_signature} },
+        { type => 'submit', field => '', value => 'Save Changes' },
+    ]
+&>
+
+%# ----------------------------------------------------------------------------
+

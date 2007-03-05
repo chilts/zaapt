@@ -12,7 +12,7 @@
 </%init>
 %# ----------------------------------------------------------------------------
 <div class="z_forum">
-<h1>Forum Settings</h1>
+<h1>Forum Info</h1>
 
 <&  /zaapt/common/table.mhtml, rows => [
         { field => 'Posts', value => $info->{i_posts} || '0' },

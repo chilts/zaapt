@@ -1,0 +1,42 @@
+%# --- ARGS -------------------------------------------------------------------
+<%args>
+    $zaapt
+    $my_roles
+</%args>
+%# --- INIT -------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Account');
+    my $accounts = $model->sel_account_all();
+</%init>
+%# --- HTML -------------------------------------------------------------------
+<h1>Account List</h1>
+
+<table class="edit">
+    <thead>
+        <tr>
+            <th class="list">Name</th>
+            <th class="action">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+% my $row = 1;
+% foreach my $account ( @$accounts ) {
+        <tr class="r<% $row=1-$row %>">
+            <td>
+                <strong>(<% $account->{a_id} | h %>)</strong> <% $account->{a_username} | h %> - <strong><% $account->{a_firstname} | h %> <% $account->{a_lastname} | h %></strong>
+                <br />
+                <% $account->{a_confirmed} ? 'Account Confirmed' : 'Not Confirmed' | h %>
+                <br />
+                <strong><% $account->{a_logins} | h %></strong> logins
+                <br />
+                Last <strong><% $account->{a_last} | h %><strong>
+            </td>
+            <td>
+                * No actions yet
+            </td>
+        </tr>
+% }
+    </tbody>
+</table>
+
+%# --- END --------------------------------------------------------------------

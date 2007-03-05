@@ -28,6 +28,7 @@ my $upd_account = __PACKAGE__->_mk_upd( 'account.account', 'id', qw(username fir
 my $upd_password = "UPDATE account.account SET password = md5(salt || ?) WHERE id = ?";
 my $upd_logins = "UPDATE account.account SET logins = logins + 1 WHERE id = ?";
 my $upd_last = "UPDATE account.account SET last = CURRENT_TIMESTAMP WHERE id = ?";
+my $sel_account_all = "SELECT $account_cols FROM $account_tablename ORDER BY a.id";
 
 # role
 my $ins_role = __PACKAGE__->_mk_ins( 'account.role', qw(name description) );
@@ -103,6 +104,11 @@ sub upd_logins {
 sub upd_last {
     my ($self, $hr) = @_;
     $self->_do( $upd_last, $hr->{a_id} );
+}
+
+sub sel_account_all {
+    my ($self) = @_;
+    return $self->_rows( $sel_account_all );
 }
 
 sub ins_confirm {

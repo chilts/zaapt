@@ -1,0 +1,21 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $my_roles
+    $c_id
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Content');
+    my $content = $model->sel_content({ c_id => $c_id });
+
+    $m->redirect('edit_c_list.html') unless defined $content;
+
+    $m->redirect('edit_c_list.html') unless exists $my_roles->{$content->{_admin}};
+
+    $model->del_content({ c_id => $c_id });
+
+    $m->redirect("edit_c_list.html");
+    return;
+</%init>
+%# ----------------------------------------------------------------------------

@@ -36,7 +36,7 @@
 %         if ( exists $my_roles->{$content->{_admin}} ) {
                 * <a href="edit_p_add.html?c_id=<% $content->{c_id} | u %>">Add Page</a><br />
                 * <a href="edit_p_list.html?c_id=<% $content->{c_id} | u %>">List/Edit</a><br />
-                * <a href="#">Delete</a><br />
+                * <a href="edit_c_del.html?c_id=<% $content->{c_id} | u %>">Delete</a><br />
 %         } else {
                 -
 %         }

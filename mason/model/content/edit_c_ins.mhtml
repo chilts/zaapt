@@ -59,7 +59,9 @@
 
 <h2>Content: ?</h2>
 
-<&  /zaapt/common/form.mhtml, action => 'edit_c_ins.html', elements => [
+<& /zaapt/common/err.mhtml, err => $err &>
+
+<& /zaapt/common/form.mhtml, action => 'edit_c_ins.html', elements => [
         { type => 'text', field => 'Name', name => 'c_name', size => 40, value => $c_name },
         { type => 'text', field => 'Title', name => 'c_title', size => 40, value => $c_title },
         { type => 'textarea', field => 'Description', name => 'c_description', rows => 10, cols => 40, value => $c_description },

@@ -1,0 +1,22 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $my_roles
+    $i_id
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Menu');
+    my $item = $model->sel_item({ i_id => $i_id });
+
+    # if there is no item, then we can't edit
+    $m->redirect('edit.html') unless defined $item;
+
+    # to edit this item, the user needs the '_edit' role
+    $m->redirect('edit.html') unless exists $my_roles->{$item->{_edit}};
+
+    $model->upd_item_move_up({ m_id => $item->{m_id}, i_id => $i_id });
+    $m->redirect("edit_i_list.html?m_id=$item->{m_id}");
+    return;
+</%init>
+%# ----------------------------------------------------------------------------

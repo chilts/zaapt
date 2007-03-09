@@ -1,0 +1,34 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $my_roles
+</%args>
+%# ----------------------------------------------------------------------------
+<%once>
+    use URI::Escape;
+</%once>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Menu');
+    my $roles = $zaapt->get_model('Account')->sel_all_roles();
+    my @options = map { { value => $_->{r_id}, text => $_->{r_name} } } @$roles;
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Add a Menu</h1>
+
+<p><a href="edit_m_list.html">&laquo; Back to Menu List</a></p>
+
+<h2>Menu: ?</h2>
+
+<& /zaapt/common/form.mhtml, action => 'edit_m_ins.html', elements => [
+        { type => 'text', field => 'Name', name => 'm_name', size => 40, value => '' },
+        { type => 'text', field => 'Title', name => 'm_title', size => 40, value => '' },
+        { type => 'textarea', field => 'Description', name => 'm_description', rows => 10, cols => 40, value => '' },
+        { type => 'select', field => 'Admin Role', name => '_admin', options => \@options },
+        { type => 'select', field => 'View Role', name => '_view', options => \@options },
+        { type => 'select', field => 'Edit Role', name => '_edit', options => \@options },
+        { type => 'submit', field => 'Actions', value => 'Add Menu', cancel => 'edit_m_list.html' },
+    ]
+&>
+
+%# ----------------------------------------------------------------------------

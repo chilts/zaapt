@@ -1,0 +1,43 @@
+%# ----------------------------------------------------------------------------
+<%doc>
+
+    This example demonstrates how to get your menu into a set of <div>s. It is
+    a VERY SIMPLE example :-)
+
+    It doesn't do any processing on the list itself and instead simply puts
+    class names against each <div> for you to place CSS against each item.
+
+</%doc>
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $m_name
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Menu');
+    my $menu = $model->sel_menu_using_name({ m_name => $m_name });
+
+    # since this is a menu and not a top level component, we probably just want
+    # to return rather than abort
+    return unless defined $menu;
+
+    my $items = $model->sel_all_items_in({ m_id => $menu->{m_id} });
+</%init>
+%# ----------------------------------------------------------------------------
+<div class="z_menu">
+% if ( @$items ) {
+%     foreach my $item ( @$items ) {
+    <div class="level_<% $item->{i_level} | h %>">
+        <a href="<% $item->{i_url} | u %>">
+%         if ( $item->{i_ishtml} ) {
+            <% $item->{i_text} %>
+%         } else {
+            <% $item->{i_text} | h %>
+%         }
+        </a>
+    </div>
+%     }
+% }
+</div>
+%# ----------------------------------------------------------------------------

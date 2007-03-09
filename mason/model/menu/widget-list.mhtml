@@ -1,0 +1,57 @@
+%# ----------------------------------------------------------------------------
+<%doc>
+
+    This example demonstrates how to get your menu into a list. It is a VERY
+    SIMPLE example :-)
+
+    It rates each item depending on level and puts them into three categories:
+
+    * level 0 - is not displayed
+    * level 1 - is display as the item
+    * level 2 and above - is display with a '-' preceeding it
+
+    If there are no items, then no list is displayed though the surrounding
+    <div> is still output.
+
+    Since this is a simple example, it doesn't show lists within lists for the
+    many and separate levels that may be found - this is left as an exercise
+    for the reader.
+
+</%doc>
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $m_name
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Menu');
+    my $menu = $model->sel_menu_using_name({ m_name => $m_name });
+
+    # since this is a menu and not a top level component, we probably just want
+    # to return rather than abort
+    return unless defined $menu;
+
+    my $items = $model->sel_all_items_in({ m_id => $menu->{m_id} });
+</%init>
+%# ----------------------------------------------------------------------------
+<div class="z_menu">
+% if ( @$items ) {
+    <ul>
+%     foreach my $item ( @$items ) {
+%         next unless $item->{i_level};
+        <li>
+            <% $item->{i_level} == 1 ? '' : '-' %>
+            <a href="<% $item->{i_url} | u %>">
+%         if ( $item->{i_ishtml} ) {
+                <% $item->{i_text} %>
+%         } else {
+                <% $item->{i_text} | h %>
+%         }
+            </a>
+        </li>
+%     }
+    </ul>
+% }
+</div>
+%# ----------------------------------------------------------------------------

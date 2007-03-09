@@ -1,0 +1,55 @@
+%# ----------------------------------------------------------------------------
+<%doc>
+
+    Usually, a menu would not be available in the main content of a
+    site. Therefore, this is just an example of getting the menu, it's items
+    and displaying them.
+
+    There are some widget-*.mhtml files here which give you more examples of
+    what you can do, but it is really hard to demonstrate a standard way of
+    doing a menu since the HTML and CSS varies considerably between different
+    sites.
+
+    Therefore, the best way to do it would be to create your own
+    widget-my-menu.mhtml component and have that called with the menu name to
+    render.
+
+</%doc>
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $m_name
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Menu');
+    my $menu = $model->sel_menu_using_name({ m_name => $m_name });
+
+    unless ( defined $menu ) {
+        $m->clear_buffer();
+        $m->abort(404);
+        return;
+    }
+
+    my $items = $model->sel_all_items_in({ m_id => $menu->{m_id} });
+</%init>
+%# ----------------------------------------------------------------------------
+<div class="z_menu">
+% if ( @$items ) {
+    <ul>
+%     foreach my $item ( @$items ) {
+        <li>
+            <% '+' x $item->{i_level} %>
+            <a href="<% $item->{i_url} | u %>">
+%         if ( $item->{i_ishtml} ) {
+                <% $item->{i_text} %>
+%         } else {
+                <% $item->{i_text} | h %>
+%         }
+            </a>
+        </li>
+%     }
+    </ul>
+% }
+</div>
+%# ----------------------------------------------------------------------------

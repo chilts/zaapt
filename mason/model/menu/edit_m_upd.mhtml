@@ -1,0 +1,80 @@
+%# ----------------------------------------------------------------------------
+<%once>
+    use Zaapt::Utils::Valid;
+</%once>
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $my_roles
+    $m_id          => undef
+    $m_name        => undef
+    $m_title       => undef
+    $m_description => undef
+    $_admin        => undef
+    $_view         => undef
+    $_edit         => undef
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Menu');
+    my $menu = $model->sel_menu({ m_id => $m_id });
+
+    # check the error conditions first - we need to recover
+    $m->redirect('edit_m_list.html') unless defined $menu;
+    $m->redirect('edit_m_list.html?m_id=$menu->{m_id}') unless exists $my_roles->{$menu->{_admin}};
+
+    my $err = [];
+
+    unless ( Zaapt::Utils::Valid::is_valid_name($m_name) ) {
+        push @$err, Zaapt::Utils::Valid::err();
+    }
+
+    # no Menu of this name should exist
+    unless ( @$err ) {
+        my $menu_check = $model->sel_menu_using_name({ m_name => $m_name });
+        if ( defined $menu_check and $menu_check->{m_id} != $menu->{m_id} ) {
+            push @$err, "Menu '$m_name' already exists." if defined $menu;
+        }
+    }
+
+    $m_description =~ s{\r}{}gxms;
+
+    unless ( @$err ) {
+        $model->upd_menu({
+            m_id          => $m_id,
+            m_name        => $m_name,
+            m_title       => $m_title,
+            m_description => $m_description,
+            _admin        => $_admin,
+            _view         => $_view,
+            _edit         => $_edit,
+        });
+        $m->redirect("edit_m_list.html");
+        return;
+    }
+
+    my $roles = $zaapt->get_model('Account')->sel_all_roles();
+    my @options = map { { value => $_->{r_id}, text => $_->{r_name} } } @$roles;
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Edit a Menu</h1>
+
+<p><a href="edit_m_list.html">&laquo; Back to Menu List</a></p>
+
+<h2>Menu: <% $menu->{m_name} | h %> - <% $menu->{m_title} | h %></h2>
+
+<& /zaapt/common/err.mhtml, err => $err &>
+
+<& /zaapt/common/form.mhtml, action => 'edit_m_ins.html', elements => [
+        { type => 'hidden', name => 'm_id', value => $m_id },
+        { type => 'text', field => 'Name', name => 'm_name', size => 40, value => $m_name },
+        { type => 'text', field => 'Title', name => 'm_title', size => 40, value => $m_title },
+        { type => 'textarea', field => 'Description', name => 'm_description', rows => 10, cols => 40, value => $m_description },
+        { type => 'select', field => 'Admin Role', name => '_admin', options => \@options, selected => $_admin },
+        { type => 'select', field => 'View Role', name => '_view', options => \@options, selected => $_view },
+        { type => 'select', field => 'Edit Role', name => '_edit', options => \@options, selected => $_edit },
+        { type => 'submit', field => 'Actions', value => 'Add Menu', cancel => 'edit_m_list.html' },
+    ]
+&>
+
+%# ----------------------------------------------------------------------------

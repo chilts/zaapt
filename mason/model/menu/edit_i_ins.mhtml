@@ -1,0 +1,78 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $my_roles
+    $m_id
+    $i_level
+    $i_url
+    $i_text
+    $i_ishtml => 0
+</%args>
+%# ----------------------------------------------------------------------------
+<%once>
+    use Zaapt::Utils::Valid;
+    use Zaapt::Utils::Conv;
+</%once>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Menu');
+    my $menu = $model->sel_menu({ m_id => $m_id });
+
+    # this menu section firstly needs to exist to be able to add a page
+    $m->redirect('edit.html') unless defined $menu;
+
+    warn "...here ($m_id)...\n";
+
+    # to insert this item, the user needs the '_admin' role on this menu section
+    $m->redirect('edit.html') unless exists $my_roles->{$menu->{_admin}};
+
+    my $err = [];
+
+    unless ( Zaapt::Utils::Valid::is_non_negative_integer($i_level, 'Level') ) {
+        push @$err, Zaapt::Utils::Valid::err();
+    }
+
+    unless ( Zaapt::Utils::Valid::contains_something($i_url, 'URL') ) {
+        push @$err, Zaapt::Utils::Valid::err();
+    }
+
+    $i_text = Zaapt::Utils::Conv::remove_cr( $i_text );
+    unless ( Zaapt::Utils::Valid::contains_something($i_text, 'Text') ) {
+        push @$err, Zaapt::Utils::Valid::err();
+    }
+
+    $i_ishtml = Zaapt::Utils::Conv::to_bool( $i_ishtml );
+
+    unless ( @$err ) {
+        $model->ins_item({
+            m_id     => $m_id,
+            i_level  => $i_level,
+            i_url    => $i_url,
+            i_text   => $i_text,
+            i_ishtml => $i_ishtml,
+        });
+        $m->redirect("edit_i_list.html?m_id=$m_id");
+        return;
+    }
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Inserting a Menu Item</h1>
+
+<p><a href="edit_i_list.html?m_id=<% $m_id | h %>">&laquo; Back to Item List</a></p>
+
+<h2>Menu: <% $menu->{m_name} | h %> - '<% $menu->{m_title} | h %>'</h2>
+
+<& /zaapt/common/err.mhtml, err => $err &>
+
+<&  /zaapt/common/form.mhtml, action => 'edit_i_ins.html', elements => [
+        { type => 'hidden', name => 'm_id', value => $m_id },
+        { type => 'read', field => 'Menu', name => 'm_name', value => $menu->{m_name} },
+        { type => 'text', field => 'Level', name => 'i_level', size => 2, value => $i_level },
+        { type => 'text', field => 'URL', name => 'i_url', size => 40, value => $i_url },
+        { type => 'textarea', field => 'Text', name => 'i_text', rows => 3, cols => 40, value => $i_text },
+        { type => 'check', field => 'Is HTML?', name => 'i_ishtml', checked => $i_ishtml },
+        { type => 'submit', field => 'Actions', value => 'Add', cancel => "edit_m_list.html?m_id=$m_id" },
+    ]
+&>
+
+%# ----------------------------------------------------------------------------

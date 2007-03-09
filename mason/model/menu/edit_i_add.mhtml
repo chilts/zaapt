@@ -1,0 +1,39 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $my_roles
+    $m_id
+</%args>
+%# ----------------------------------------------------------------------------
+<%once>
+    use URI::Escape;
+</%once>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Menu');
+
+    my $menu = $model->sel_menu({ m_id => $m_id });
+    $m->redirect('edit_m_list.html') unless defined $menu;
+
+    # need admin
+    $m->redirect('edit_m_list.html') unless exists $my_roles->{$menu->{_admin}};
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Add a Menu Item</h1>
+
+<p><a href="edit_i_list.html?m_id=<% $m_id | h %>">&laquo; Back to Item List</a></p>
+
+<h2>Menu: <% $menu->{m_name} | h %> - '<% $menu->{m_title} | h %>'</h2>
+
+<&  /zaapt/common/form.mhtml, action => 'edit_i_ins.html', elements => [
+        { type => 'hidden', name => 'm_id', value => $m_id },
+        { type => 'read', field => 'Menu', name => 'm_name', value => $menu->{m_name} },
+        { type => 'text', field => 'Level', name => 'i_level', size => 2, value => 0 },
+        { type => 'text', field => 'URL', name => 'i_url', size => 40, value => '' },
+        { type => 'textarea', field => 'Text', name => 'i_text', rows => 3, cols => 40, value => '' },
+        { type => 'check', field => 'Is HTML?', name => 'i_ishtml' },
+        { type => 'submit', field => 'Actions', value => 'Add', cancel => "edit_m_list.html?m_id=$m_id" },
+    ]
+&>
+
+%# ----------------------------------------------------------------------------

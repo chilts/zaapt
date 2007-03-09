@@ -5,7 +5,7 @@ CREATE SCHEMA faq;
 -- table: faq
 CREATE SEQUENCE faq.faq_id_seq;
 CREATE TABLE faq.faq (
-    id              INTEGER NOT NULL DEFAULT nextval('content.content_id_seq'::TEXT) PRIMARY KEY,
+    id              INTEGER NOT NULL DEFAULT nextval('faq.faq_id_seq'::TEXT) PRIMARY KEY,
     name            TEXT NOT NULL,
     title           TEXT NOT NULL,
     description     TEXT NOT NULL,
@@ -19,11 +19,11 @@ CREATE TABLE faq.faq (
 CREATE TRIGGER faq_updated BEFORE UPDATE ON faq.faq
     FOR EACH ROW EXECUTE PROCEDURE updated();
 
-COMMENT ON COLUMN content.content.admin_id IS
-    'Admin allows the user to do anything with the content, including delete it';
-COMMENT ON COLUMN content.content.view_id IS
+COMMENT ON COLUMN faq.faq.admin_id IS
+    'Admin allows the user to do anything with the FAQ, including delete it';
+COMMENT ON COLUMN faq.faq.view_id IS
     'View allows the user to see the questions and answers';
-COMMENT ON COLUMN content.content.edit_id IS
+COMMENT ON COLUMN faq.faq.edit_id IS
     'Edit allows the user to edit the questions and answers, including adding a new one';
 
 -- table: question

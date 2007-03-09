@@ -35,29 +35,76 @@ sub is_valid_name {
     return 1;
 }
 
+sub contains_something {
+    my ($str, $name) = @_;
+
+    unless ( defined $str ) {
+        $err = "'$name' is undefined";
+        return;
+    }
+
+    if ( $str eq '' ) {
+        $err = "no '$name' given";
+        return;
+    }
+
+    unless ( $str =~ m{ \S }xms ) {
+        $err = "'$name' must contain ";
+        return;
+    }
+
+    return 1;
+}
+
+# means 0 or more...
 sub is_non_negative_integer {
     my ($num, $name) = @_;
 
     $err = undef;
 
-    # check that the FAQ name has been given
     unless ( defined $num ) {
         $err = "'$name' is undefined";
         return;
     }
 
     if ( $num eq '' ) {
-        $err = "No '$name' given";
+        $err = "no '$name' given";
         return;
     }
 
     unless ( $num =~ m{ \A \d+ \z }xms ) {
-        $err = "'$name' must contain only digits.";
+        $err = "'$name' ($num) must contain only digits";
+        return;
+    }
+
+    # since $num contains ONLY 0-9 then it must be non-negative
+
+    return 1;
+}
+
+# means greater than 0, ie. 1 or more...
+sub is_positive_integer {
+    my ($num, $name) = @_;
+
+    $err = undef;
+
+    unless ( defined $num ) {
+        $err = "no '$name' given";
+        return;
+    }
+
+    if ( $num eq '' ) {
+        $err = "no '$name' given";
+        return;
+    }
+
+    unless ( $num =~ m{ \A \d+ \z }xms ) {
+        $err = "'$name' ($num) must contain only digits";
         return;
     }
 
     unless ( $num > 0 ) {
-        $err = "'$name' must be greater than 0";
+        $err = "'$name' ($num) must be greater than 0";
         return;
     }
 

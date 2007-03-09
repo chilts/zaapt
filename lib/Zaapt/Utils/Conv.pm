@@ -6,6 +6,14 @@ use warnings;
 
 our $VERSION = '0.1';
 
+my $true_values = {
+    checked => 1,
+    on => 1,
+    yes => 1,
+    true => 1,
+    '1' => 1,
+};
+
 my $err;
 
 sub err {
@@ -14,8 +22,8 @@ sub err {
 
 sub to_bool {
     my ($arg) = @_;
-    $arg = ( $arg ? 1 : 0 );
-    return $arg;
+    $arg = lc $arg;
+    return exists $true_values->{$arg} ? '1' : '0';
 }
 
 sub remove_cr {

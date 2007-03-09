@@ -137,6 +137,12 @@ sub _currval {
     return $id;
 }
 
+sub _nextval {
+    my ($self, $seqname) = @_;
+    my ($id) = $self->dbh()->selectrow_array( "SELECT nextval(?)", undef, $seqname );
+    return $id;
+}
+
 sub _do {
     my ($self, $stm, @bind_values) = @_;
     return $self->dbh()->do( $stm, undef, @bind_values );

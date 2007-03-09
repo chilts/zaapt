@@ -20,7 +20,7 @@
 
 <p><a href="edit_m_list.html">&laquo; Back to Menu List</a></p>
 
-<h2>Menu: <% $menu->{m_name} | h %> - <% $menu->{m_title} | h %></h2>
+<h2>Menu: <% $menu->{m_name} | h %> - '<% $menu->{m_title} | h %>'</h2>
 
 % if ( exists $my_roles->{$menu->{_admin}} ) {
 <p>

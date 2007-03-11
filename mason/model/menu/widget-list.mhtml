@@ -42,7 +42,7 @@
 %         next unless $item->{i_level};
         <li>
             <% $item->{i_level} == 1 ? '' : '-' %>
-            <a href="<% $item->{i_url} | u %>">
+            <a href="<% $item->{i_url} %>">
 %         if ( $item->{i_ishtml} ) {
                 <% $item->{i_text} %>
 %         } else {

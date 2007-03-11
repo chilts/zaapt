@@ -29,7 +29,7 @@
 % if ( @$items ) {
 %     foreach my $item ( @$items ) {
     <div class="level_<% $item->{i_level} | h %>">
-        <a href="<% $item->{i_url} | u %>">
+        <a href="<% $item->{i_url} %>">
 %         if ( $item->{i_ishtml} ) {
             <% $item->{i_text} %>
 %         } else {

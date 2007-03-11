@@ -1,0 +1,29 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $n_name
+    $base
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('News');
+    my $news = $model->sel_news_using_name({ n_name => $n_name });
+
+    # since this is a widget, we shouldn't abort, but just not display anything
+    return unless defined $news;
+
+    my $articles = $model->sel_latest_articles({ n_id => $news->{n_id}, _limit => 1 });
+</%init>
+%# ----------------------------------------------------------------------------
+<em>Latest News</em>
+<br />
+% if ( @$articles ) {
+<strong><% $articles->[0]{a_title} | h %></strong>
+<br />
+<a href="<% $base %>/<% $articles->[0]{a_id} %>.html">Read More...</a>
+% } else {
+<strong>No news.</strong>
+<br />
+&nbsp;
+% }
+%# ----------------------------------------------------------------------------

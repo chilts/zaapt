@@ -4,10 +4,6 @@
     $content
 </%args>
 %# ----------------------------------------------------------------------------
-<%once>
-    use Text::Phliky;
-</%once>
-%# ----------------------------------------------------------------------------
 % if ( $t_name eq 'text' ) {
 %     my @paras = split /\n\n+/, $content;
 %     foreach my $para ( @paras ) {
@@ -19,8 +15,6 @@
 <pre>
 <% $content %>
 </pre>
-% } elsif ( $t_name eq 'phliky' ) {
-    <% Text::Phliky->text2html( $content ) %>
 % } else {
     <p>Unknown content type: '<% $t_name | h %>'
 % }

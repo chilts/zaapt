@@ -34,10 +34,12 @@ sub get_model {
     if ( $model =~ m{ \A \w+ \z }xms ) {
         eval "use Zaapt::Store::$self->{store}::$model";
         $self->{models}{$model} = "Zaapt::Store::$self->{store}::$model"->new( $self->{args} );
+        $self->{models}{$model}->parent( $self );
     }
     elsif ( $model =~ m{ \A \w+(::\w+)* \z }xms ) {
         eval "use $model";
         $self->{models}{$model} = $model->new( $self->{args} );
+        $self->{models}{$model}->parent( $self );
     }
     else {
         warn "Unknown model: '$model'";

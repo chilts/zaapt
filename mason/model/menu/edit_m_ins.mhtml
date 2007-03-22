@@ -17,7 +17,7 @@
 <%init>
     my $model = $zaapt->get_model('Menu');
 
-    # to insert this page, the user needs the '_admin' role on this menu
+    # to insert this page, the user needs the 'super' role
     $m->redirect('edit_m_list.html') unless exists $my_roles->{super};
 
     my $err = [];

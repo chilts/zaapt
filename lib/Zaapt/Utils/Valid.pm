@@ -49,7 +49,7 @@ sub contains_something {
     }
 
     unless ( $str =~ m{ \S }xms ) {
-        $err = "'$name' must contain ";
+        $err = "'$name' must contain something other than whitespace";
         return;
     }
 

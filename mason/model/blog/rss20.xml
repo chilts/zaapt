@@ -1,0 +1,72 @@
+%# ----------------------------------------------------------------------------
+<%once>
+    use XML::RSS;
+    use HTML::Entities;
+    my $tm = {
+        '01' => 'Jan', '02' => 'Feb', '03' => 'Mar', '04' => 'Apr',
+        '05' => 'May', '06' => 'Jun', '07' => 'Jul', '08' => 'Aug',
+        '09' => 'Sep', '10' => 'Oct', '11' => 'Nov', '12' => 'Dec',
+    };
+</%once>
+%# ----------------------------------------------------------------------------
+<%doc>
+
+    The input args are:
+    - $domain - e.g. 'zaapt.org.nz' (no http:// or trailing slash)
+    - $path - e.g. 'blog' (no preceeding/trailing slashes)
+
+</%doc>
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $b_name
+    $domain
+    $path
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    # $r->content_type('text/xml');
+
+    my $model = $zaapt->get_model('Blog');
+    my $blog = $model->sel_blog_using_name({ b_name => $b_name });
+    unless ( defined $blog ) {
+        $m->clear_buffer();
+        $m->abort(404);
+        return;
+    }
+    my $entries = $model->sel_latest_entries({ b_id => $blog->{b_id}, _limit => $blog->{b_show} });
+
+    my $date = $entries->[-1]{a_inserted};
+    $date =~ /(\d{4})-(\d{2})-(\d{2}) (\d{2}:\d{2}:\d{2})/;
+    $date = "$3 $tm->{$2} $1 $4 +1200";
+
+    my $rss = new XML::RSS (version => '2.0');
+    $rss->channel(
+        title        => $blog->{b_description},
+        link         => "http://$domain/",
+        language     => 'en',
+        description  => $blog->{b_description},
+        copyright    => "Copyright $domain",
+        pubDate      => $date,
+        lastBuildDate => $date,
+    );
+
+    foreach my $entry ( @$entries ) {
+        $entry->{e_inserted} =~ /(\d{4})-(\d{2})-(\d{2}) (\d{2}:\d{2}:\d{2})/;
+        $entry->{e_inserted} = "$3 $tm->{$2} $1 $4 +1200";
+
+        $rss->add_item(
+            title => $entry->{e_title},
+            link => "http://$domain/$path/$entry->{e_id}.html",
+            permaLink => "http://$domain/$path/$entry->{e_id}.html",
+            description => HTML::Entities::encode($entry->{e_intro}),
+            dc => {
+                creator => $domain,
+            },
+            pubDate => $a->{e_inserted},
+        );
+    }
+    print $rss->as_string();
+    return;
+</%init>
+%# ----------------------------------------------------------------------------

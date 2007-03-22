@@ -12,11 +12,13 @@ use warnings;
 my $blog_tablename = "blog.blog b";
 my $entry_tablename = "blog.entry e";
 my $type_tablename = "common.type t";
+my $entry_label_tablename = 'blog.entry_label el';
 
 # helper
 my $blog_cols = __PACKAGE__->_mk_cols( 'b', qw(id name title description show comment trackback r:admin_id r:view_id r:edit_id r:publish_id) );
 my $entry_cols = __PACKAGE__->_mk_cols( 'e', qw(id blog_id type_id name title intro article draft comment trackback ts:inserted ts:updated) );
 my $type_cols = __PACKAGE__->_mk_cols( 't', qw(id name) );
+my $el_tablename = __PACKAGE__->_mk_cols( 'el', qw(entry_id label_id) );
 
 # joins
 my $b_e_join = "JOIN $entry_tablename ON (b.id = e.blog_id)";
@@ -38,6 +40,9 @@ my $sel_entry_in_blog = "SELECT $blog_cols, $entry_cols, $type_cols FROM $blog_t
 my $sel_all_entries_in = "SELECT $blog_cols, $entry_cols, $type_cols FROM $blog_tablename $b_e_join $e_t_join WHERE b.id = ? ORDER BY e.inserted DESC";
 my $sel_latest_entries = "SELECT $blog_cols, $entry_cols, $type_cols FROM $blog_tablename $b_e_join $e_t_join WHERE b.id = ? ORDER BY e.inserted DESC LIMIT ?";
 my $sel_archive_entries = "SELECT $blog_cols, $entry_cols, $type_cols FROM $blog_tablename $b_e_join $e_t_join WHERE b.id = ? AND e.inserted >= ?::DATE AND e.inserted <= ?::DATE + ?::INTERVAL ORDER BY e.inserted DESC";
+
+# entry_label
+my $ins_entry_label = __PACKAGE__->_mk_ins( 'blog.entry_label', qw(entry_id label_id) );
 
 ## ----------------------------------------------------------------------------
 # methods
@@ -105,6 +110,19 @@ sub sel_latest_entries {
 sub sel_archive_entries {
     my ($self, $hr) = @_;
     return $self->_rows( $sel_archive_entries, $hr->{b_id}, $hr->{_from}, $hr->{_from}, $hr->{_for} );
+}
+
+sub ins_label {
+    my ($self, $hr) = @_;
+
+    my $common_model = $self->parent()->get_model('Common');
+
+    warn "c_m=" . ref $common_model;
+
+    $self->dbh()->begin_work();
+    my $label = $common_model->ass_label( $hr );
+    $self->_do( $ins_entry_label, $hr->{e_id}, $label->{l_id} );
+    $self->dbh()->commit();
 }
 
 sub _nuke {

@@ -78,7 +78,7 @@
             <& /zaapt/common/a_username.mhtml, a_username => $post->{a_username} &><br />
             <span class="small soft nw">
             Joined: <& /zaapt/common/date.mhtml, date => $post->{a_inserted} &><br />
-            Posts: <% $post->{i_count} | h %><br />
+            Posts: <% $post->{i_posts} | h %><br />
             </span>
         </td>
         <td class="top">

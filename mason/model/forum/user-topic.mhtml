@@ -67,8 +67,7 @@
 
     my $forum = $model->sel_forum_using_name({ f_name => $f_name} );
     unless ( defined $forum ) {
-        $m->clear_buffer();
-        $m->abort(404);
+        die "Forum '$f_name' not found.";
         return;
     }
 

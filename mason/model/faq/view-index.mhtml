@@ -9,8 +9,7 @@
     my $faq = $model->sel_faq_using_name({ f_name => $f_name });
 
     unless ( defined $faq ) {
-        $m->clear_buffer();
-        $m->abort(404);
+        die "FAQ '$f_name' not found.";
         return;
     }
 

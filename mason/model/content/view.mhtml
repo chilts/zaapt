@@ -10,8 +10,7 @@
     my $content = $model->sel_content_using_name({ c_name => $c_name });
 
     unless ( defined $content ) {
-        $m->clear_buffer();
-        $m->abort(404);
+        die "Content section '$c_name' not found.";
         return;
     }
 

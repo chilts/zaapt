@@ -26,8 +26,7 @@
     my $menu = $model->sel_menu_using_name({ m_name => $m_name });
 
     unless ( defined $menu ) {
-        $m->clear_buffer();
-        $m->abort(404);
+        die "Menu '$m_name' not found.";
         return;
     }
 

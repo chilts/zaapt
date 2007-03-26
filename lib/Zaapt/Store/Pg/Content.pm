@@ -11,7 +11,7 @@ use warnings;
 # table names
 my $content_tablename = "content.content c";
 my $page_tablename = "content.page p";
-my $type_tablename = "content.type t";
+my $type_tablename = "common.type t";
 
 # helper
 my $content_cols = __PACKAGE__->_mk_cols( 'c', qw(id name title description r:admin_id r:view_id r:edit_id r:publish_id) );

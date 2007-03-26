@@ -6,7 +6,7 @@
 </%args>
 %# ----------------------------------------------------------------------------
 <%init>
-    # see if this looks like a date
+    # check for the index page
     if ( $page =~ m{ \A index \z}xms ) {
         $m->comp('/zaapt/model/account/view-index.mhtml', zaapt => $zaapt, a_id => $a_id);
     }

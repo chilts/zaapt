@@ -5,7 +5,7 @@
 %# ----------------------------------------------------------------------------
 <h1><% $entry->{e_title} | h %></h1>
 
-<& /zaapt/common/render.mhtml, t_name => $entry->{t_name}, content => $entry->{e_intro} &>
+<p><strong><% $entry->{e_intro} | h %></strong></p>
 
 <p><a href="<% $entry->{e_name} | h %>.html">Read More...</a></p>
 <p class="footnote">Date: <% $entry->{e_inserted} | h %></p>

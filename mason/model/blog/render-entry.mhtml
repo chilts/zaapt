@@ -7,7 +7,7 @@
 %# ----------------------------------------------------------------------------
 <h1><% $entry->{e_title} | h %></h1>
 
-<& /zaapt/common/render.mhtml, t_name => $entry->{t_name}, content => $entry->{e_intro} &>
+<p><strong><% $entry->{e_intro} | h %></strong></p>
 <& /zaapt/common/render.mhtml, t_name => $entry->{t_name}, content => $entry->{e_article} &>
 
 % if ( $entry->{b_trackback} ) {

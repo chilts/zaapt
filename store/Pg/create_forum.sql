@@ -79,27 +79,27 @@ CREATE TABLE forum.info (
 -- functions
 
 -- function: newtopic
-CREATE FUNCTION newtopic() RETURNS trigger as '
+CREATE FUNCTION forum.newtopic() RETURNS trigger as '
     BEGIN
         UPDATE forum.forum SET topics = topics + 1 WHERE id = NEW.forum_id;
         RETURN NEW;
     END;
 ' LANGUAGE plpgsql;
 CREATE TRIGGER newtopic_inserted BEFORE INSERT ON forum.topic
-    FOR EACH ROW EXECUTE PROCEDURE newtopic();
+    FOR EACH ROW EXECUTE PROCEDURE forum.newtopic();
 
 -- function: deltopic
-CREATE FUNCTION deltopic() RETURNS trigger as '
+CREATE FUNCTION forum.deltopic() RETURNS trigger as '
     BEGIN
         UPDATE forum.forum SET topics = topics - 1 WHERE id = OLD.forum_id;
         RETURN NEW;
     END;
 ' LANGUAGE plpgsql;
 CREATE TRIGGER deltopic_deleted AFTER DELETE ON forum.topic
-    FOR EACH ROW EXECUTE PROCEDURE deltopic();
+    FOR EACH ROW EXECUTE PROCEDURE forum.deltopic();
 
 -- function: newpost
-CREATE FUNCTION newpost() RETURNS trigger as '
+CREATE FUNCTION forum.newpost() RETURNS trigger as '
     DECLARE
         -- to hold the account id of the person posting
         found_id INTEGER;
@@ -119,10 +119,10 @@ CREATE FUNCTION newpost() RETURNS trigger as '
     END;
 ' LANGUAGE plpgsql;
 CREATE TRIGGER newpost_inserted BEFORE INSERT ON forum.post
-    FOR EACH ROW EXECUTE PROCEDURE newpost();
+    FOR EACH ROW EXECUTE PROCEDURE forum.newpost();
 
 -- function: delpost
-CREATE FUNCTION delpost() RETURNS trigger as '
+CREATE FUNCTION forum.delpost() RETURNS trigger as '
     BEGIN
         UPDATE forum.topic SET posts = posts - 1 WHERE id = OLD.topic_id;
         UPDATE forum.forum SET posts = posts - 1 WHERE id = (SELECT forum_id FROM forum.topic WHERE id = OLD.topic_id);
@@ -131,6 +131,6 @@ CREATE FUNCTION delpost() RETURNS trigger as '
     END;
 ' LANGUAGE plpgsql;
 CREATE TRIGGER delpost_deleted AFTER DELETE ON forum.post
-    FOR EACH ROW EXECUTE PROCEDURE delpost();
+    FOR EACH ROW EXECUTE PROCEDURE forum.delpost();
 
 -- ----------------------------------------------------------------------------

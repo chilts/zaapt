@@ -169,6 +169,44 @@ sub _row {
     return $row;
 }
 
+sub mk_inserter {
+    my ($self, $sql, $table, $prefix, @cols) = @_;
+
+    my $class = ref $self || $self;
+    my $accessor_name = "ins_$table";
+    my $accessor;
+
+    # don't have to check to see if $accessor_name is 'DESTROY' since it never will be
+
+    $accessor = $self->_mk_inserter($sql, $table, $prefix, @cols);
+    unless ( defined &{"${class}::$accessor_name"} ) {
+        # about as close as we can get it :-)
+        no strict 'refs';
+        *{"${class}::$accessor_name"} = $accessor;
+    }
+}
+
+sub _mk_inserter {
+    my ($class, $sql, $table, $prefix, @cols) = @_;
+
+    # don't need the 'id' for an insert
+    shift @cols;
+
+    # change all the 'roles' into the name we require and prefix all the other columns
+    # print "a=@cols\n";
+    @cols = map { m{ \A r:(\w+)_id \z }xms ? "_$1" : "${prefix}_$_" } @cols;
+    # print "b=@cols\n";
+
+    # build a closure around these parameters
+    return sub {
+        my ($self, $hr) = @_;
+
+        my @params = map { $hr->{$_} } @cols;
+
+        $self->_do( $sql, @params );
+    };
+}
+
 ## ----------------------------------------------------------------------------
 # methods
 

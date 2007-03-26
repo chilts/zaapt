@@ -29,27 +29,12 @@ COMMENT ON COLUMN content.content.edit_id IS
 COMMENT ON COLUMN content.content.publish_id IS
     'Publish allows the user to (un)publish entries';
 
--- table: type
-CREATE SEQUENCE content.type_id_seq;
-CREATE TABLE content.type (
-    id              INTEGER NOT NULL DEFAULT nextval('content.type_id_seq'::TEXT) PRIMARY KEY,
-    name            TEXT NOT NULL,
-
-    UNIQUE(name),
-    LIKE base       INCLUDING DEFAULTS
-);
-CREATE TRIGGER type_updated BEFORE UPDATE ON content.type
-    FOR EACH ROW EXECUTE PROCEDURE updated();
-INSERT INTO content.type(name) VALUES('html');
-INSERT INTO content.type(name) VALUES('text');
-INSERT INTO content.type(name) VALUES('code');
-
 -- table: page
 CREATE SEQUENCE content.page_id_seq;
 CREATE TABLE content.page (
     id              INTEGER NOT NULL DEFAULT nextval('content.page_id_seq'::TEXT) PRIMARY KEY,
     content_id      INTEGER NOT NULL REFERENCES content.content,
-    type_id         INTEGER NOT NULL REFERENCES content.type,
+    type_id         INTEGER NOT NULL REFERENCES common.type,
     name            TEXT NOT NULL,
     content         TEXT NOT NULL,
 

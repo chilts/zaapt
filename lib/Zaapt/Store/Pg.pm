@@ -108,6 +108,9 @@ sub _mk_upd {
     my ($class, $table, $pk, @colnames) = @_;
     return '' unless @colnames;
 
+    @colnames = grep { !m{ \A ts:.* \z }xms } @colnames;
+    @colnames = map { m{ \A r:(\w+_id) \z }xms ? $1 : $_ } @colnames;
+
     my $colname = shift @colnames;
     my $cols = "$colname = COALESCE(?, $colname)";
     foreach my $colname ( @colnames ) {
@@ -190,13 +193,90 @@ sub mk_inserter {
     # create the closure
     my $accessor =  sub {
         my ($self, $hr) = @_;
-        $self->_do( $sql, map { $hr->{$_} } @cols_sql );
+        return $self->_do( $sql, map { $hr->{$_} } @cols_sql );
     };
 
     # inject into package's namespace
     unless ( defined &{"${class}::$accessor_name"} ) {
         no strict 'refs';
         *{"${class}::$accessor_name"} = $accessor;
+    }
+}
+
+sub mk_updater {
+    my ($self, $schema, $table, $prefix, $id, @cols) = @_;
+
+    my $sql = __PACKAGE__->_mk_upd( "$schema.$table", $id, @cols );
+
+    my $class = ref $self || $self;
+    my $accessor_name = "upd_$table";
+
+    # don't have to check to see if $accessor_name is 'DESTROY' since it never will be
+
+    # get the cols for update
+    @cols = grep { m{ \A ts:(\w+) \z }xms ? 0 : 1 } @cols;
+    @cols = map { m{ \A r:(\w+)_id \z }xms ? "_$1" : "${prefix}_$_" } @cols;
+
+    # create the closure
+    my $accessor =  sub {
+        my ($self, $hr) = @_;
+        my $v = $hr->{"${prefix}_${id}"};
+        my @map = map { $hr->{$_} } @cols;
+        return $self->_do( $sql, @map, $hr->{"${prefix}_${id}"} );
+    };
+
+    # inject into package's namespace
+    unless ( defined &{"${class}::$accessor_name"} ) {
+        no strict 'refs';
+        *{"${class}::$accessor_name"} = $accessor;
+    }
+}
+
+sub mk_deleter {
+    my ($self, $schema, $table, $prefix, $id) = @_;
+
+    # my $sql = "DELETE FROM $schema.$table WHERE $id = ?";
+    my $sql = __PACKAGE__->_mk_del("$schema.$table", $id);
+
+    my $class = ref $self || $self;
+    my $method_name = "del_$table";
+
+    # don't have to check to see if $method_name is 'DESTROY' since it never will be
+
+    # create the closure
+    my $method =  sub {
+        my ($self, $hr) = @_;
+        return $self->_do( $sql, $hr->{"${prefix}_${id}"} );
+    };
+
+    # inject into package's namespace
+    unless ( defined &{"${class}::$method_name"} ) {
+        no strict 'refs';
+        *{"${class}::$method_name"} = $method;
+    }
+}
+
+sub mk_selecter {
+    my ($self, $schema, $table, $prefix, $id, @cols) = @_;
+
+    my $cols = __PACKAGE__->_mk_cols( $prefix, $id, @cols );
+    my $sql = "SELECT $cols FROM $schema.$table $prefix WHERE $prefix.$id = ?";
+
+    my $class = ref $self || $self;
+    my $method_name = "sel_$table";
+
+    # don't have to check to see if $method_name is 'DESTROY' since it never will be
+
+    # create the closure
+    my $method =  sub {
+        my ($self, $hr) = @_;
+        return $self->_row( $sql, $hr->{"${prefix}_${id}"} );
+    };
+
+    # inject into package's namespace
+    unless ( defined &{"${class}::$method_name"} ) {
+        no strict 'refs';
+        *{"${class}::$method_name"} = $method;
     }
 }
 

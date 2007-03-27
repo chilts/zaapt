@@ -280,6 +280,30 @@ sub mk_selecter {
     }
 }
 
+sub mk_selecter_using {
+    my ($self, $schema, $table, $prefix, $col, @cols) = @_;
+
+    my $cols = __PACKAGE__->_mk_cols( $prefix, @cols );
+    my $sql = "SELECT $cols FROM $schema.$table $prefix WHERE $prefix.$col = ?";
+
+    my $class = ref $self || $self;
+    my $method_name = "sel_${table}_using_${col}";
+
+    # don't have to check to see if $method_name is 'DESTROY' since it never will be
+
+    # create the closure
+    my $method =  sub {
+        my ($self, $hr) = @_;
+        return $self->_row( $sql, $hr->{"${prefix}_${col}"} );
+    };
+
+    # inject into package's namespace
+    unless ( defined &{"${class}::$method_name"} ) {
+        no strict 'refs';
+        *{"${class}::$method_name"} = $method;
+    }
+}
+
 ## ----------------------------------------------------------------------------
 # methods
 

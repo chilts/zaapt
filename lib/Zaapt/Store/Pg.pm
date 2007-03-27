@@ -34,6 +34,8 @@ sub _mk_cols {
     foreach ( @colnames ) {
         if ( m{ \A ts: (.*) \z }xms ) {
             $cols .= ", to_char($letter.$1, '$datetime') AS ${letter}_$1";
+        } elsif ( m{ \A dt: (.*) \z }xms ) {
+            $cols .= ", to_char($letter.$1, '$datetime') AS ${letter}_$1";
         } elsif ( m{ \A d: (.*) \z }xms ) {
             $cols .= ", to_char($letter.$1, '$date') AS ${letter}_$1_date";
         } elsif ( m{ \A t: (.*) \z }xms ) {

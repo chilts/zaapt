@@ -4,7 +4,10 @@ package Zaapt::Store;
 use strict;
 use warnings;
 
-our $VERSION = '0.1';
+sub store_name {
+    die "Zaapt::Store::store_name(): should be implemented";
+}
+
 
 ## ----------------------------------------------------------------------------
 1;

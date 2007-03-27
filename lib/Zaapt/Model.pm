@@ -5,8 +5,6 @@ use strict;
 use warnings;
 use Scalar::Util qw(weaken);
 
-our $VERSION = '0.1';
-
 sub model_name {
     die "Zaapt::Model::model_name(): should be implemented";
 }

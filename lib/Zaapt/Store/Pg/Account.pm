@@ -32,7 +32,9 @@ my $sel_account_all = "SELECT $account_cols FROM $account_tablename ORDER BY a.i
 
 # role
 my $ins_role = __PACKAGE__->_mk_ins( 'account.role', qw(name description) );
+my $upd_role = __PACKAGE__->_mk_upd( 'account.role', 'id', qw(name description) );
 my $del_role = __PACKAGE__->_mk_del( 'account.role', qw(id) );
+my $sel_role = __PACKAGE__->_mk_sel( 'account.role', 'r', qw(name description) );
 my $sel_all_roles = "SELECT $role_cols FROM $role_tablename ORDER BY name";
 
 # privilege
@@ -59,6 +61,26 @@ sub ins_account {
 sub ins_privilege {
     my ($self, $hr) = @_;
     $self->_do( $ins_privilege, $hr->{a_id}, $hr->{r_id} );
+}
+
+sub ins_role {
+    my ($self, $hr) = @_;
+    $self->_do( $ins_role, $hr->{r_name}, $hr->{r_description} );
+}
+
+sub upd_role {
+    my ($self, $hr) = @_;
+    $self->_do( $upd_role, $hr->{r_name}, $hr->{r_description}, $hr->{r_id} );
+}
+
+sub del_role {
+    my ($self, $hr) = @_;
+    $self->_do( $del_role, $hr->{r_id} );
+}
+
+sub sel_role {
+    my ($self, $hr) = @_;
+    return $self->_row( $sel_role, $hr->{r_id} );
 }
 
 sub sel_all_roles {

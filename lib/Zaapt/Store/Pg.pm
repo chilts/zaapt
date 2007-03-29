@@ -306,6 +306,28 @@ sub mk_selecter_using {
     }
 }
 
+# has side-effects
+sub _mk_sql {
+    my ($self, $schema, $table) = @_;
+    foreach my $t ( values %$table ) {
+        # generate some helpful sql while we're here
+        $t->{sql_fqt} = "$schema.$t->{name} $t->{prefix}"; # fully qualified table
+        $t->{sql_cols} = $self->_mk_cols( $t->{prefix}, @{$t->{cols}} );
+    }
+}
+
+# injects the accessors into the package's namespace
+sub _mk_sql_accessors {
+    my ($self, $schema, $table) = @_;
+    foreach my $t ( values %$table ) {
+        my $last = @{$t->{cols}} - 1;
+        __PACKAGE__->mk_inserter( $schema, $t->{name}, $t->{prefix}, @{$t->{cols}}[1..$last] );
+        __PACKAGE__->mk_updater( $schema, $t->{name}, $t->{prefix}, @{$t->{cols}} );
+        __PACKAGE__->mk_deleter( $schema, $t->{name}, $t->{prefix}, @{$t->{cols}}[0] );
+        __PACKAGE__->mk_selecter( $schema, $t->{name}, $t->{prefix}, @{$t->{cols}} );
+    }
+}
+
 ## ----------------------------------------------------------------------------
 # methods
 

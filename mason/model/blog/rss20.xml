@@ -57,8 +57,8 @@
 
         $rss->add_item(
             title => $entry->{e_title},
-            link => "http://$domain/$path/$entry->{e_id}.html",
-            permaLink => "http://$domain/$path/$entry->{e_id}.html",
+            link => "http://$domain/$path/$entry->{e_name}.html",
+            permaLink => "http://$domain/$path/$entry->{e_name}.html",
             description => HTML::Entities::encode($entry->{e_intro}),
             dc => {
                 creator => $domain,

@@ -51,11 +51,11 @@
     }
 </%init>
 %# ----------------------------------------------------------------------------
-<h1>Editing: 'Content'</h1>
+<h1>Edit a Page</h1>
 
-<p><a href="edit_p_list.html?c_id=<% $page->{c_id} | h %>">&lt;&lt; Back to Page List</a></p>
+<p><a href="edit_p_list.html?c_id=<% $page->{c_id} | h %>">&laquo; Back to Page List</a></p>
 
-<h2>Add a Page to <% $page->{c_name} | h %></h2>
+<h2>Content: <% $content->{c_name} | h %> - '<% $content->{c_title} | h %>'</h2>
 
 <& /zaapt/common/err.mhtml, err => $err &>
 

@@ -29,9 +29,9 @@
 </pre>
 % }
 
-<p><a href="edit_p_list.html?c_name=<% $page->{c_name} | h %>&amp;c_id=<% $page->{c_id} | h %>">&lt;&lt; Back to Page List</a></p>
+<p><a href="edit_p_list.html?c_name=<% $page->{c_name} | h %>&amp;c_id=<% $page->{c_id} | h %>">&laquo; Back to Page List</a></p>
 
-<h2>Content: '<% $page->{c_title} | h %>'</h2>
+<h2>Content: <% $content->{c_name} | h %> - '<% $content->{c_title} | h %>'</h2>
 
 <&  /zaapt/common/form.mhtml, action => 'edit_p_upd.html', elements => [
         { type => 'hidden', name => 'c_id', value => $page->{c_id} },

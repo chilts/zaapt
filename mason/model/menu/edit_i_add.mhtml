@@ -21,7 +21,7 @@
 %# ----------------------------------------------------------------------------
 <h1>Add a Menu Item</h1>
 
-<p><a href="edit_i_list.html?m_id=<% $m_id | h %>">&laquo; Back to Item List</a></p>
+<p><a href="edit_i_list.html?m_id=<% $m_id | u %>">&laquo; Back to Item List</a></p>
 
 <h2>Menu: <% $menu->{m_name} | h %> - '<% $menu->{m_title} | h %>'</h2>
 

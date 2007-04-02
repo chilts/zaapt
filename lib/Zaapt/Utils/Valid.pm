@@ -4,6 +4,8 @@ package Zaapt::Utils::Valid;
 use strict;
 use warnings;
 
+use DateTime;
+
 our $VERSION = '0.1';
 
 my $err;
@@ -12,12 +14,13 @@ sub err {
     return $err;
 }
 
+# usually for all 'name' fields, hence it's all called 'Name' :-)
 sub is_valid_name {
     my ($name) = @_;
 
     $err = undef;
 
-    # check that the FAQ name has been given
+    # check that the name has been given
     unless ( defined $name ) {
         $err = 'Name is undefined';
         return;
@@ -28,8 +31,8 @@ sub is_valid_name {
         return;
     }
 
-    unless ( $name =~ m{ \A [a-z0-9\-]+ \z }xms ) {
-        $err = "Name must contain only 'a-z', '0-9' and '-'.";
+    unless ( $name =~ m{ \A [a-z][a-z0-9\-]* \z }xms ) {
+        $err = "Name must contain only lowercase 'a-z', '0-9' and '-' and must start with a letter.";
         return;
     }
     return 1;
@@ -105,6 +108,37 @@ sub is_positive_integer {
 
     unless ( $num > 0 ) {
         $err = "'$name' ($num) must be greater than 0";
+        return;
+    }
+
+    return 1;
+}
+
+sub is_datetime {
+    my ($dt, $name) = @_;
+
+    warn "dt=$dt, name=$name";
+
+    unless ( $dt =~ m{ \A (\d{4})\-(\d{2})\-(\d{2}) \s (\d{2}):(\d{2}):(\d{2}) \z }xms ) {
+        $err = "'$name' must be of the format 'yyyy-mm-dd hh:mm:ss'";
+        return;
+    }
+
+    warn "dt=$1-$2-$3 $4:$5:$6";
+
+    my $datetime;
+    eval {
+        $datetime = DateTime->new(
+            year   => $1,
+            month  => $2,
+            day    => $3,
+            hour   => $4,
+            minute => $5,
+            second => $6,
+        );
+    };
+    if ( $@ ) {
+        $err = "'$name' doesn't look like a valid date";
         return;
     }
 

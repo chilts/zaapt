@@ -37,9 +37,9 @@ sub _mk_cols {
         } elsif ( m{ \A dt: (.*) \z }xms ) {
             $cols .= ", to_char($letter.$1, '$datetime') AS ${letter}_$1";
         } elsif ( m{ \A d: (.*) \z }xms ) {
-            $cols .= ", to_char($letter.$1, '$date') AS ${letter}_$1_date";
+            $cols .= ", to_char($letter.$1, '$date') AS ${letter}_$1";
         } elsif ( m{ \A t: (.*) \z }xms ) {
-            $cols .= ", to_char($letter.$1, '$time') AS ${letter}_$1_time";
+            $cols .= ", to_char($letter.$1, '$time') AS ${letter}_$1";
         } elsif ( m{ \A r: (.*) \z }xms ) {
             my $col = $1;
             # getting a role
@@ -95,6 +95,7 @@ sub _mk_ins {
 
     @colnames = grep { !m{ \A ts:.* \z }xms } @colnames;
     @colnames = map { m{ \A r:(\w+_id) \z }xms ? $1 : $_ } @colnames;
+    @colnames = map { m{ \A (\w+):(\w+) \z }xms ? $2 : $_ } @colnames;
 
     my $cols = shift @colnames;
     my $qs = '?';
@@ -112,6 +113,7 @@ sub _mk_upd {
 
     @colnames = grep { !m{ \A ts:.* \z }xms } @colnames;
     @colnames = map { m{ \A r:(\w+_id) \z }xms ? $1 : $_ } @colnames;
+    @colnames = map { m{ \A (\w+):(\w+) \z }xms ? $2 : $_ } @colnames;
 
     my $colname = shift @colnames;
     my $cols = "$colname = COALESCE(?, $colname)";
@@ -190,7 +192,8 @@ sub mk_inserter {
     # get the cols for insertion
     my @cols_sql = @cols;
     @cols_sql = grep { m{ \A ts:(\w+) \z }xms ? 0 : 1 } @cols_sql;
-    @cols_sql = map { m{ \A r:(\w+)_id \z }xms ? "_$1" : "${prefix}_$_" } @cols_sql;
+    @cols_sql = map { m{ \A r:(\w+)_id \z }xms ? "_$1" : $_ } @cols_sql;
+    @cols_sql = map { m{ \A (\w+):(\w+) \z }xms ? "${prefix}_$2" : "${prefix}_$_" } @cols_sql;
 
     # create the closure
     my $accessor =  sub {

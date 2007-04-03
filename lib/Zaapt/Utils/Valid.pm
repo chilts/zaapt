@@ -31,8 +31,8 @@ sub is_valid_name {
         return;
     }
 
-    unless ( $name =~ m{ \A [a-z][a-z0-9\-]* \z }xms ) {
-        $err = "Name must contain only lowercase 'a-z', '0-9' and '-' and must start with a letter.";
+    unless ( $name =~ m{ \A [a-z0-9][a-z0-9\-]* \z }xms ) {
+        $err = "Name must contain only lowercase 'a-z', '0-9', '-' and must start with a letter or a number.";
         return;
     }
     return 1;

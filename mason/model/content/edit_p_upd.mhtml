@@ -55,7 +55,7 @@
 
 <p><a href="edit_p_list.html?c_id=<% $page->{c_id} | h %>">&laquo; Back to Page List</a></p>
 
-<h2>Content: <% $content->{c_name} | h %> - '<% $content->{c_title} | h %>'</h2>
+<h2>Content: <% $page->{c_name} | h %> - '<% $page->{c_title} | h %>'</h2>
 
 <& /zaapt/common/err.mhtml, err => $err &>
 

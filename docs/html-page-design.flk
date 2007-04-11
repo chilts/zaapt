@@ -8,7 +8,7 @@ After playing with some CMS's in the past which forced lots and lots of HTML
 and CSS down your throat, I decided that Zaapt would give you a minimal set of
 HTML, enough to get you started, but easy enough to override. You get
 absolutely no CSS at all (thought Zaapt may add a few class names here and
-there (these should be documented - \l{class-names-used.html}).
+there (these \l{should be documented|class-names-used.html}).
 
 !2 What should I tell my designer?
 

@@ -10,7 +10,7 @@ Package: zaapt
 Section: perl
 Priority: optional
 Architecture: all
-Depends: ${perl:Depends}, libhtml-mason-perl, libdbi-perl, libdbd-pg-perl, libxml-rss-perl, libxml-mini-perl, apache-perl, libclass-accessor-perl, libdatetime-perl
+Depends: ${perl:Depends}, libhtml-mason-perl, libdbi-perl, libdbd-pg-perl, libxml-rss-perl, libxml-mini-perl, libclass-accessor-perl, libdatetime-perl
 Description: content framework for websites, specifically Mason ones
  Managing the content of a website is the hardest and more laborious
  part. Therefore, this package is designed to leverage the power of already

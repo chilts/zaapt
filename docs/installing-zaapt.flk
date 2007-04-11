@@ -1,0 +1,83 @@
+!1 Installing Zaapt
+
+The following instructions can be followed to help you install \c{Zaapt}. It
+doesn't show you how to set up a site though. That will come later.
+
+!2 Download the Zaapt Package
+
+For this example, we will install Zaapt v0.1:
+
+Choose either the trunk, the latest stable release or the whole lot:
+
+ For the trunk:
+ 
+ $ svn checkout http://zaapt.googlecode.com/svn/trunk/ zaapt
+ 
+ For a release (branch or tag):
+ 
+ $ svn checkout http://zaapt.googlecode.com/svn/branches/0.1 zaapt
+ $ svn checkout http://zaapt.googlecode.com/svn/tags/0.1.0 zaapt
+ 
+ For everything:
+ 
+ $ svn checkout http://zaapt.googlecode.com/svn/ zaapt
+
+You have now checked everything you need out.
+
+!2 Build a DEB file
+
+Now you need to create the Debian package (\c{*.deb} file):
+
+ $ cd zaapt # or 'cd zaapt/trunk'
+ $ fakeroot dpkg-buildpackage -tc
+
+Check the Debian package file:
+
+ $ lintian -v ../zaapt_0.1.0_all.deb
+ $ linda -v ../zaapt_0.1.0_all.deb
+
+These two checks shouldn't give any warnings or errors.
+
+!2 Install
+
+As root, firstly install any dependencies required, then install the \c{Zaapt}
+package.
+
+Please note that unless you have Zaapt in a Debian Repository referenced by
+your \c{sources.list} and use \c{apt-get install zaapt}, these dependencies
+will not be installed automatically. Therefore it's best to install them
+first. For a full and correct list of dependencies, look in the
+\c{debian/control} file of your checked out version of Zaapt:
+
+ # apt-get install libhtml-mason-perl libdbi-perl libdbd-pg-perl libxml-rss-perl libxml-mini-perl libclass-accessor-perl libdatetime-perl
+ # dpkg -i zaapt_0.1.0_all.deb
+
+You have now installed all dependencies and the Zaapt package itself.
+
+!2 Done
+
+In reality, Zaapt itself doesn't require a lot of dependencies, but nor does it
+actually do anything once you have installed it. It just sits there until used.
+
+Basically Zaapt consists of Perl modules, Mason component pages and database
+patch scripts.
+
+Nothing more, nothing less.
+
+It contains \b{nothing} to help you set up a site! That's your job so you have
+to think about it and get it right instead of Zaapt forcing any particular
+infrastructure or implementation on you :-)
+
+!2 However...
+
+If you want to see an example site then have a look at the next section which
+shows a \c{zaapt-demo} site being set up. This uses \c{apache-perl},
+\c{libapache-dbi-perl}, \c{libapache-request-perl} and various other packages.
+
+\b{Note}: \c{zaapt-demo} is only an example of how \c{Zaapt} can be set up -
+therefore, this is unsupported and is only given as an example. Also note that
+I am sure there are many other ways of doing it and this demonstrates just
+one. If you set Zaapt up in a different way, I'd be ery keen on hearing about
+it.
+
+(Ends)

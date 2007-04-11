@@ -1,0 +1,48 @@
+!1 Who is Zaapt for?
+
+Since Zaapt only consists only of Perl modules, Mason components and database
+patch scripts, it has no infrastucture to help you set up an actual site.
+
+This is on purpose!
+
+The main reason for this is so that Zaapt doesn't force any kind of
+infrastructure on you (besides it's essential infrastructure - Perl, Mason,
+PostgreSQL).
+
+Therefore, you may set up Zaapt using \c{apache-perl}, \c{apache2}, \c{lighttd}
+and \c{libfcgi-perl} and (theoretically) many other configurations.
+
+It also means you have to decide how you do your sessions, cookies, caching and
+various other things you really need to think about when building a site. In
+some cases, you can install one of the \c{zaapt-demo} packages and it will be
+perfectly fine for you, but if you are wanting to build a high-traffic site,
+then you probably want to think about these things a little harder.
+
+!2 Zaapt is for Programmer's (first and foremost)
+
+All of this means that \c{Zaapt} is more like a programmer's CMS rather than an
+end-user CMS. This doesn't inhibit the possibility that an end-user CMS appears
+which relies on Zaapt and in fact, one would be very welcome. Please see \l{How
+to make an End-User CMS using Zaapt|how-to-make-an-end-user-cms-using-zaapt.html}.
+
+!2 Zaapt is for End-Users (once the programmer has done their trick)
+
+If a programmer has set up Zaapt for use by an end-user, then that is
+fine. It's just not suitable for an end-user out of the box, that's all.
+
+!2 Future
+
+Hopefully one day in the future, a package can be installed which will depend
+on Zaapt and get a site up and running straight away. Unlike the \c{zaapt-demo}
+sites, the ability to add new sections and be mapped onto the site will also be
+taken care of.
+
+Remember, however, that if such a thing existed, it would have to choose your
+implementations of cookies, sessions, caching and how the content sections map
+onto the site. This is great for getting a site up and running but bad if you
+want to have full control. Packages like this could give you a leg-up to a more
+customised site too though.
+
+It's swings and roundabouts...!
+
+(Ends)

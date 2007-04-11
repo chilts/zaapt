@@ -1,0 +1,52 @@
+!1 Setting up the Zaapt Demo site
+
+Before trying to set up the Zaapt Demo site, please read \l{Who is Zaapt
+for|who-is-zaapt-for.html?}
+
+!2 Download PGPatcher and Zaapt Demo
+
+You need to download and build the \c{pgpatcher} and \c{zaapt-demo} packages.
+
+ $ svn checkout http://pgpatcher.googlecode.com/svn/trunk/ pgpatcher
+ $ svn checkout http://zaapt-demo.googlecode.com/svn/trunk/ zaapt-demo
+ 
+ $ (cd pgpatcher; fakeroot dpkg-buildpackage -fc;)
+ $ (cd zaapt-demo; fakeroot dpkg-buildpackage -fc;)
+
+Install the dependencies (a complete list can be found in the 'control' file
+from each package):
+
+ # apt-get install libgetopt-mixed-perl
+ # dpkg -i pgpatcher_0.1.0_all.deb
+ 
+ # apt-get install libgetopt-mixed-perl libconfig-simple-perl libxml-rss-perl libxml-atom-perl apache-perl libtext-wikiformat-perl
+ # dpkg -i zaapt-demo_0.1.0_all.deb
+
+The Zaapt Demo site bootstraps a new account \c{super} with 'super' privileges
+using the password \c{password} (of course, this should be changed).
+
+It adds the following roles:
+
+* admin
+* view
+* editor
+* publisher
+* moderator
+
+It also gives these privileges to the \c{super} account.
+
+!2 Content
+
+The Zaapt Demo site also adds the following content:
+
+* a content section called 'home' at \c{/}
+* a blog called 'blog' at \c{/blog/}
+* a news section called 'news' at \c{/news/}
+* an faq called 'faq' at \c{/faq/}
+* enough menus to make changes to both the navigational tabs and the main menu
+
+\b{Note}: as at 2007-04-11, full administration of user accounts is not
+complete. You may have to go straight to the database to make any changes
+necessary.
+
+(Ends)

@@ -1,0 +1,41 @@
+!1 How to make an End-User CMS using Zaapt
+
+To make an end-user CMS using Zaapt, you need to provide the following things.
+
+!2 Add a user Account with Super privileges
+
+To be able to sign in to the administration area of the site, you need to allow
+someone to log in. For this you need a user \c{Account}. You also need to give
+them 'super' privileges (to be documented).
+
+Once you have one account set up, you can add new sections to the site via the
+admin interface. You still need to add it to the deployed part of the site
+unless you have some magic to map sections onto URL's (in which case, I'd be
+interested in taking a look).
+
+!2 Session Management
+
+Wherever the 'admin' part of the site lives, you need to manage your 'sign-in'
+and 'sign-out' pages. You also need to provide session management and (most
+probably) cookie management.
+
+!3 Examples
+
+Here are some examples which may or may not be well thought through:
+
+* place your admin area behind a \i{Basic Auth} subdomain/directory. \b{But please don't do this, you'll only regret it later}
+* put your admin area behind a session/cookie managed subdirectory (recommended)
+* put your admin area on a subdomain accessible only via your intranet (but this stops you updating the site from wherever)
+
+Basically, it's up to you.
+
+!2 Database Management/Patching
+
+It probably makes the most sense that your website deployment scripts also
+manage the patch level of the database. For instance, you may be adding FAQs to
+the site, but you have not yet created the FAQ schema in the
+database. Therefore, patching the database via the website deployment script
+can be useful (there are other ways of managing it but however you choose, it
+still needs to be done).
+
+(Ends)

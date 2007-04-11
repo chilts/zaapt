@@ -326,7 +326,7 @@ sub _nextval {
 
 sub _do {
     my ($self, $stm, @bind_values) = @_;
-    warn "stm=$stm";
+    # warn "stm=$stm";
     return $self->dbh()->do( $stm, undef, @bind_values );
 }
 

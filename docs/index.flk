@@ -6,8 +6,13 @@ If you wish to get a new instance of Zaapt going, or you wish to learn more,
 it's preferable (though not essential) to read these docs in order.
 
 * \l{Who is Zaapt For?|who-is-zaapt-for.html}
+* \l{Design Considerations|design-considerations.html}
 * \l{Installing Zaapt|installing-zaapt.html}
 * \l{Setting up the Zaapt Demo site|setting-up-the-zaapt-demo-site.html}
 * \l{How to make an End-User CMS using Zaapt|how-to-make-an-end-user-cms-using-zaapt.html}
+
+!2 When creating a site
+
+* \l{HTML/Page Design|html-page-design.html}
 
 (Ends)

@@ -1,0 +1,37 @@
+!1 HTML/Page Design
+
+In a lot of cases, Zaapt doesn't actually care about the actual page design nor
+HTML implementation. The reason for this is because it is layout agnostic - or
+in reality, all HTML layout can be overriden and changed.
+
+After playing with some CMS's in the past which forced lots and lots of HTML
+and CSS down your throat, I decided that Zaapt would give you a minimal set of
+HTML, enough to get you started, but easy enough to override. You get
+absolutely no CSS at all (thought Zaapt may add a few class names here and
+there (these should be documented - \l{class-names-used.html}).
+
+!2 What should I tell my designer?
+
+You can tell her to be herself and design in whichever way makes them happy. Of
+course, you may want to give guidelines such as whether to place all images,
+css and js in the same directory (so you can put Expires headers on them easily
+enough), but even then, that's not necessary.
+
+For example, if you want to practice getting Zaapt to show different designs,
+just go to \l{OSWD|http://www.oswg.org/}, \l{Open Web
+Design|http://www.openwebdesign.org/} or \l{Open
+Designs|http://www.opendesigns.org/}, download a few templates and make them
+work.
+
+I have found that, the main template is easy enough to rip out and put the
+content in the middle. You may also want to place a news or a blog widget
+somewhere which constantly updates with the latest news or blog entry.
+
+Many times, the only widget you need to override in your site's Mason
+components are the menu ones since they are the ones that vary most from site
+to site.
+
+If you need to override any other rendering or widget components, then just go
+ahead.
+
+(Ends)

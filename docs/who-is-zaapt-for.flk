@@ -11,34 +11,34 @@ This is all on purpose!
 
 The main reason for this minimal structure is so that Zaapt doesn't force any
 particular kind of infrastructure on you besides it's essential requirements
-such as Perl, Mason, PostgreSQL).
+such as Perl, Mason, PostgreSQL.
 
-Therefore, you may set up Zaapt using \c{apache-perl}, \c{apache2}, \c{lighttd}
-and \c{libfcgi-perl} and (theoretically) many other configurations.
+Therefore, you may use Zaapt with \c{apache-perl}, \c{apache2}, \c{lighttd} and
+\c{libfcgi-perl} and (theoretically) many other configurations.
 
 It also means you have to decide how you do your sessions, cookies, caching,
 load balancing and various other things you really need to think about when
 building a site. In some cases, you can install one of the \c{zaapt-demo}
 packages and it will be perfectly fine for you, but if you are wanting to build
-a high-traffic site, then you probably want to think about these things a
-little harder.
+a high-traffic site or one with more customisations, then you probably want to
+think about these things a little harder.
 
 !2 First and foremost, Zaapt is for Programmers
 
 All of this means that \c{Zaapt} is more like a programmer's CMS rather than an
 end-user CMS. This is for two reasons:
 
-* because it's too hard to set up for the end user
-* it was written by a programmer who wants to have control of these things on \
-  each site installation
+* because it's too hard to set up for the end user (it might even be impossible)
+* it was written by a programmer who wants to have control of these things on each site installation but can re-use models between them
 
 None of this inhibits the possibility that an end-user CMS can be written which
 uses Zaapt and in fact, one would be very welcome. Please see \l{How to make an
 End-User CMS using Zaapt|how-to-make-an-end-user-cms-using-zaapt.html} for
 initial details. Also see the Zaapt Demo sites for an example of something
-which can be installed for an end user and be instantly usable.
+which can be installed for an end user and be instantly usable (even if it
+can't be configured by the end user).
 
-One of the main reasons why Zaapt was written is because I was creating new
+One of the main reasons why Zaapt came about is because I was creating new
 websites fairly frequently which all contained the same elements, like a blog
 (or blogs), news, content etc. I wanted a way whereby I could leverage off one
 implementation of these models but still retain a lot of control regarding the
@@ -55,16 +55,23 @@ out of the box, that's all. Certain things need to be filled in.
 !2 Future
 
 Hopefully one day in the future, a package can be installed which will depend
-on Zaapt and get a site up and running straight away.
+on Zaapt and get a site up and running straight away. The \c{zaapt-demo} and
+\c{zaapt-simple-demo} sites get a little of the way there, but not all the way
+there.
 
-Remember, however, that if such a thing existed, it would have to decide which
-implementations of cookies, sessions, caching and how the content sections map
-onto the site for you. This is great for getting a site up and running but bad
-if you want to have full control. Packages like this could give you a leg-up to
-a more customised site too though.
+Remember, however, that if such a complete end user CMS using Zaapt thing
+existed, it would have to pre-decide your implementations and use of cookies,
+sessions, caching and how the content sections map onto the site for you. This
+is great for getting a site up and running but bad if you want to have full
+control.
+
+Packages like this could give you a leg-up to a more customised site too
+though. By downloading and customising \c{zaapt-demo} you can get closer to
+what you really want.
 
 Unlike the \c{zaapt-demo} sites, the ability to add new sections and be mapped
-via the admin interface onto the site will also be taken care of. The Zaapt
-Demo sites don't work like this and need a code change for all new sections.
+via the admin interface onto the site should also be taken care of in an end
+user CMS. The Zaapt Demo sites don't work like this and require a code change
+for all every new section added.
 
 (Ends)

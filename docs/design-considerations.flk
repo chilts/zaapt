@@ -1,0 +1,29 @@
+!1 Design Considerations
+
+This section describes why certain design decisions were made for Zaapt
+
+!2 Use of Multiple Mason Component Roots
+
+A while ago, I hadn't needed multiple-component roots and hadn't yet come
+across a problem that did. When I started thinking about it, I realised that
+using them for a CMS would be a great idea. And so it happened.
+
+Out of the box, Zaapt includes the bare minimum HTML it can get away with. This
+means that there should be an easy way to override Zaapt's built in Mason
+components with your own - and luckily there is.
+
+Using multiple component roots means you can automatically use all of Zaapt's
+model rendering and widget rendering components for free. But at the same time,
+if you'd like to customise any of them to your own liking just place a
+component with the same path and name in your own site's component root and
+Mason will automatically call it instead of Zaapts.
+
+This means you can override the menu widget components to use \c{<ul>s} instead
+of \c{<div>s}. You can place the author of a blog entry at the top instead of
+the bottom. You can change all dates throughout the site by changing one
+component and you can link to everyone's profile every time you want to show
+their username. It's all just too easy.
+
+(More to come...)
+
+(Ends)

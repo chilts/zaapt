@@ -38,6 +38,14 @@ End-User CMS using Zaapt|how-to-make-an-end-user-cms-using-zaapt.html} for
 initial details. Also see the Zaapt Demo sites for an example of something
 which can be installed for an end user and be instantly usable.
 
+One of the main reasons why Zaapt was written is because I was creating new
+websites fairly frequently which all contained the same elements, like a blog
+(or blogs), news, content etc. I wanted a way whereby I could leverage off one
+implementation of these models but still retain a lot of control regarding the
+site's infrastructure and it's look and feel.
+
+One thrown-away implementation later and Zaapt was born.
+
 !2 Secondly, Zaapt is for End-Users
 
 If a programmer has set up Zaapt for use by an end-user then it will look

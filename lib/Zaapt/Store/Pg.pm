@@ -481,6 +481,23 @@ sub mk_select_row {
     }
 }
 
+sub mk_select_rows {
+    my ($class, $method_name, $stm, $hr_names) = @_;
+    $class = ref $class || $class;
+
+    # create the closure
+    my $method =  sub {
+        my ($self, $hr) = @_;
+        return $self->_rows( $stm, map { $hr->{$_} } @$hr_names );
+    };
+
+    # inject into package's namespace
+    unless ( defined &{"${class}::$method_name"} ) {
+        no strict 'refs';
+        *{"${class}::$method_name"} = $method;
+    }
+}
+
 sub mk_selecter_using {
     my ($self, $schema, $table, $prefix, $col, @cols) = @_;
 

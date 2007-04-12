@@ -9,13 +9,13 @@
     my $model = $zaapt->get_model('Blog');
     my $blog = $model->sel_blog({ b_id => $b_id });
 
-    $m->redirect('edit_b_list.html') unless defined $blog;
+    $m->redirect('edit-b-list.html') unless defined $blog;
 
-    $m->redirect('edit_b_list.html') unless exists $my_roles->{$blog->{_admin}};
+    $m->redirect('edit-b-list.html') unless exists $my_roles->{$blog->{_admin}};
 
     $model->del_blog({ b_id => $b_id });
 
-    $m->redirect("edit_b_list.html");
+    $m->redirect("edit-b-list.html");
     return;
 </%init>
 %# ----------------------------------------------------------------------------

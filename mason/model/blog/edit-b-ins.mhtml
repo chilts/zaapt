@@ -28,7 +28,7 @@
 <%init>
     my $model = $zaapt->get_model('Blog');
 
-    $m->redirect('edit_b_list.html') unless exists $my_roles->{super};
+    $m->redirect('edit-b-list.html') unless exists $my_roles->{super};
 
     my $err = [];
 
@@ -63,7 +63,7 @@
             _edit         => $_edit,
             _publish      => $_publish,
         });
-        $m->redirect("edit_b_list.html");
+        $m->redirect("edit-b-list.html");
         return;
     }
 
@@ -73,13 +73,13 @@
 %# ----------------------------------------------------------------------------
 <h1>Add a Blog</h1>
 
-<p><a href="edit_b_list.html">&laquo; Back to Blog List</a></p>
+<p><a href="edit-b-list.html">&laquo; Back to Blog List</a></p>
 
 <h2>Blog: ?</h2>
 
 <& /zaapt/common/err.mhtml, err => $err &>
 
-<& /zaapt/common/form.mhtml, action => 'edit_b_ins.html', elements => [
+<& /zaapt/common/form.mhtml, action => 'edit-b-ins.html', elements => [
         { type => 'text', field => 'Name', name => 'b_name', size => 40, value => $b_name },
         { type => 'text', field => 'Title', name => 'b_title', size => 40, value => $b_title },
         { type => 'textarea', field => 'Description', name => 'b_description', rows => 10, cols => 40, value => $b_description },
@@ -90,7 +90,7 @@
         { type => 'select', field => 'View Role', name => '_view', options => \@options, selected => $_view },
         { type => 'select', field => 'Edit Role', name => '_edit', options => \@options, selected => $_edit },
         { type => 'select', field => 'Publish Role', name => '_publish', options => \@options, selected => $_publish },
-        { type => 'submit', field => 'Actions', value => 'Add Blog', cancel => 'edit_b_list.html' },
+        { type => 'submit', field => 'Actions', value => 'Add Blog', cancel => 'edit-b-list.html' },
     ]
 &>
 

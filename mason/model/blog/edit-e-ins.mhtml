@@ -2,7 +2,8 @@
 <%args>
     $zaapt
     $my_roles
-    $e_id
+    $a_id
+    $b_id
     $e_name      => ''
     $e_title     => ''
     $e_intro     => ''
@@ -21,15 +22,19 @@
 %# ----------------------------------------------------------------------------
 <%init>
     my $model = $zaapt->get_model('Blog');
-    my $entry = $model->sel_entry({ e_id => $e_id });
+    my $blog = $model->sel_blog({ b_id => $b_id });
 
     # check the error conditions first - we need to recover
-    $m->redirect('edit_b_list.html') unless defined $entry;
-    $m->redirect('edit_e_list.html?b_id=' . uri_escape($entry->{b_id})) unless exists $my_roles->{$entry->{_edit}};
+
+    # this content section firstly needs to exist to be able to add a page
+    $m->redirect('edit-b-list.html') unless defined $blog;
+
+    # to insert a question, '_admin' is required
+    $m->redirect('edit-b-list.html') unless exists $my_roles->{$blog->{_admin}};
 
     # check this type exists
     unless ( $zaapt->get_model('Common')->sel_type({ t_id => $t_id }) ) {
-        $m->redirect('edit_e_list.html?b_id=' . uri_escape($entry->{b_id}));
+        $m->redirect('edit-b-list.html');
     }
 
     # now we're into the normal user errors
@@ -54,7 +59,9 @@
     $e_trackback = Zaapt::Utils::Conv::to_bool( $e_trackback );
 
     unless ( @$err ) {
-        $model->upd_entry({
+        $model->ins_entry({
+            a_id        => $a_id,
+            b_id        => $b_id,
             e_name      => $e_name,
             e_title     => $e_title,
             e_intro     => $e_intro,
@@ -63,9 +70,8 @@
             e_draft     => $e_draft,
             e_comment   => $e_comment,
             e_trackback => $e_trackback,
-            e_id        => $e_id,
         });
-        $m->redirect('edit_e_list.html?b_id=' . uri_escape($entry->{b_id}));
+        $m->redirect('edit-e-list.html?b_id=' . uri_escape($b_id));
         return;
     }
 
@@ -73,27 +79,27 @@
     my @options = map { { value => $_->{t_id}, text => $_->{t_name} } } @$page_types;
 </%init>
 %# ----------------------------------------------------------------------------
-<h1>Edit an Entry</h1>
+<h1>Add an Entry</h1>
 
-<p><a href="edit_e_list.html?b_id=<% $entry->{b_id} | u %>">&laquo; Back to Entry List</a></p>
+<p><a href="edit-e-list.html?b_id=<% $b_id | u %>">&laquo; Back to Entry List</a></p>
 
-<h2>Blog: '<% $entry->{b_title} | h %>'</h2>
+<h2>Blog: '<% $blog->{b_title} | h %>'</h2>
 
 <& /zaapt/common/err.mhtml, err => $err &>
 
-<& /zaapt/common/form.mhtml, action => 'edit_e_upd.html', elements => [
-        { type => 'hidden', name => 'e_id', value => $entry->{e_id} },
-        { type => 'read', field => 'Blog', name => 'b_name', value => $entry->{b_name} },
+<& /zaapt/common/form.mhtml, action => 'edit-e-ins.html', elements => [
+        { type => 'hidden', name => 'b_id', value => $b_id },
+        { type => 'read', field => 'Blog', name => 'b_name', value => $blog->{b_name} },
         { type => 'text', field => 'Name', name => 'e_name', size => 40, value => $e_name },
         { type => 'text', field => 'Title', name => 'e_title', size => 40, value => $e_title },
-        { type => 'textarea', field => 'Intro', name => 'e_intro', rows => 5, cols => 40, value => $e_intro },
+        { type => 'textarea', field => 'Intro', name => 'e_intro', rows => 10, cols => 40, value => $e_intro },
         { type => 'read', value => 'Note: The intro field is always plain text.' },
         { type => 'textarea', field => 'Article', name => 'e_article', rows => 10, cols => 40, value => $e_article },
         { type => 'select', field => 'Type', name => 't_id', options => \@options, selected => $t_id },
         { type => 'check', field => 'Draft', name => 'e_draft', checked => $e_draft },
         { type => 'check', field => 'Comment', name => 'e_comment', checked => $e_comment },
         { type => 'check', field => 'Trackback', name => 'e_trackback', checked => $e_trackback },
-        { type => 'submit', field => 'Actions', value => 'Save', cancel => 'edit_e_list.html?b_id=' . uri_escape($entry->{b_id}) },
+        { type => 'submit', field => 'Actions', value => 'Add Entry', cancel => 'edit-e-list.html?b_id=' . uri_escape($b_id) },
     ]
 &>
 

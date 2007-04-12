@@ -13,7 +13,7 @@
 
 % if ( exists $my_roles->{super} ) {
 <p>
-    * <a href="edit_b_add.html">Add Blog &raquo;</a><br />
+    * <a href="edit-b-add.html">Add Blog &raquo;</a><br />
 </p>
 % }
 
@@ -34,10 +34,10 @@
             </td>
             <td>
 %         if ( exists $my_roles->{$blog->{_edit}} ) {
-                * <a href="edit_e_add.html?b_id=<% $blog->{b_id} | u %>">Add Entry</a><br />
-                * <a href="edit_e_list.html?b_id=<% $blog->{b_id} | u %>">Entry List</a><br />
+                * <a href="edit-e-add.html?b_id=<% $blog->{b_id} | u %>">Add Entry</a><br />
+                * <a href="edit-e-list.html?b_id=<% $blog->{b_id} | u %>">Entry List</a><br />
 %             if ( exists $my_roles->{$blog->{_admin}} ) {
-                * <a href="edit_b_del.html?b_id=<% $blog->{b_id} | u %>">Delete</a><br />
+                * <a href="edit-b-del.html?b_id=<% $blog->{b_id} | u %>">Delete</a><br />
 %             }
 %         } else {
                 -

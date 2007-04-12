@@ -14,8 +14,8 @@
     my $entry = $model->sel_entry({ e_id => $e_id });
 
     # check the error conditions first - we need to recover
-    $m->redirect('edit_b_list.html') unless defined $entry;
-    $m->redirect('edit_e_list.html?b_id=' . uri_escape($entry->{b_id})) unless exists $my_roles->{$entry->{_edit}};
+    $m->redirect('edit-b-list.html') unless defined $entry;
+    $m->redirect('edit-e-list.html?b_id=' . uri_escape($entry->{b_id})) unless exists $my_roles->{$entry->{_edit}};
 
     my $page_types = $zaapt->get_model('Common')->sel_all_types();
     my @options = map { { value => $_->{t_id}, text => $_->{t_name} } } @$page_types;
@@ -23,11 +23,11 @@
 %# ----------------------------------------------------------------------------
 <h1>Edit an Entry</h1>
 
-<p><a href="edit_e_list.html?b_id=<% $entry->{b_id} | u %>">&laquo; Back to Entry List</a></p>
+<p><a href="edit-e-list.html?b_id=<% $entry->{b_id} | u %>">&laquo; Back to Entry List</a></p>
 
 <h2>Blog: '<% $entry->{b_title} | h %>'</h2>
 
-<& /zaapt/common/form.mhtml, action => 'edit_e_upd.html', elements => [
+<& /zaapt/common/form.mhtml, action => 'edit-e-upd.html', elements => [
         { type => 'hidden', name => 'e_id', value => $entry->{e_id} },
         { type => 'read', field => 'Blog', name => 'b_name', value => $entry->{b_name} },
         { type => 'text', field => 'Name', name => 'e_name', size => 40, value => $entry->{e_name} },
@@ -39,7 +39,7 @@
         { type => 'check', field => 'Draft', name => 'e_draft', checked => $entry->{e_draft} },
         { type => 'check', field => 'Comment', name => 'e_comment', checked => $entry->{e_comment} },
         { type => 'check', field => 'Trackback', name => 'e_trackback', checked => $entry->{e_trackback} },
-        { type => 'submit', field => 'Actions', value => 'Save', cancel => 'edit_e_list.html?b_id=' . uri_escape($entry->{b_id}) },
+        { type => 'submit', field => 'Actions', value => 'Save', cancel => 'edit-e-list.html?b_id=' . uri_escape($entry->{b_id}) },
     ]
 &>
 

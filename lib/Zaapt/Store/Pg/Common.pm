@@ -8,6 +8,15 @@ use warnings;
 ## ----------------------------------------------------------------------------
 # constants
 
+my $table = {
+    type => {
+        schema => 'common',
+        name   => 'type',
+        prefix => 't',
+        cols   => [ qw(id name ts:inserted ts:updated) ],
+    },
+};
+
 # table names
 my $type_tablename = "common.type t";
 my $label_tablename = "common.label l";
@@ -30,6 +39,12 @@ my $sel_label_using_name = "SELECT $label_cols FROM $label_tablename WHERE l.nam
 
 ## ----------------------------------------------------------------------------
 # methods
+
+sub get_table_details {
+    my ($class, $tablename) = @_;
+    return unless exists $table->{$tablename};
+    return $table->{$tablename};
+}
 
 # table: type
 sub sel_all_types {

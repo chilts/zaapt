@@ -8,6 +8,15 @@ use warnings;
 ## ----------------------------------------------------------------------------
 # constants
 
+my $table = {
+    account => {
+        schema => 'account',
+        name   => 'account',
+        prefix => 'a',
+        cols   => [ qw(id username) ],
+    },
+};
+
 # table names
 my $account_tablename = "account.account a";
 my $role_tablename = "account.role r";
@@ -52,6 +61,12 @@ my $sel_roles_for_account = "SELECT a.username AS a_username, r.id AS r_id, r.na
 
 ## ----------------------------------------------------------------------------
 # methods
+
+sub get_table_details {
+    my ($class, $tablename) = @_;
+    return unless exists $table->{$tablename};
+    return $table->{$tablename};
+}
 
 sub ins_account {
     my ($self, $hr) = @_;

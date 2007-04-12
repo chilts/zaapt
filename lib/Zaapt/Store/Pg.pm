@@ -438,6 +438,11 @@ sub mk_deleter {
     }
 }
 
+sub mk_selecter_from {
+    my ($self, $schema, $t) = @_;
+    __PACKAGE__->mk_selecter( $schema, $t->{name}, $t->{prefix}, @{$t->{cols}} );
+}
+
 sub mk_selecter {
     my ($self, $schema, $table, $prefix, $id, @cols) = @_;
 
@@ -531,17 +536,21 @@ sub _mk_sel_fqt {
 sub _mk_sql {
     my ($self, $schema, $table) = @_;
     foreach my $t ( values %$table ) {
-        # generate some helpful sql while we're here
-        $t->{sql_fqt} = $self->_mk_sel_fqt($schema, $t->{name}, $t->{prefix}); # fully qualified table
-        $t->{sql_sel_cols} = $self->_mk_sel_cols( $t->{prefix}, @{$t->{cols}} );
-        $t->{sql_ins_cols} = $self->_mk_ins_cols( $t->{prefix}, @{$t->{cols}} );
-        $t->{sql_upd_cols} = $self->_mk_upd_cols( $t->{prefix}, @{$t->{cols}} );
-
-        # 
-        #$t->{col_names} = $self->_mk_col_names( $t->{prefix}, @{$t->{cols}} );
-        #print "@{$t->{col_names}}\n";
-        $t->{qm} = $self->_mk_qm( @{$t->{cols}} );
+        $self->_mk_sql_for( $schema, $t );
     }
+}
+
+# has side-effects
+sub _mk_sql_for {
+    my ($self, $schema, $t) = @_;
+
+    # generate some helpful sql while we're here
+    $t->{sql_fqt} = $self->_mk_sel_fqt($schema, $t->{name}, $t->{prefix}); # fully qualified table
+    $t->{sql_sel_cols} = $self->_mk_sel_cols( $t->{prefix}, @{$t->{cols}} );
+    $t->{sql_ins_cols} = $self->_mk_ins_cols( $t->{prefix}, @{$t->{cols}} );
+    $t->{sql_upd_cols} = $self->_mk_upd_cols( $t->{prefix}, @{$t->{cols}} );
+
+    $t->{qm} = $self->_mk_qm( @{$t->{cols}} );
 }
 
 # injects the accessors into the package's namespace
@@ -552,7 +561,6 @@ sub _mk_sql_accessors {
         __PACKAGE__->mk_inserter( $schema, $t );
         __PACKAGE__->mk_updater( $schema, $t );
         __PACKAGE__->mk_deleter( $schema, $t->{name}, $t->{prefix}, @{$t->{cols}}[0] );
-        # __PACKAGE__->mk_selecter( $schema, $t->{name}, $t->{prefix}, @{$t->{cols}} );
     }
 }
 

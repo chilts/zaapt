@@ -5,112 +5,110 @@ use base qw( Zaapt::Store::Pg Zaapt::Model::Blog );
 use strict;
 use warnings;
 
+use Zaapt::Store::Pg::Account;
+use Zaapt::Store::Pg::Common;
+
 ## ----------------------------------------------------------------------------
 # constants
 
-# table names
-my $blog_tablename = "blog.blog b";
-my $entry_tablename = "blog.entry e";
-my $type_tablename = "common.type t";
-my $entry_label_tablename = 'blog.entry_label el';
+my $schema = 'blog';
 
-# helper
-my $blog_cols = __PACKAGE__->_mk_cols( 'b', qw(id name title description show comment trackback r:admin_id r:view_id r:edit_id r:publish_id) );
-my $entry_cols = __PACKAGE__->_mk_cols( 'e', qw(id blog_id type_id name title intro article draft comment trackback ts:inserted ts:updated) );
-my $type_cols = __PACKAGE__->_mk_cols( 't', qw(id name) );
-my $el_tablename = __PACKAGE__->_mk_cols( 'el', qw(entry_id label_id) );
+my $table = {
+    blog => {
+        name => 'blog',
+        prefix => 'b',
+        cols => [ qw(id name title description show comment trackback r:admin_id r:view_id r:edit_id r:publish_id ts:inserted ts:updated) ],
+    },
+    entry => {
+        name => 'entry',
+        prefix => 'e',
+        cols => [
+            'id',
+            [ 'blog_id', 'fk', 'b_id' ],
+            [ 'account_id', 'fk', 'a_id' ],
+            [ 'type_id', 'fk', 't_id' ],
+            qw(name title intro article draft comment trackback ts:inserted ts:updated)
+        ],
+    },
+    entry_label => {
+        name => 'entry_label',
+        prefix => 'el',
+        cols => [
+            'id',
+            [ 'entry_id', 'fk', 'e_id' ],
+            [ 'label_id', 'fk', 'l_id' ],
+            qw(ts:inserted ts:updated)
+        ],
+    },
+    comment => {
+        name => 'comment',
+        prefix => 'c',
+        cols => [
+            'id',
+            [ 'entry_id', 'fk', 'e_id' ],
+            qw(name email homepage comment status ts:inserted ts:updated)
+        ],
+    },
+    trackback => {
+        name => 'trackback',
+        prefix => 'tr',
+        cols => [
+            'id',
+            [ 'entry_id', 'fk', 'e_id' ],
+            qw(url blogname title excerpt status ts:inserted ts:updated)
+        ],
+    },
+};
 
-# joins
-my $b_e_join = "JOIN $entry_tablename ON (b.id = e.blog_id)";
-my $e_t_join = "JOIN $type_tablename ON (t.id = e.type_id)";
+my $join = {
+    b_e  => "JOIN $schema.entry e ON (b.id = e.blog_id)",
+    e_t  => "JOIN common.type t ON (e.type_id = t.id)",
+    e_l  => "JOIN $schema.entry_label el ON (el.entry_id = e.id) JOIN common.label l ON (el.label_id = l.id)",
+    e_c  => "JOIN $schema.comment c ON (c.entry_id = e.id)",
+    e_tr => "JOIN $schema.trackback tr ON (tr.entry_id = e.id)",
+};
+
+## ----------------------------------------------------------------------------
+
+# creates {sql_fqt} and {sql_sel_cols}
+__PACKAGE__->_mk_sql( $schema, $table );
+
+# generate the SQL ins/upd/del (no sel)
+__PACKAGE__->_mk_sql_accessors( $schema, $table );
+
+# add the 'foreign' tables
+$table->{account} = Zaapt::Store::Pg::Account->get_table_details('account');
+__PACKAGE__->_mk_sql_for( $table->{account}{schema}, $table->{account} );
+
+$table->{type} = Zaapt::Store::Pg::Common->get_table_details('type');
+__PACKAGE__->_mk_sql_for( $table->{type}{schema}, $table->{type} );
+
+## ----------------------------------------------------------------------------
 
 # blog
-my $ins_blog = __PACKAGE__->_mk_ins( 'blog.blog', qw(name title description show comment trackback admin_id view_id edit_id publish_id) );
-my $sel_blog = "SELECT $blog_cols FROM $blog_tablename WHERE b.id = ?";
-my $sel_blog_using_name = "SELECT $blog_cols FROM $blog_tablename WHERE b.name = ?";
-my $sel_blog_all = "SELECT $blog_cols FROM $blog_tablename ORDER BY b.name";
-my $del_blog = __PACKAGE__->_mk_del('blog.blog', 'id');
+__PACKAGE__->mk_selecter( $schema, $table->{blog}{name}, $table->{blog}{prefix}, @{$table->{blog}{cols}} );
+__PACKAGE__->mk_selecter_using( $schema, $table->{blog}{name}, $table->{blog}{prefix}, 'name', @{$table->{blog}{cols}} );
+__PACKAGE__->mk_select_rows( 'sel_blog_all', "SELECT $table->{blog}{sql_sel_cols} FROM $table->{blog}{sql_fqt} ORDER BY b.id", [] );
 
 # entry
-my $ins_entry = __PACKAGE__->_mk_ins( 'blog.entry', qw(blog_id type_id name title intro article draft comment trackback) );
-my $upd_entry = __PACKAGE__->_mk_upd( 'blog.entry', 'id', qw(blog_id type_id name title intro article draft comment trackback));
-my $del_entry = __PACKAGE__->_mk_del( 'blog.entry', 'id' );
-my $sel_entry = "SELECT $blog_cols, $entry_cols, $type_cols FROM $blog_tablename $b_e_join $e_t_join WHERE e.id = ?";
-my $sel_entry_in_blog = "SELECT $blog_cols, $entry_cols, $type_cols FROM $blog_tablename $b_e_join $e_t_join WHERE b.id = ? AND e.name = ?";
-my $sel_all_entries_in = "SELECT $blog_cols, $entry_cols, $type_cols FROM $blog_tablename $b_e_join $e_t_join WHERE b.id = ? ORDER BY e.inserted DESC";
-my $sel_latest_entries = "SELECT $blog_cols, $entry_cols, $type_cols FROM $blog_tablename $b_e_join $e_t_join WHERE b.id = ? ORDER BY e.inserted DESC LIMIT ?";
-my $sel_archive_entries = "SELECT $blog_cols, $entry_cols, $type_cols FROM $blog_tablename $b_e_join $e_t_join WHERE b.id = ? AND e.inserted >= ?::DATE AND e.inserted <= ?::DATE + ?::INTERVAL ORDER BY e.inserted DESC";
+my $blog_cols = "$table->{blog}{sql_sel_cols}, $table->{entry}{sql_sel_cols}, $table->{type}{sql_sel_cols}";
+my $blog_joins = "$table->{blog}{sql_fqt} $join->{b_e} $join->{e_t}";
+
+__PACKAGE__->mk_select_row( 'sel_entry', "SELECT $blog_cols FROM $blog_joins WHERE e.id = ?", [ 'e_id' ] );
+
+__PACKAGE__->mk_select_row( 'sel_entry_in_blog', "SELECT $blog_cols FROM $blog_joins WHERE b.id = ? AND e.name = ?", [ 'b_id', 'e_name' ] );
+
+__PACKAGE__->mk_select_rows( 'sel_entry_all_in', "SELECT $blog_cols FROM $blog_joins WHERE b.id = ? ORDER BY e.inserted DESC", [ 'b_id' ] );
+
+__PACKAGE__->mk_select_rows( 'sel_entry_latest_in', "SELECT $blog_cols FROM $blog_joins WHERE b.id = ? ORDER BY e.inserted DESC LIMIT ?", [ 'b_id', '_limit' ] );
+
+__PACKAGE__->mk_select_rows( 'sel_entry_archive_in', "SELECT $blog_cols FROM $blog_joins WHERE b.id = ? AND e.inserted >= ?::DATE AND e.inserted <= ?::DATE ORDER BY e.inserted DESC", [ 'b_id', '_from', '_to' ] );
 
 # entry_label
 my $ins_entry_label = __PACKAGE__->_mk_ins( 'blog.entry_label', qw(entry_id label_id) );
 
 ## ----------------------------------------------------------------------------
 # methods
-
-sub ins_blog {
-    my ($self, $hr) = @_;
-    $self->_do( $ins_blog, $hr->{b_name}, $hr->{b_title}, $hr->{b_description}, $hr->{b_show}, $hr->{b_comment}, $hr->{b_trackback}, $hr->{_admin}, $hr->{_view}, $hr->{_edit}, $hr->{_publish} );
-}
-
-sub del_blog {
-    my ($self, $hr) = @_;
-    $self->_do( $del_blog, $hr->{b_id} );
-}
-
-sub sel_blog {
-    my ($self, $hr) = @_;
-    return $self->_row( $sel_blog, $hr->{b_id} );
-}
-
-sub sel_blog_all {
-    my ($self) = @_;
-    return $self->_rows( $sel_blog_all );
-}
-
-sub sel_blog_using_name {
-    my ($self, $hr) = @_;
-    return $self->_row( $sel_blog_using_name, $hr->{b_name} );
-}
-
-sub ins_entry {
-    my ($self, $hr) = @_;
-    $self->_do( $ins_entry, $hr->{b_id}, $hr->{t_id}, $hr->{e_name}, $hr->{e_title}, $hr->{e_intro}, $hr->{e_article}, $hr->{e_draft}, $hr->{e_comment}, $hr->{e_trackback} );
-}
-
-sub upd_entry {
-    my ($self, $hr) = @_;
-    $self->_do( $upd_entry, $hr->{b_id}, $hr->{t_id}, $hr->{e_name}, $hr->{e_title}, $hr->{e_intro}, $hr->{e_article}, $hr->{e_draft}, $hr->{e_comment}, $hr->{e_trackback}, $hr->{e_id},  );
-}
-
-sub del_entry {
-    my ($self, $hr) = @_;
-    $self->_do( $del_entry, $hr->{e_id} );
-}
-
-sub sel_entry {
-    my ($self, $hr) = @_;
-    return $self->_row( $sel_entry, $hr->{e_id} );
-}
-
-sub sel_entry_in_blog {
-    my ($self, $hr) = @_;
-    return $self->_row( $sel_entry_in_blog, $hr->{b_id}, $hr->{e_name} );
-}
-
-sub sel_all_entries_in {
-    my ($self, $hr) = @_;
-    return $self->_rows( $sel_all_entries_in, $hr->{b_id} );
-}
-
-sub sel_latest_entries {
-    my ($self, $hr) = @_;
-    return $self->_rows( $sel_latest_entries, $hr->{b_id}, $hr->{_limit} );
-}
-
-sub sel_archive_entries {
-    my ($self, $hr) = @_;
-    return $self->_rows( $sel_archive_entries, $hr->{b_id}, $hr->{_from}, $hr->{_from}, $hr->{_for} );
-}
 
 sub ins_label {
     my ($self, $hr) = @_;

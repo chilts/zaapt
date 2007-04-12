@@ -13,7 +13,7 @@
         return;
     }
     $m->redirect('edit_b_list.html') unless exists $my_roles->{$blog->{_view}};
-    my $entries = $model->sel_all_entries_in({ b_id => $b_id });
+    my $entries = $model->sel_entry_all_in({ b_id => $b_id });
 </%init>
 %# --- HTML -------------------------------------------------------------------
 <h1>Entry List</h1>

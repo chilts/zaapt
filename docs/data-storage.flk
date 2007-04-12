@@ -1,0 +1,36 @@
+!1 Data Stores
+
+Zaapt is data store neutral meaning that any number of storage engines may be
+used with it. As long as the storage API implements and adheres to what Zaapt
+expects, it can be used with anything relatively sane.
+
+Zaapt was designed and written to use PostgreSQL as it's backend storage,
+however it has been written in such a way that any back end store may be
+used. Of course, you probably want something that resembles a database but
+that's your choice.
+
+The concept of \i{models} is used to describe how each content type works as
+well as what fields it needs to manage.
+
+As an example, the API's are determined via the \c{Zaapt::Model::*} namespace
+and the actual implementations are under the \c{Zaapt::Store::*::*} namespace.
+
+For example, you may implement your models, such as:
+
+* \c{Zaapt::Store::MySQL::*}
+* \c{Zaapt::Store::SQLite::*}
+* \c{Zaapt::Store::Firebird::*}
+* \c{Zaapt::Store::SillyFlatFileFormat::*}
+* \c{Zaapt::Store::WeirdTempMemoryStore::*}
+
+Let's take the \i{News} model. It's API is defined in \c{Zaapt::Model::News},
+it's PostgreSQL implementation is \c{Zaapt::Store::Pg::News}, it's MySQL
+implementation is \c{Zaapt::Store::MySQL::News} and it's SQLite implementation
+is \c{Zaapt::Store::SQLite::News}.
+
+Soon there will be unit tests that should work with all storage backends.
+
+Out of the box, Zaapt supports PostgreSQL since that could be called it's
+\i{native} store
+
+(Ends)

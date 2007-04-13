@@ -3,6 +3,7 @@ package Zaapt::Utils::Valid;
 
 use strict;
 use warnings;
+use Carp;
 
 use DateTime;
 
@@ -38,8 +39,31 @@ sub is_valid_name {
     return 1;
 }
 
+sub has_content {
+    my ($str, $name) = @_;
+
+    unless ( defined $str ) {
+        $err = "'$name' is undefined";
+        return 0;
+    }
+
+    if ( $str eq '' ) {
+        $err = "no '$name' given";
+        return 0;
+    }
+
+    unless ( $str =~ m{ \S }xms ) {
+        $err = "'$name' must contain something other than whitespace";
+        return 0;
+    }
+
+    return 1;
+}
+
 sub contains_something {
     my ($str, $name) = @_;
+
+    carp "contains_something(): is deprecated";
 
     unless ( defined $str ) {
         $err = "'$name' is undefined";

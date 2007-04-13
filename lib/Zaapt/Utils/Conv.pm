@@ -32,6 +32,23 @@ sub remove_cr {
     return $arg;
 }
 
+sub trim {
+	my ($arg) = @_;
+    return unless defined $arg;
+    $arg =~ s{ \A \s+ }{}gxms;
+    $arg =~ s{ \s+ \z }{}gxms;
+	return $arg;
+}
+
+sub crunch {
+	my ($arg) = @_;
+    return unless defined $arg;
+    $arg =~ s{ \A \s+ }{}gxms;
+    $arg =~ s{ \s+ \z }{}gxms;
+    $arg =~ s{ \s+ }{\ }gxms;
+	return $arg;
+}
+
 ## ----------------------------------------------------------------------------
 1;
 ## ----------------------------------------------------------------------------

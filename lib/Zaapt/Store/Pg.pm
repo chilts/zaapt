@@ -42,6 +42,8 @@ sub _mk_cols {
             $cols .= ", to_char($letter.$1, '$date') AS ${letter}_$1";
         } elsif ( m{ \A t: (.*) \z }xms ) {
             $cols .= ", to_char($letter.$1, '$time') AS ${letter}_$1";
+        } elsif ( m{ \A ro: (.*) \z }xms ) {
+            $cols .= ", $letter.$1 AS ${letter}_$1";
         } elsif ( m{ \A r: (.*) \z }xms ) {
             my $col = $1;
             # getting a role
@@ -88,9 +90,14 @@ sub _mk_sel_col {
         return "to_char($prefix.$1, '$time') AS ${prefix}_$1";
     }
 
+    if ( $col =~ m{ \A ro: (.*) \z }xms ) {
+        return "$prefix.${1} AS _$1";
+    }
+
     if ( $col =~ m{ \A r: (.*)_id \z }xms ) {
         return "$prefix.${1}_id AS _$1";
     }
+
     return "$prefix.$col AS ${prefix}_$col";
 }
 
@@ -150,6 +157,7 @@ sub _mk_ins {
 
     @colnames = grep { !m{ \A ts:.* \z }xms } @colnames;
     @colnames = map { m{ \A r:(\w+_id) \z }xms ? $1 : $_ } @colnames;
+    @colnames = grep { !m{ \A ro: }xms } @colnames;
     @colnames = map { m{ \A (\w+):(\w+) \z }xms ? $2 : $_ } @colnames;
 
     my $cols = shift @colnames;
@@ -171,6 +179,7 @@ sub _mk_col_names {
     foreach my $col ( @cols ) {
         next if $col eq 'id';
         next if $col =~ m{ \A ts: }xms;
+        next if $col =~ m{ \A ro: }xms;
         if ( $col =~ m{ \A r:(\w+_id) \z }xms )  {
             push @$colnames, $1;
             next;
@@ -199,6 +208,7 @@ sub _mk_ins_cols {
     foreach my $col ( @cols ) {
         next if $col eq 'id';
         next if $col =~ m{ \A ts: }xms;
+        next if $col =~ m{ \A ro: }xms;
         if ( $col =~ m{ \A r:(\w+_id) \z }xms )  {
             push @colnames, $1;
             next;
@@ -231,6 +241,7 @@ sub _mk_qm {
     foreach my $col ( @cols ) {
         next if $col eq 'id';
         next if $col =~ m{ \A ts: }xms;
+        next if $col =~ m{ \A ro: }xms;
         next if ( ref $col eq 'ARRAY' and $col->[1] eq 'virtual' );
         push @colnames, $col;
     }
@@ -246,6 +257,7 @@ sub _mk_upd {
 
     @colnames = grep { !m{ \A ts:.* \z }xms } @colnames;
     @colnames = map { m{ \A r:(\w+_id) \z }xms ? $1 : $_ } @colnames;
+    @colnames = grep { !m{ \A ro: }xms } @colnames;
     @colnames = map { m{ \A (\w+):(\w+) \z }xms ? $2 : $_ } @colnames;
 
     my $colname = shift @colnames;
@@ -288,6 +300,7 @@ sub _mk_hr_names {
 
     foreach my $col ( @cols ) {
         next if $col =~ m{ \A ts: }xms;
+        next if $col =~ m{ \A ro: }xms;
         if ( $col =~ m{ \A r:(\w+)_id \z }xms ) {
             push @names, "_$1";
             next;
@@ -326,7 +339,6 @@ sub _nextval {
 
 sub _do {
     my ($self, $stm, @bind_values) = @_;
-    # warn "stm=$stm";
     return $self->dbh()->do( $stm, undef, @bind_values );
 }
 

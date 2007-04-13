@@ -15,6 +15,12 @@ my $table = {
         prefix => 't',
         cols   => [ qw(id name ts:inserted ts:updated) ],
     },
+    label => {
+        schema => 'common',
+        name   => 'label',
+        prefix => 'l',
+        cols   => [ qw(id name ts:inserted ts:updated) ],
+    },
 };
 
 # table names

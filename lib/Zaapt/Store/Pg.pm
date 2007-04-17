@@ -91,7 +91,7 @@ sub _mk_sel_col {
     }
 
     if ( $col =~ m{ \A ro: (.*) \z }xms ) {
-        return "$prefix.${1} AS _$1";
+        return "$prefix.${1} AS ${prefix}_$1";
     }
 
     if ( $col =~ m{ \A r: (.*)_id \z }xms ) {

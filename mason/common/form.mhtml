@@ -7,7 +7,7 @@
 <form action="<% $action || '?' %>" method="post">
 % foreach my $e ( @$elements ) {
 %     if ( $e->{type} eq 'hidden' ) {
-<input type="hidden" name="<% $e->{name} | h %>" value="<% $e->{value} | h %>" />
+<input type="hidden"<% defined $e->{id} ? q{ id="$e->{id}"} : '' | h %> name="<% $e->{name} | h %>" value="<% $e->{value} | h %>" />
 %     }
 % }
 <table>
@@ -17,7 +17,7 @@
         <td class="key"><% $e->{field} | h %><% length($e->{field}) ? ' :' : '&nbsp;' %></td>
         <td class="val">
 %     if ( $e->{type} eq 'text' ) {
-            <input type="text" name="<% $e->{name} | h %>" value="<% $e->{value} | h %>"<% $e->{size} ? " size=\"$e->{size}\"" : ''%><% $e->{maxlength} && " maxlength=\"$e->{maxlength}\"" %> />\
+            <input type="text"<% defined $e->{id} ? q{ id="$e->{id}"} : '' | h %> name="<% $e->{name} | h %>" value="<% $e->{value} | h %>"<% $e->{size} ? " size=\"$e->{size}\"" : ''%><% $e->{maxlength} && " maxlength=\"$e->{maxlength}\"" %> />\
 
 %     } elsif ( $e->{type} eq 'password' ) {
             <input type="password" name="<% $e->{name} | h %>" value=""<% $e->{size} ? " size=\"$e->{size}\"" : ''%><% $e->{maxlength} && " maxlength=\"$e->{maxlength}\"" %> />\
@@ -72,6 +72,9 @@
 %         if ( defined $e->{cancel_js} ) {
             <button class="button" type="button" onclick="<% $e->{cancel_js} %>">Cancel</button>\
 %         }
+%         if ( defined $e->{reset} ) {
+            <button class="button" type="reset">Reset</button>\
+%         }
 
 %     } elsif ( $e->{type} eq 'button' ) {
             <button type="button" onClick="<% $e->{onclick} | h %>"><% $e->{value} | h %></button>\
@@ -79,6 +82,11 @@
 %     } else {
             Unknown type: <% $e->{type} | h %>\
 %     }
+
+%     if ( defined $e->{note} ) {
+            <% $e->{note} | h %>\
+%     }
+
         </td>
     </tr>
 % }

@@ -25,6 +25,7 @@
         { type => 'text', field => 'Title', name => 'b_title', size => 40, value => '' },
         { type => 'textarea', field => 'Description', name => 'b_description', rows => 10, cols => 40, value => '' },
         { type => 'text', field => 'Show', name => 'b_show', size => 3, value => 7 },
+        { type => 'check', field => 'Moderate', name => 'b_moderate', checked => 0 },
         { type => 'check', field => 'Comment', name => 'b_comment', checked => 0 },
         { type => 'check', field => 'Trackback', name => 'b_trackback', checked => 0 },
         { type => 'select', field => 'Admin Role', name => '_admin', options => \@options },

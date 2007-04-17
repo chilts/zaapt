@@ -12,6 +12,7 @@
     $b_title       => ''
     $b_description => ''
     $b_show        => ''
+    $b_moderate    => ''
     $b_comment     => ''
     $b_trackback   => ''
     $_admin        => ''
@@ -46,6 +47,7 @@
         push @$err, "Blog name '$b_name' already exists." if defined $blog;
     }
 
+    $b_moderate = Zaapt::Utils::Conv::to_bool( $b_moderate );
     $b_comment = Zaapt::Utils::Conv::to_bool( $b_comment );
     $b_trackback = Zaapt::Utils::Conv::to_bool( $b_trackback );
     $b_description = Zaapt::Utils::Conv::remove_cr( $b_description );
@@ -56,8 +58,9 @@
             b_title       => $b_title,
             b_description => $b_description,
             b_show        => $b_show,
-            b_trackback   => $b_trackback,
+            b_moderate    => $b_moderate,
             b_comment     => $b_comment,
+            b_trackback   => $b_trackback,
             _admin        => $_admin,
             _view         => $_view,
             _edit         => $_edit,
@@ -84,6 +87,7 @@
         { type => 'text', field => 'Title', name => 'b_title', size => 40, value => $b_title },
         { type => 'textarea', field => 'Description', name => 'b_description', rows => 10, cols => 40, value => $b_description },
         { type => 'text', field => 'Show', name => 'b_show', size => 3, value => $b_show },
+        { type => 'check', field => 'Moderate', name => 'b_moderate', checked => $b_moderate },
         { type => 'check', field => 'Comment', name => 'b_comment', checked => $b_comment },
         { type => 'check', field => 'Trackback', name => 'b_trackback', checked => $b_trackback },
         { type => 'select', field => 'Admin Role', name => '_admin', options => \@options, selected => $_admin },

@@ -1,0 +1,80 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $my_roles
+    $e_id
+    $e_labels
+</%args>
+%# ----------------------------------------------------------------------------
+<%once>
+    use URI::Escape;
+    use Zaapt::Utils::Valid;
+    use Zaapt::Utils::Conv;
+</%once>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Blog');
+
+    my $entry = $model->sel_entry({ e_id => $e_id });
+
+    unless ( defined $entry ) {
+        $m->redirect('edit-b-list.html');
+        return;
+    }
+
+    # check we can edit labels
+    $m->redirect('edit-b-list.html') unless exists $my_roles->{$entry->{_edit}};
+    my $labels = $model->sel_label_all_for({ e_id => $entry->{e_id} });
+
+    # now we're into the normal user errors
+    my $err = [];
+
+    # tidy $e_labels up a bit
+    $e_labels = Zaapt::Utils::Conv::remove_cr( $e_labels );
+    my @labels = split m{\n+}, $e_labels; # don't need m{}xms
+    @labels = map { Zaapt::Utils::Conv::crunch($_) } @labels;
+
+    my $i = 1;
+    for my $label ( @labels ) {
+        unless ( $label =~ m{ \A [A-Za-z0-9][A-Za-z0-9-]* \z }xms ) {
+            push @$err, "label on line $i may only contain letters, digits and/or dashes";
+        }
+        $i++;
+    }
+
+    unless ( @$err ) {
+        $model->dbh()->begin_work();
+
+        # delete the labels, then re-add them
+        $model->del_entry_label_for({ e_id => $entry->{e_id} });
+        foreach my $label ( @labels ) {
+            $model->ins_label({ e_id => $entry->{e_id}, l_name => $label });
+        }
+
+        $model->dbh()->commit();
+
+        $m->redirect('edit-e-list.html?b_id=' . uri_escape($entry->{b_id}));
+        return;
+    }
+
+    my $value = join "\n", @labels;
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Edit Labels</h1>
+
+<p><a href="edit-e-list.html?b_id=<% $entry->{b_id} %>">&laquo; Back to Entry List</a></p>
+
+<h2>Blog: <% $entry->{b_name} | h %> - '<% $entry->{b_title} | h %>'</h2>
+
+<& /zaapt/common/err.mhtml, err => $err &>
+
+<& /zaapt/common/form.mhtml, action => 'edit-l-upd.html', elements => [
+        { type => 'hidden', name => 'e_id', value => $entry->{e_id} },
+        { type => 'read', field => 'Entry', value => "$entry->{e_name} - '$entry->{e_title}'" },
+        { type => 'textarea', field => 'Labels', name => 'e_labels', rows => 5, cols => 40, value => "$value\n" },
+        { type => 'note', value => 'Note: Use a new line for each label, multiple words permitted.' },
+        { type => 'submit', field => 'Actions', value => 'Save', cancel => 'edit-e-list.html?b_id=' . uri_escape($entry->{b_id}) },
+    ]
+&>
+
+%# ----------------------------------------------------------------------------

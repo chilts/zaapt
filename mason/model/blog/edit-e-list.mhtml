@@ -20,7 +20,7 @@
 
 <p><a href="edit-b-list.html">&laquo; Back to Blog List</a></p>
 
-<h2>Blog: '<% $blog->{b_title} | h %>'</h2>
+<h2>Blog: <% $blog->{b_name} | h %> - '<% $blog->{b_title} | h %>'</h2>
 
 % if ( exists $my_roles->{$blog->{_admin}} ) {
 <p>
@@ -39,10 +39,14 @@
 % my $row = 1;
 % foreach my $entry ( @$entries ) {
         <tr class="r<% $row=1-$row %>">
-            <td><% $entry->{e_name} | h %> (<% $entry->{e_inserted} | h %>)</td>
+            <td>
+                <% $entry->{e_name} | h %> (<% $entry->{e_inserted} | h %>)<br />
+                <% $entry->{e_comments} || '0' | h %> comments, <% $entry->{e_trackbacks} || '0' | h %> trackbacks<br />
+            </td>
             <td>
 %         if ( exists $my_roles->{$blog->{_edit}} ) {
                 * <a href="edit-e-edit.html?e_id=<% $entry->{e_id} | u %>">Edit Entry</a><br />
+                * <a href="edit-l-edit.html?e_id=<% $entry->{e_id} | u %>">Edit Labels</a><br />
 %             if ( exists $my_roles->{$blog->{_admin}} ) {
                 * <a href="edit-e-del.html?e_id=<% $entry->{e_id} | u %>">Delete</a><br />
 %             }

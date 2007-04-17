@@ -1,12 +1,27 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $entry
+    $labels     => []
 </%args>
 %# ----------------------------------------------------------------------------
 <h1><% $entry->{e_title} | h %></h1>
 
+<p class="feint">
+    Labels:
+% if ( @$labels ) {
+%     foreach my $label ( @$labels ) {
+    <a href="<% $label | h %>.html"><% $label | h %></a>
+%     }
+% } else {
+    (none)
+% }
+</p>
+
 <p><strong><% $entry->{e_intro} | h %></strong></p>
 
-<p><a href="<% $entry->{e_name} | h %>.html">Read More...</a></p>
-<p class="footnote">Date: <% $entry->{e_inserted} | h %></p>
+<p class="r">
+    <a href="<% $entry->{e_name} %>.html" class="readmore">Permalink</a>,
+    <a href="<% $entry->{e_name} %>.html#comments" class="comments">Comments (<% $entry->{e_comments} || '0' | h %>)</a>,
+    <span class="date"><% $entry->{e_inserted} | h %></span>
+</p>
 %# ----------------------------------------------------------------------------

@@ -11,7 +11,7 @@
         die "Blog '$b_name' not found.";
         return;
     }
-    my $entries = $model->sel_latest_entries({ b_id => $blog->{b_id}, _limit => $blog->{b_show} });
+    my $entries = $model->sel_entry_latest({ b_id => $blog->{b_id}, _limit => $blog->{b_show} });
 </%init>
 %# ----------------------------------------------------------------------------
 % if ( @$entries ) {

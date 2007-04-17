@@ -1,8 +1,17 @@
 %# ----------------------------------------------------------------------------
+<%once>
+    use Zaapt::Utils::Valid;
+</%once>
+%# ----------------------------------------------------------------------------
 <%args>
     $zaapt
     $b_name
     $e_name
+    $e_id       => undef
+    $c_name     => undef
+    $c_email    => undef
+    $c_homepage => undef
+    $c_comment  => undef
 </%args>
 %# ----------------------------------------------------------------------------
 <%init>
@@ -21,9 +30,52 @@
         return;
     }
 
+    my $err = [];
+
+    warn "here";
+
+    # see if we have a comment to add
+    if ( $blog->{b_comment} ) {
+        warn "blog has comments switched on";
+        warn "e_id=$e_id and entry->{e_id}=$entry->{e_id} are the same";
+        if ( defined $e_id and $e_id eq $entry->{e_id} ) {
+            warn "e_id and entry->{e_id} are the same";
+
+            unless ( Zaapt::Utils::Valid::has_content($c_name) ) {
+                push @$err, "please specify a name";
+            }
+
+            unless ( Zaapt::Utils::Valid::has_content($c_email) ) {
+                push @$err, "please specify an email address (required)";
+            }
+
+            unless ( Zaapt::Utils::Valid::has_content($c_comment) ) {
+                push @$err, "your comment is blank, please type something";
+            }
+
+            # remove our stub
+            $c_homepage =~ s{ \A http:// }{}gxms;
+
+            unless ( @$err ) {
+                warn "inserting...";
+                $model->ins_comment({
+                    e_id        => $e_id,
+                    c_name      => $c_name,
+                    c_email     => $c_email,
+                    c_homepage  => $c_homepage,
+                    c_comment   => $c_comment,
+                    c_status    => $entry->{b_moderate} ? 'new' : 'acc',
+                });
+                $m->redirect('?');
+                return;
+            }
+        }
+    }
+    # else, shouldn't really have a comment if the blog doesn't allow it - just ignore
+
     my $comments;
     if ( $blog->{b_comment} ) {
-        $comments = $model->sel_comments_for({ e_id => $entry->{e_id} });
+        $comments = $model->sel_comments_for({ e_id => $entry->{e_id}, c_status => 'acc' });
     }
     else {
         $comments = [];
@@ -31,7 +83,7 @@
 
     my $trackbacks;
     if ( $blog->{b_trackback} ) {
-        $trackbacks = $model->sel_trackbacks_for({ e_id => $entry->{e_id} });
+        $trackbacks = $model->sel_trackbacks_for({ e_id => $entry->{e_id}, tr_status => 'acc' });
     }
     else {
         $trackbacks = [];
@@ -40,7 +92,25 @@
 %# ----------------------------------------------------------------------------
 <div class="z_blog">
 
-<& render-entry.mhtml, entry => $entry &>
+%# call all these things so if the user wants to override anything, they can
+<& render-entry.mhtml,
+    entry => $entry
+&>
+<& render-trackbacks.mhtml,
+    entry => $entry,
+    trackbacks => $trackbacks
+&>
+<& render-comments.mhtml,
+    entry => $entry,
+    comments => $comments
+&>
+<& render-comment-form.mhtml,
+    entry => $entry,
+    c_name => $c_name,
+    c_email => $c_email,
+    c_homepage => $c_homepage,
+    c_comment => $c_comment
+&>
 
 </div>
 %# ----------------------------------------------------------------------------

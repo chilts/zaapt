@@ -1,0 +1,45 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $my_roles
+    $e_id
+</%args>
+%# ----------------------------------------------------------------------------
+<%once>
+    use URI::Escape;
+</%once>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Blog');
+
+    my $entry = $model->sel_entry({ e_id => $e_id });
+
+    unless ( defined $entry ) {
+        $m->redirect('edit-b-list.html');
+        return;
+    }
+
+    # check we can edit labels
+    $m->redirect('edit-b-list.html') unless exists $my_roles->{$entry->{_edit}};
+    my $labels = $model->sel_label_all_for({ e_id => $entry->{e_id} });
+
+    my $value = join "\n", map { $_->{l_name} } @$labels;
+    $value ||= '';
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Edit Labels</h1>
+
+<p><a href="edit-e-list.html?b_id=<% $entry->{b_id} %>">&laquo; Back to Entry List</a></p>
+
+<h2>Blog: <% $entry->{b_name} | h %> - '<% $entry->{b_title} | h %>'</h2>
+
+<& /zaapt/common/form.mhtml, action => 'edit-l-upd.html', elements => [
+        { type => 'hidden', name => 'e_id', value => $entry->{e_id} },
+        { type => 'read', field => 'Entry', value => "$entry->{e_name} - '$entry->{e_title}'" },
+        { type => 'textarea', field => 'Labels', name => 'e_labels', rows => 5, cols => 40, value => "$value\n" },
+        { type => 'note', value => 'Note: Use a new line for each label, multiple words permitted.' },
+        { type => 'submit', field => 'Actions', value => 'Save', cancel => 'edit-e-list.html?b_id=' . uri_escape($entry->{b_id}) },
+    ]
+&>
+
+%# ----------------------------------------------------------------------------

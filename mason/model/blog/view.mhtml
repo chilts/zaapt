@@ -25,7 +25,12 @@
     }
     else {
         # this is a named entry
-        $m->comp('/zaapt/model/blog/view-entry.mhtml', zaapt => $ZAAPT, b_name => $b_name, e_name => $page);
+        $m->comp('/zaapt/model/blog/view-entry.mhtml',
+            %ARGS, # pass everything since there might be a comment
+            zaapt => $ZAAPT,
+            b_name => $b_name,
+            e_name => $page
+        );
     }
     return;
 </%init>

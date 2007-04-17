@@ -1,24 +1,34 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $entry
+    $labels     => []
     $trackbacks => []
     $comments   => []
 </%args>
 %# ----------------------------------------------------------------------------
 <h1><% $entry->{e_title} | h %></h1>
 
+<p>
+    Posted by: <& /zaapt/common/a_username.mhtml, a_username => $entry->{a_username} &>
+    <br />
+    Labels:
+% if ( @$labels ) {
+%     foreach my $label ( @$labels ) {
+    <a href="label:<% $label | h %>.html"><% $label | h %></a>
+%     }
+% } else {
+    (none)
+% }
+</p>
+
 <p><strong><% $entry->{e_intro} | h %></strong></p>
+
 <& /zaapt/common/render.mhtml, t_name => $entry->{t_name}, content => $entry->{e_article} &>
 
-% if ( $entry->{b_trackback} ) {
-<h2>Trackbacks</h2>
-<p>Coming soon</p>
-% }
+<p>
+    <a href="<% $entry->{e_name} %>.html">Permalink</a> |
+    <a href="<% $entry->{e_name} %>.html#comments">Comments (<% $entry->{e_comments} || '0' | h %>)</a> |
+    <& /zaapt/common/datetime.mhtml, datetime => $entry->{e_inserted} &>
+</p>
 
-% if ( $entry->{b_comment} ) {
-<h2>Comments</h2>
-<p>Coming soon</p>
-% }
-
-<p class="footnote"><% $entry->{e_inserted} | h %></p>
 %# ----------------------------------------------------------------------------

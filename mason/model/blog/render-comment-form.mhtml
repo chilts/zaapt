@@ -1,0 +1,19 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $entry
+</%args>
+%# ----------------------------------------------------------------------------
+% if ( $entry->{b_comment} ) {
+<h2>Leave a Comment</h2>
+
+<& /zaapt/common/form.mhtml, action => '?', elements => [
+        { type => 'hidden', name => 'e_id', value => $entry->{e_id} },
+        { type => 'text', field => 'Name', name => 'c_name', size => 30 },
+        { type => 'text', field => 'Email', name => 'c_email', size => 30, note => '(required: will not be shown)' },
+        { type => 'text', field => 'Homepage', name => 'c_homepage', size => 30, value => 'http://' },
+        { type => 'textarea', field => 'Comment', name => 'c_comment', rows => 5, cols => 40 },
+        { type => 'submit', field => 'Actions', value => 'Post Comment', reset => 1 },
+    ]
+&>
+% }
+%# ----------------------------------------------------------------------------

@@ -1,0 +1,13 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $comment
+</%args>
+%# ----------------------------------------------------------------------------
+<p>
+    On <& /zaapt/common/datetime.mhtml, datetime => $comment->{c_inserted} &>
+    <a href="http://<% $comment->{c_homepage} | u %>"><% $comment->{c_name} | h %></a> said:
+</p>
+
+<& /zaapt/common/render.mhtml, t_name => 'text', content => $comment->{c_comment} &>
+
+%# ----------------------------------------------------------------------------

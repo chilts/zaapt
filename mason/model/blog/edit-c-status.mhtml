@@ -1,0 +1,52 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $my_roles
+    $b_id
+    $c_id
+    $c_status
+</%args>
+%# ----------------------------------------------------------------------------
+<%once>
+    my $allowed = {
+        status => {
+            new => 1,
+            acc => 1,
+            rej => 1,
+        },
+    };
+</%once>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Blog');
+    my $blog = $model->sel_blog({ b_id => $b_id });
+    unless ( defined $blog ) {
+        $m->redirect('edit-b-list.html');
+        return;
+    }
+    $m->redirect('edit-b-list.html') unless exists $my_roles->{$blog->{_edit}};
+    my $comment = $model->sel_comment({ c_id => $c_id });
+
+    warn "blog=$blog, comment=$comment";
+
+    # probably need to check that this comment belongs to this blog (to be sure
+    # that the URL can't be hacked) - for now, just delete
+    if ( $c_status eq 'del' ) {
+        warn "here - del";
+        $model->del_comment({ c_id => $c_id });
+    }
+    else {
+        warn "here - not del";
+        if ( exists $allowed->{status}{$c_status} ) {
+            warn "here - upd";
+            $model->upd_comment({ c_id => $c_id, c_status => $c_status });
+        }
+    }
+
+    warn "here - end";
+
+    my $i = $m->interp();
+    $m->redirect('edit-c-list.html?b_id=' . $i->apply_escapes($b_id, 'u'));
+    return;
+</%init>
+%# ----------------------------------------------------------------------------

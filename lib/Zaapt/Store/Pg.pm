@@ -483,8 +483,6 @@ sub mk_select_row {
     my ($class, $method_name, $stm, $hr_names) = @_;
     $class = ref $class || $class;
 
-    # warn "stm=$stm";
-
     # create the closure
     my $method =  sub {
         my ($self, $hr) = @_;

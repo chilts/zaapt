@@ -149,17 +149,17 @@ CREATE OR REPLACE FUNCTION blog.comment_bu() RETURNS trigger as '
 CREATE TRIGGER comment_bu BEFORE UPDATE ON blog.comment
     FOR EACH ROW EXECUTE PROCEDURE blog.comment_bu();
 
--- function: comment_bd
-CREATE FUNCTION blog.comment_bd() RETURNS trigger as '
+-- function: comment_ad
+CREATE FUNCTION blog.comment_ad() RETURNS trigger as '
     BEGIN
         IF OLD.status = ''acc'' THEN
             UPDATE blog.entry SET comments = comments - 1 WHERE id = OLD.entry_id;
         END IF;
-        RETURN NEW;
+        RETURN OLD;
     END;
 ' LANGUAGE plpgsql;
-CREATE TRIGGER comment_bd BEFORE DELETE ON blog.comment
-    FOR EACH ROW EXECUTE PROCEDURE blog.comment_bd();
+CREATE TRIGGER comment_ad BEFORE DELETE ON blog.comment
+    FOR EACH ROW EXECUTE PROCEDURE blog.comment_ad();
 
 -- function: trackback_bi
 CREATE FUNCTION blog.trackback_bi() RETURNS trigger as '
@@ -200,16 +200,16 @@ CREATE OR REPLACE FUNCTION blog.trackback_bu() RETURNS trigger as '
 CREATE TRIGGER trackback_bu BEFORE UPDATE ON blog.trackback
     FOR EACH ROW EXECUTE PROCEDURE blog.trackback_bu();
 
--- function: trackback_bd
-CREATE FUNCTION blog.trackback_bd() RETURNS trigger as '
+-- function: trackback_ad
+CREATE FUNCTION blog.trackback_ad() RETURNS trigger as '
     BEGIN
         IF OLD.status = ''acc'' THEN
             UPDATE blog.entry SET trackbacks = trackbacks - 1 WHERE id = OLD.entry_id;
         END IF;
-        RETURN NEW;
+        RETURN OLD;
     END;
 ' LANGUAGE plpgsql;
-CREATE TRIGGER trackback_bd BEFORE DELETE ON blog.trackback
-    FOR EACH ROW EXECUTE PROCEDURE blog.trackback_bd();
+CREATE TRIGGER trackback_ad BEFORE DELETE ON blog.trackback
+    FOR EACH ROW EXECUTE PROCEDURE blog.trackback_ad();
 
 -- ----------------------------------------------------------------------------

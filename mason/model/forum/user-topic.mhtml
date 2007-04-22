@@ -8,13 +8,13 @@
 <%once>
     use POSIX;
     sub is_editable {
-        my ($posts, $post, $forum, $a_id, $p) = @_;
+        my ($posts, $post, $forum, $id, $p) = @_;
 
         # not editable if a new post has been added (ie. this isn't the last post)
         return 0 unless $post == $posts->[-1];
 
         # not editable if this isn't your post
-        return 0 unless $post->{p_account_id} == $a_id;
+        return 0 unless $post->{p_account_id} == $id;
 
         # not editable unless the database says
         return 0 unless $post->{p_editable};
@@ -43,11 +43,11 @@
     $a         => ''
     $f_name
     $tp_id
-    $a_id      => undef
+    $id        => undef
     $p_message => undef
     $t_id      => undef
     $p         => 1
-    $last       => '9999-99-99 99:99:99'
+    $last      => '9999-99-99 99:99:99'
 </%args>
 %# ----------------------------------------------------------------------------
 <%once>
@@ -90,14 +90,14 @@
             return;
         }
 
-        unless ( defined $a_id and defined $t_id ) {
+        unless ( defined $id and defined $t_id ) {
             $m->clear_buffer();
             $m->redirect('?');
             return;
         }
 
         if ( $p_message =~ m{ \S }xms ) {
-            $model->ins_post({ tp_id => $tp_id, a_id => $a_id, p_message => $p_message, t_id => $t_id });
+            $model->ins_post({ tp_id => $tp_id, a_id => $id, p_message => $p_message, t_id => $t_id });
             $p_message = '';
             $m->clear_buffer();
             $m->redirect("?p=$p");
@@ -216,7 +216,7 @@
             <br />
             <a href="moderator-del-post.html?p_id=<% $post->{p_id} | u %>&amp;p=<% $p | u %>" title="Del Post"><& /zaapt/common/icon.mhtml, name => 'script_delete', title => 'Del Post' &> Del Post</a>
 %         } else {
-%             if ( is_editable($posts, $post, $forum, $a_id, $p) ) {
+%             if ( is_editable($posts, $post, $forum, $id, $p) ) {
             <hr />
             <a href="user-edit-post.html?p_id=<% $post->{p_id} | u %>&amp;p=<% $p | u %>" title="Edit Post"><& /zaapt/common/icon.mhtml, name => 'script_edit', title => 'Edit Post' &> Edit Your Post</a>
 %             }

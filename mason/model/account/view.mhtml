@@ -1,14 +1,14 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $a_id
+    $id
     $page
 </%args>
 %# ----------------------------------------------------------------------------
 <%init>
     # check for the index page
     if ( $page =~ m{ \A index \z}xms ) {
-        $m->comp('/zaapt/model/account/view-index.mhtml', zaapt => $zaapt, a_id => $a_id);
+        $m->comp('/zaapt/model/account/view-index.mhtml', zaapt => $zaapt, id => $id);
     }
     else {
         $m->clear_buffer();

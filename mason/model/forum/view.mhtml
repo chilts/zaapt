@@ -6,7 +6,7 @@
     $t_id       => undef
     $t_name     => undef
     $p          => 1
-    $a_id       => undef
+    $id         => undef
 </%args>
 %# ----------------------------------------------------------------------------
 <%init>
@@ -32,7 +32,7 @@
         # main index page
         $m->comp('/zaapt/model/forum/view-info.mhtml',
             zaapt      => $zaapt,
-            a_id       => $a_id,
+            a_id       => $id,
             t_name     => $t_name,
         );
     }

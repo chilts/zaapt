@@ -3,7 +3,7 @@
     $zaapt
     $a          => ''
     $f_name
-    $a_id       => undef
+    $id       => undef
     $tp_subject => undef
     $p_message  => undef
     $t_id       => undef
@@ -26,7 +26,7 @@
     my $err = [];
     if ( $a eq 'topic' ) {
         # firstly, check the error cases
-        unless ( defined $a_id and defined $t_id ) {
+        unless ( defined $id and defined $t_id ) {
             $m->clear_buffer();
             $m->redirect('?');
             return;
@@ -43,7 +43,7 @@
         unless ( @$err ) {
             $model->ins_new_topic({
                 f_id       => $forum->{f_id},
-                a_id       => $a_id,
+                a_id       => $id,
                 tp_subject => $tp_subject,
                 p_message  => $p_message,
                 t_id       => $t_id

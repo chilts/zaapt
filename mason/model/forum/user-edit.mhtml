@@ -6,12 +6,12 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $a_id => undef
+    $id => undef
 </%args>
 %# ----------------------------------------------------------------------------
 <%init>
     my $model = $zaapt->get_model('Forum');
-    my $info = $model->sel_info({ a_id => $a_id });
+    my $info = $model->sel_info({ a_id => $id });
 
     # check to see if this person has any posts/info yet
     unless ( defined $info ) {

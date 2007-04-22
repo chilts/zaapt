@@ -17,8 +17,8 @@
     $m->redirect('edit_n_list.html') unless defined $article;
     $m->redirect('edit_a_list.html?n_id=' . uri_escape($article->{n_id})) unless exists $my_roles->{$article->{_edit}};
 
-    my $paga_types = $zaapt->get_model('Common')->sel_all_types();
-    my @options = map { { value => $_->{t_id}, text => $_->{t_name} } } @$paga_types;
+    my $page_types = $zaapt->get_model('Common')->sel_all_types();
+    my @options = map { { value => $_->{t_id}, text => $_->{t_name} } } @$page_types;
 </%init>
 %# ----------------------------------------------------------------------------
 <h1>Edit an Article</h1>

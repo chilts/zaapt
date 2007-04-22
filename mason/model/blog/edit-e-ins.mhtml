@@ -2,7 +2,7 @@
 <%args>
     $zaapt
     $my_roles
-    $a_id
+    $id
     $b_id
     $e_name      => ''
     $e_title     => ''
@@ -60,7 +60,7 @@
 
     unless ( @$err ) {
         $model->ins_entry({
-            a_id        => $a_id,
+            a_id        => $id,
             b_id        => $b_id,
             e_name      => $e_name,
             e_title     => $e_title,

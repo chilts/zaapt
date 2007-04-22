@@ -2,13 +2,13 @@
 <%args>
     $zaapt
     $f_name     => undef
-    $a_id
+    $id
     $t_name
 </%args>
 %# ----------------------------------------------------------------------------
 <%init>
     my $model = $zaapt->get_model('Forum');
-    my $info = $model->sel_info({ a_id => $a_id });
+    my $info = $model->sel_info({ a_id => $id });
 </%init>
 %# ----------------------------------------------------------------------------
 <div class="z_forum">

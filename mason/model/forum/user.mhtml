@@ -5,7 +5,7 @@
     $a          => ''
     $f_name
     $page       => ''
-    $a_id       => undef
+    $id       => undef
     $tp_subject => ''
     $p_message  => ''
     $t_id       => undef
@@ -31,7 +31,7 @@
             zaapt      => $zaapt,
             a          => $a,
             f_name     => $f_name,
-            a_id       => $a_id,
+            a_id       => $id,
             tp_subject => $tp_subject,
             p_message  => $p_message,
             t_id       => $t_id,
@@ -81,7 +81,7 @@
             a         => $a,
             f_name    => $f_name,
             tp_id     => $page,
-            a_id      => $a_id,
+            a_id      => $id,
             p_message => $p_message,
             t_id      => $t_id,
             p         => $p,

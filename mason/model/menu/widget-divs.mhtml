@@ -25,19 +25,17 @@
     my $items = $model->sel_all_items_in({ m_id => $menu->{m_id} });
 </%init>
 %# ----------------------------------------------------------------------------
-<div class="z_menu">
 % if ( @$items ) {
 %     foreach my $item ( @$items ) {
-    <div class="level_<% $item->{i_level} | h %>">
-        <a href="<% $item->{i_url} %>">
+<div class="level_<% $item->{i_level} | h %>">
+    <a href="<% $item->{i_url} %>">
 %         if ( $item->{i_ishtml} ) {
-            <% $item->{i_text} %>
+        <% $item->{i_text} %>
 %         } else {
-            <% $item->{i_text} | h %>
+        <% $item->{i_text} | h %>
 %         }
-        </a>
-    </div>
+    </a>
+</div>
 %     }
 % }
-</div>
 %# ----------------------------------------------------------------------------

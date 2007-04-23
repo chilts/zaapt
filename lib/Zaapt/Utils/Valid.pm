@@ -17,22 +17,23 @@ sub err {
 
 # usually for all 'name' fields, hence it's all called 'Name' :-)
 sub is_valid_name {
-    my ($name) = @_;
+    my ($str, $name) = @_;
 
     $err = undef;
+    $name ||= 'name';
 
     # check that the name has been given
-    unless ( defined $name ) {
+    unless ( defined $str ) {
         $err = 'Name is undefined';
         return;
     }
 
-    if ( $name eq '' ) {
+    if ( $str eq '' ) {
         $err = 'No name given';
         return;
     }
 
-    unless ( $name =~ m{ \A [a-z0-9][a-z0-9\-]* \z }xms ) {
+    unless ( $str =~ m{ \A [a-z0-9][a-z0-9\-]* \z }xms ) {
         $err = "Name must contain only lowercase 'a-z', '0-9', '-' and must start with a letter or a number.";
         return;
     }
@@ -41,6 +42,8 @@ sub is_valid_name {
 
 sub is_min_length {
     my ($str, $min_length, $name) = @_;
+
+    $name ||= 'string';
 
     unless ( length $str >= $min_length ) {
         $err = "'$name' must be at least $min_length characters long";
@@ -52,6 +55,8 @@ sub is_min_length {
 sub is_max_length {
     my ($str, $max_length, $name) = @_;
 
+    $name ||= 'string';
+
     unless ( length $str <= $max_length ) {
         $err = "'$name' must be maximum $max_length characters long";
         return 0;
@@ -61,6 +66,8 @@ sub is_max_length {
 
 sub has_content {
     my ($str, $name) = @_;
+
+    $name ||= 'string';
 
     unless ( defined $str ) {
         $err = "'$name' is undefined";

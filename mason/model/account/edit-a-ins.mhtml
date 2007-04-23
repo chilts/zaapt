@@ -1,0 +1,105 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $my_roles
+    $a_username  => ''
+    $a_firstname => ''
+    $a_lastname  => ''
+    $a_email     => ''
+    $a_password  => ''
+    $a_repeat    => ''
+    $a_notify    => ''
+    $a_confirmed => ''
+    $a_admin     => ''
+</%args>
+%# ----------------------------------------------------------------------------
+<%once>
+    use String::Random qw(random_string);
+</%once>
+%# ----------------------------------------------------------------------------
+<%init>
+    $m->redirect('edit-a-list.html') unless exists $my_roles->{super};
+
+    # do some checking
+    my $err = [];
+
+    unless ( Zaapt::Utils::Valid::is_valid_name($a_username, 'Username') ) {
+        push @$err, Zaapt::Utils::Valid::err();
+    }
+
+    unless ( Zaapt::Utils::Valid::is_min_length($a_username, 3, 'Username') ) {
+        push @$err, Zaapt::Utils::Valid::err();
+    }
+
+    unless ( Zaapt::Utils::Valid::contains_something($a_firstname, 'Firstname') ) {
+        push @$err, Zaapt::Utils::Valid::err();
+    }
+
+    unless ( Zaapt::Utils::Valid::contains_something($a_lastname, 'Lastname') ) {
+        push @$err, Zaapt::Utils::Valid::err();
+    }
+
+    # need to do better checking for this email address
+    unless ( Zaapt::Utils::Valid::contains_something($a_email, 'Email') ) {
+        push @$err, Zaapt::Utils::Valid::err();
+    }
+
+    unless ( Zaapt::Utils::Valid::is_min_length($a_password, 6, 'Password') ) {
+        push @$err, Zaapt::Utils::Valid::err();
+    }
+
+    unless ( $a_password eq $a_repeat ) {
+        push @$err, "'Password' and 'Repeat' are not the same";
+    }
+
+    unless ( @$err ) {
+        $a_notify = Zaapt::Utils::Conv::to_bool( $a_notify );
+        $a_confirmed = Zaapt::Utils::Conv::to_bool( $a_confirmed );
+        $a_admin = Zaapt::Utils::Conv::to_bool( $a_admin );
+
+        # get a random_string for the salt
+        my $a_salt = random_string('s' x 8);
+
+        my $model = $ZAAPT->get_model('Account');
+        $model->ins_account({
+            a_username  => $a_username,
+            a_firstname => $a_firstname,
+            a_lastname  => $a_lastname,
+            a_email     => $a_email,
+            a_notify    => $a_notify,
+            a_salt      => $a_salt,
+            a_password  => $a_password,
+            a_confirmed => $a_confirmed,
+            a_admin     => $a_admin,
+        });
+        $m->redirect('edit-a-list.html');
+        return;
+    }
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Add an Account</h1>
+
+<p><a href="edit-a-list.html">&laquo; Back to Account List</a></p>
+
+<h2>Account: ?</h2>
+
+<& /zaapt/common/err.mhtml, err => $err &>
+
+<& /zaapt/common/form.mhtml, action => 'edit-a-ins.html', elements => [
+        { type => 'text', field => 'Username', name => 'a_username', size => 40, value => $a_username },
+        { type => 'text', field => 'Firstname', name => 'a_firstname', size => 40, value => $a_firstname },
+        { type => 'text', field => 'Lastname', name => 'a_lastname', size => 40, value => $a_lastname },
+        { type => 'text', field => 'Email', name => 'a_email', size => 40, value => $a_email },
+        { type => 'password', field => 'Password', name => 'a_password', size => 40, value => '' },
+        { type => 'password', field => 'Repeat', name => 'a_repeat', size => 40, value => '' },
+        { type => 'check', field => 'Notify?', name => 'a_notify', checked => $a_notify },
+        { type => 'note', value => "Note: If you have any mailing lists, 'Notify' can be used to show interest." },
+        { type => 'check', field => 'Confirmed?', name => 'a_confirmed', checked => $a_confirmed },
+        { type => 'note', value => "Note: This shows that the email address is valid." },
+        { type => 'check', field => 'Admin?', name => 'a_admin', checked => $a_admin },
+        { type => 'note', value => "Note: Check if this person is an administrator." },
+        { type => 'submit', field => 'Actions', value => 'Add Account', cancel => 'edit-a-list.html' },
+    ]
+&>
+
+%# ----------------------------------------------------------------------------

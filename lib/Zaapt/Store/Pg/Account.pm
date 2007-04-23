@@ -31,6 +31,7 @@ my $confirm_cols = __PACKAGE__->_mk_cols( 'c', qw(account_id code) );
 
 # account
 my $ins_account = "INSERT INTO account.account(username, firstname, lastname, email, notify, salt, password, admin, confirmed) VALUES(?, ?, ?, ?, ?, ?, md5(? || ?), COALESCE(?, False), COALESCE(?, False))";
+my $del_account = __PACKAGE__->_mk_del( 'account.account', qw(id) );
 my $sel_account = "SELECT $account_cols FROM $account_tablename WHERE id = ?";
 my $sel_account_using_username = "SELECT $account_cols FROM $account_tablename WHERE username = ?";
 my $upd_account = __PACKAGE__->_mk_upd( 'account.account', 'id', qw(username firstname lastname email notify confirmed admin));
@@ -111,6 +112,11 @@ sub sel_roles_for_account {
 sub sel_account {
     my ($self, $hr) = @_;
     return $self->_row( $sel_account, $hr->{a_id} );
+}
+
+sub del_account {
+    my ($self, $hr) = @_;
+    $self->_do( $del_account, $hr->{a_id} );
 }
 
 sub sel_account_using_username {

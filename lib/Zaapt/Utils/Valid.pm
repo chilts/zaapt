@@ -39,6 +39,26 @@ sub is_valid_name {
     return 1;
 }
 
+sub is_min_length {
+    my ($str, $min_length, $name) = @_;
+
+    unless ( length $str >= $min_length ) {
+        $err = "'$name' must be at least $min_length characters long";
+        return 0;
+    }
+    return 1;
+}
+
+sub is_max_length {
+    my ($str, $max_length, $name) = @_;
+
+    unless ( length $str <= $max_length ) {
+        $err = "'$name' must be maximum $max_length characters long";
+        return 0;
+    }
+    return 1;
+}
+
 sub has_content {
     my ($str, $name) = @_;
 

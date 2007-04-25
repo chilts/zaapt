@@ -60,7 +60,7 @@
         # get a random_string for the salt
         my $a_salt = random_string('s' x 8);
 
-        my $model = $ZAAPT->get_model('Account');
+        my $model = $zaapt->get_model('Account');
         $model->ins_account({
             a_username  => $a_username,
             a_firstname => $a_firstname,

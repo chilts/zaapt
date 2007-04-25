@@ -1,3 +1,18 @@
 %# ----------------------------------------------------------------------------
-<& "edit-a-list.mhtml", %ARGS &>
+<h1>Account Admin</h1>
+
+<h2>General Account</h2>
+
+<ul>
+    <li><a href="edit-a-list.html">Account List</a></li>
+    <li><a href="#">Role List (ToDo)</a></li>
+    <li><a href="#">Privilege List (ToDo)</a></li>
+</ul>
+
+<h2>Your Account:</h2>
+
+<ul>
+    <li><a href="edit-a-password-edit.html">Change Password</a></li>
+</ul>
+
 %# ----------------------------------------------------------------------------

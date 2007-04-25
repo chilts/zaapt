@@ -8,11 +8,11 @@
 <%init>
     if ( $page =~ m{ \A index \z}xms ) {
         # main index page
-        $m->comp('/zaapt/model/news/view-index.mhtml', zaapt => $ZAAPT, n_name => $n_name);
+        $m->comp('/zaapt/model/news/view-index.mhtml', zaapt => $zaapt, n_name => $n_name);
     }
     else {
         # this is a named article
-        $m->comp('/zaapt/model/news/view-article.mhtml', zaapt => $ZAAPT, n_name => $n_name, a_id => $page);
+        $m->comp('/zaapt/model/news/view-article.mhtml', zaapt => $zaapt, n_name => $n_name, a_id => $page);
     }
     return;
 </%init>

@@ -8,17 +8,17 @@
 <%init>
     # see if this looks like a date
     if ( $page =~ m{ \A \d{4}-\d{2}-\d{2} \z}xms ) {
-        $m->comp('/zaapt/model/blog/view-archive.mhtml', zaapt => $ZAAPT, b_name => $b_name, from => $page, for => '1 day');
+        $m->comp('/zaapt/model/blog/view-archive.mhtml', zaapt => $zaapt, b_name => $b_name, from => $page, for => '1 day');
     }
     elsif ( $page =~ m{ \A \d{4}-\d{2} \z}xms ) {
-        $m->comp('/zaapt/model/blog/view-archive.mhtml', zaapt => $ZAAPT, b_name => $b_name, from => "$page-01", for => '1 month');
+        $m->comp('/zaapt/model/blog/view-archive.mhtml', zaapt => $zaapt, b_name => $b_name, from => "$page-01", for => '1 month');
     }
     elsif ( $page =~ m{ \A \d{4} \z}xms ) {
-        $m->comp('/zaapt/model/blog/view-archive.mhtml', zaapt => $ZAAPT, b_name => $b_name, from => "$page-01-01", for => '1 year');
+        $m->comp('/zaapt/model/blog/view-archive.mhtml', zaapt => $zaapt, b_name => $b_name, from => "$page-01-01", for => '1 year');
     }
     elsif ( $page =~ m{ \A index \z}xms ) {
         # main index page
-        $m->comp('/zaapt/model/blog/view-index.mhtml', zaapt => $ZAAPT, b_name => $b_name);
+        $m->comp('/zaapt/model/blog/view-index.mhtml', zaapt => $zaapt, b_name => $b_name);
     }
     elsif ( $page =~ m{ \A tags \z}xms ) {
         # do the tag cloud
@@ -27,7 +27,7 @@
         # this is a named entry
         $m->comp('/zaapt/model/blog/view-entry.mhtml',
             %ARGS, # pass everything since there might be a comment
-            zaapt => $ZAAPT,
+            zaapt => $zaapt,
             b_name => $b_name,
             e_name => $page
         );

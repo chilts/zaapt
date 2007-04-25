@@ -8,7 +8,7 @@
 <%init>
     if ( $page eq 'index' ) {
         # main index page
-        $m->comp('/zaapt/model/faq/view-index.mhtml', zaapt => $ZAAPT, f_name => $f_name);
+        $m->comp('/zaapt/model/faq/view-index.mhtml', zaapt => $zaapt, f_name => $f_name);
     }
     else {
         # we do not know what this is

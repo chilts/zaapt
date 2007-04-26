@@ -26,7 +26,6 @@
     $r_description = Zaapt::Utils::Conv::remove_cr( $r_description );
 
     unless ( @$err ) {
-        warn "n=$r_name, d=$r_description";
         $model->upd_role({
             r_name        => $r_name,
             r_description => $r_description,

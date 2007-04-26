@@ -1,0 +1,42 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $my_roles
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Account');
+    my $roles = $model->sel_all_roles();
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Role List</h1>
+
+% if ( exists $my_roles->{super} ) {
+<p>
+    * <a href="edit-r-add.html">Add Role &raquo;</a><br />
+</p>
+% }
+
+<&| /zaapt/common/admin/table-edit.mhtml, title => 'Role' &>
+
+% my $row = 1;
+% foreach my $role ( @$roles ) {
+    <tr class="r<% $row=1-$row %>">
+        <td>
+            (<% $role->{r_id} | h %>) <strong><% $role->{r_name} | h %></strong><br />
+            <% $role->{r_description} | h %>
+        </td>
+        <td>
+%    if ( exists $my_roles->{super} ) {
+            * <a href="edit-r-edit.html?r_id=<% $role->{r_id} | u %>">Edit Role</a><br />
+            * <a href="edit-r-del.html?r_id=<% $role->{r_id} | u %>">Delete</a><br />
+%    } else {
+            * No Actions
+%    }
+        </td>
+    </tr>
+% }
+
+</&>
+
+%# ----------------------------------------------------------------------------

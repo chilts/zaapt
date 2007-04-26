@@ -1,0 +1,56 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $my_roles
+    $r_id
+    $r_name
+    $r_description
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    $m->redirect('edit-r-list.html') unless exists $my_roles->{super};
+
+    my $model = $zaapt->get_model('Account');
+    my $role = $model->sel_role({ r_id => $r_id });
+
+    # check the error conditions first - we need to recover
+    $m->redirect('edit-r-list.html') unless defined $role;
+
+    # do some checking
+    my $err = [];
+
+    unless ( Zaapt::Utils::Valid::is_valid_name($r_name, 'Name') ) {
+        push @$err, Zaapt::Utils::Valid::err();
+    }
+
+    $r_description = Zaapt::Utils::Conv::remove_cr( $r_description );
+
+    unless ( @$err ) {
+        warn "n=$r_name, d=$r_description";
+        $model->upd_role({
+            r_name        => $r_name,
+            r_description => $r_description,
+            r_id          => $r_id,
+        });
+        $m->redirect('edit-r-list.html');
+        return;
+    }
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Edit a Role</h1>
+
+<p><a href="edit-r-list.html">&laquo; Back to Role List</a></p>
+
+<h2>Role: <% $role->{r_name} | h %></h2>
+
+<& /zaapt/common/err.mhtml, err => $err &>
+
+<& /zaapt/common/form.mhtml, action => 'edit-r-upd.html', elements => [
+        { type => 'hidden', name => 'r_id', value => $r_id },
+        { type => 'text', field => 'Name', name => 'r_name', size => 40, value => $r_name },
+        { type => 'textarea', field => 'Description', name => 'r_description', rows => 10, cols => 40, value => $r_description },
+        { type => 'submit', field => 'Actions', value => 'Save', cancel => 'edit-r-list.html' },
+    ]
+&>
+
+%# ----------------------------------------------------------------------------

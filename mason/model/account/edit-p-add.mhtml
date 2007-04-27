@@ -1,0 +1,45 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $my_roles
+    $from => 'list'
+</%args>
+%# ----------------------------------------------------------------------------
+<%once>
+    my $allowed = {
+        from => {
+            list    => 'edit-p-list.html',
+            account => 'edit-p-list-by-account.html',
+            role    => 'edit-p-list-by-role.html',
+        },
+    };
+</%once>
+%# ----------------------------------------------------------------------------
+<%init>
+    $m->redirect('edit-r-list.html') unless exists $my_roles->{super};
+
+    $from = 'list' unless exists $allowed->{from}{$from};
+    my $from_to = $allowed->{from}{$from};
+
+    my $model = $zaapt->get_model('Account');
+    my $accounts = $model->sel_account_all();
+    my $roles = $model->sel_role_all();
+
+    my @accounts = map { { value => $_->{a_id}, text => $_->{a_username} } } @$accounts;
+    my @roles = map { { value => $_->{r_id}, text => $_->{r_name} } } @$roles;
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Add a Privilege</h1>
+
+<p><a href="<% $from_to %>">&laquo; Back to Privilege List</a></p>
+
+<h2>Role: ?</h2>
+
+<& /zaapt/common/form.mhtml, action => 'edit-p-ins.html', elements => [
+        { type => 'hidden', name => 'from', value => $from },
+        { type => 'select', field => 'Accounts', name => 'a_id', options => \@accounts },
+        { type => 'select', field => 'Roles', name => 'r_id', options => \@roles },
+        { type => 'submit', field => 'Actions', value => 'Add Privilege', cancel => 'edit-p-list.html' },
+    ]
+&>
+%# ----------------------------------------------------------------------------

@@ -1,0 +1,39 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $my_roles
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Account');
+    my $privileges = $model->sel_privilege_all();
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Privilege List</h1>
+
+% if ( exists $my_roles->{super} ) {
+<p>
+    * <a href="edit-p-add.html">Add Privilege &raquo;</a><br />
+</p>
+% }
+
+<&| /zaapt/common/admin/table-edit.mhtml, title => 'Privileges by Account' &>
+
+% my $row = 1;
+% foreach my $privilege ( @$privileges ) {
+    <tr class="r<% $row=1-$row %>">
+        <td>
+            (<% $privilege->{a_id} | h %>) <strong><% $privilege->{a_username} | h %></strong> - <% $privilege->{r_name} | h %><br />
+        </td>
+        <td>
+%         if ( exists $my_roles->{super} ) {
+            * <a href="edit-p-del.html?p_id=<% $privilege->{p_id} | u %>&amp;from=list">Delete</a><br />
+%         } else {
+            * No Actions
+%         }
+        </td>
+    </tr>
+% }
+
+</&>
+%# ----------------------------------------------------------------------------

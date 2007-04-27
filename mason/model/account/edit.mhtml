@@ -6,13 +6,14 @@
 <ul>
     <li><a href="edit-a-list.html">Account List</a></li>
     <li><a href="edit-r-list.html">Role List</a></li>
-    <li>Privilege List [ <a href="edit-p-list-by-account.html">By Account</a> | <a href="edit-p-list-by-role.html">By Role</a> ]</a></li>
+    <li><a href="edit-p-list.html">Privilege List</a> [ <a href="edit-p-list-by-account.html">By Account</a> | <a href="edit-p-list-by-role.html">By Role</a> ]</a></li>
 </ul>
 
 <h2>Your Account:</h2>
 
 <ul>
     <li><a href="edit-a-password-edit.html">Change Password</a></li>
+    <li><a href="#">List My Privileges (ToDo)</a></li>
 </ul>
 
 %# ----------------------------------------------------------------------------

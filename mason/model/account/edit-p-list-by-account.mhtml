@@ -21,7 +21,7 @@
 
 % if ( exists $my_roles->{super} ) {
 <p>
-    * <a href="#">Add Privilege (ToDo) &raquo;</a><br />
+    * <a href="edit-p-add.html?from=account">Add Privilege &raquo;</a><br />
 </p>
 % }
 
@@ -34,7 +34,11 @@
             (<% $account->{a_id} | h %>) <strong><% $account->{a_username} | h %></strong> - <% $account->{a_firstname} | h %> <% $account->{a_lastname} | h %><br />
             <ul>
 %     foreach my $role ( @{$account->{roles}} ) {
-                <li>(<% $role->{r_id} | h %>) <% $role->{r_name} | h %> [<a href="edit-p-del.html?p_id=<% $role->{p_id} | u %>&amp;from=account">delete</a>]</li>
+                <li>(<% $role->{r_id} | h %>) <% $role->{r_name} | h %>
+%         if ( exists $my_roles->{super} ) {
+                    [<a href="edit-p-del.html?p_id=<% $role->{p_id} | u %>&amp;from=account">delete</a>]
+%         }
+                </li>
 %     }
             </ul>
         </td>

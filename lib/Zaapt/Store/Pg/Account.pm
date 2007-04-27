@@ -45,12 +45,14 @@ my $ins_role = __PACKAGE__->_mk_ins( 'account.role', qw(name description) );
 my $upd_role = __PACKAGE__->_mk_upd( 'account.role', 'id', qw(name description) );
 my $del_role = __PACKAGE__->_mk_del( 'account.role', qw(id) );
 my $sel_role = __PACKAGE__->_mk_sel( 'account.role', 'r', qw(name description) );
-my $sel_all_roles = "SELECT $role_cols FROM $role_tablename ORDER BY name";
+my $sel_all_roles = "SELECT $role_cols FROM $role_tablename ORDER BY name"; # deprecated
+my $sel_role_all = "SELECT $role_cols FROM $role_tablename ORDER BY name";
 
 # privilege
 my $ins_privilege = __PACKAGE__->_mk_ins( 'account.privilege', qw(account_id role_id) );
 my $del_privilege = __PACKAGE__->_mk_del( 'account.privilege', qw(id) );
 my $sel_privilege = "SELECT $privilege_cols FROM $privilege_tablename WHERE p.id = ?";
+my $sel_privilege_all = "SELECT $account_cols, $privilege_cols, $role_cols FROM $account_tablename JOIN $privilege_tablename ON (a.id = p.account_id) JOIN $role_tablename ON (p.role_id = r.id) ORDER BY a.id, r.id";
 my $sel_privilege_all_by_account = "SELECT $account_cols, $privilege_cols, $role_cols FROM $account_tablename JOIN $privilege_tablename ON (a.id = p.account_id) JOIN $role_tablename ON (p.role_id = r.id) ORDER BY a.id, r.id";
 my $sel_privilege_all_by_role = "SELECT $role_cols, $privilege_cols, $account_cols FROM $role_tablename JOIN $privilege_tablename ON (r.id = p.role_id) JOIN $account_tablename ON (p.account_id = a.id) ORDER BY r.id, a.id";
 
@@ -102,9 +104,15 @@ sub sel_role {
     return $self->_row( $sel_role, $hr->{r_id} );
 }
 
-sub sel_all_roles {
+sub sel_all_roles { # deprecated
     my ($self, $hr) = @_;
+    warn "Account::sel_all_roles(): is deprecated";
     return $self->_rows( $sel_all_roles );
+}
+
+sub sel_role_all {
+    my ($self, $hr) = @_;
+    return $self->_rows( $sel_role_all );
 }
 
 sub sel_roles_for_account {
@@ -120,6 +128,11 @@ sub del_privilege {
 sub sel_privilege {
     my ($self, $hr) = @_;
     return $self->_row( $sel_privilege, $hr->{p_id} );
+}
+
+sub sel_privilege_all {
+    my ($self, $hr) = @_;
+    return $self->_rows( $sel_privilege_all );
 }
 
 sub sel_privilege_all_by_account {

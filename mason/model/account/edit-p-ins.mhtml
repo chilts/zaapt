@@ -2,8 +2,9 @@
 <%args>
     $zaapt
     $my_roles
-    $p_id
-    $from => 'account'
+    $a_id => undef
+    $r_id => undef
+    $from => 'list'
 </%args>
 %# ----------------------------------------------------------------------------
 <%once>
@@ -17,19 +18,22 @@
 </%once>
 %# ----------------------------------------------------------------------------
 <%init>
-    # need 'super'
-    $m->redirect('edit-a-list.html') unless exists $my_roles->{super};
+    $m->redirect('edit-r-list.html') unless exists $my_roles->{super};
 
     $from = 'list' unless exists $allowed->{from}{$from};
     my $redirect_to = $allowed->{from}{$from};
 
     my $model = $zaapt->get_model('Account');
-    my $privilege = $model->sel_privilege({ p_id => $p_id });
+    my $account = $model->sel_account({ a_id => $a_id });
+    my $role = $model->sel_role({ r_id => $r_id });
 
-    $m->redirect($redirect_to) unless defined $privilege;
+    $m->redirect($redirect_to) unless defined $account;
+    $m->redirect($redirect_to) unless defined $role;
 
-    $model->del_privilege({ p_id => $p_id });
-
+    $model->ins_privilege({
+        a_id  => $a_id,
+        r_id => $r_id,
+    });
     $m->redirect($redirect_to);
     return;
 </%init>

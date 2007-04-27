@@ -1,0 +1,37 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $my_roles
+    $p_id
+    $from => 'account'
+</%args>
+%# ----------------------------------------------------------------------------
+<%once>
+    my $allowed = {
+        from => {
+            account => 1,
+            role => 1,
+        },
+    };
+</%once>
+%# ----------------------------------------------------------------------------
+<%init>
+    # need 'super'
+    $m->redirect('edit-a-list.html') unless exists $my_roles->{super};
+
+    $from = 'account' unless exists $allowed->{from}{$from};
+    my $redirect_to = "edit-p-list-by-$from.html";
+
+    my $model = $zaapt->get_model('Account');
+    my $privilege = $model->sel_privilege({ p_id => $p_id });
+
+    $m->redirect($redirect_to) unless defined $privilege;
+
+    $m->redirect($redirect_to) unless exists $my_roles->{super};
+
+    $model->del_privilege({ p_id => $p_id });
+
+    $m->redirect($redirect_to);
+    return;
+</%init>
+%# ----------------------------------------------------------------------------

@@ -38,7 +38,9 @@ CREATE TRIGGER role_updated BEFORE UPDATE ON account.role
     FOR EACH ROW EXECUTE PROCEDURE updated();
 
 -- table: privilege
+CREATE SEQUENCE account.privilege_id_seq;
 CREATE TABLE account.privilege (
+    id              INTEGER NOT NULL DEFAULT nextval('account.privilege_id_seq'::TEXT) PRIMARY KEY,
     account_id      INTEGER NOT NULL REFERENCES account.account,
     role_id         INTEGER NOT NULL REFERENCES account.role,
 

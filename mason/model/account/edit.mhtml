@@ -6,7 +6,7 @@
 <ul>
     <li><a href="edit-a-list.html">Account List</a></li>
     <li><a href="edit-r-list.html">Role List</a></li>
-    <li><a href="#">Privilege List (ToDo)</a></li>
+    <li>Privilege List [ <a href="edit-p-list-by-account.html">By Account</a> | <a href="edit-p-list-by-role.html">By Role</a> ]</a></li>
 </ul>
 
 <h2>Your Account:</h2>

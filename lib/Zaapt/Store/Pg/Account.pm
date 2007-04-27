@@ -26,7 +26,7 @@ my $confirm_tablename = "account.confirm c";
 # helper
 my $account_cols = __PACKAGE__->_mk_cols( 'a', qw(id username firstname lastname email notify salt password confirmed admin logins last ts:inserted ts:updated) );
 my $role_cols = __PACKAGE__->_mk_cols( 'r', qw(id name description) );
-my $privilege_cols = __PACKAGE__->_mk_cols( 'p', qw(account_id privilege_id) );
+my $privilege_cols = __PACKAGE__->_mk_cols( 'p', qw(id account_id role_id) );
 my $confirm_cols = __PACKAGE__->_mk_cols( 'c', qw(account_id code) );
 
 # account
@@ -49,7 +49,10 @@ my $sel_all_roles = "SELECT $role_cols FROM $role_tablename ORDER BY name";
 
 # privilege
 my $ins_privilege = __PACKAGE__->_mk_ins( 'account.privilege', qw(account_id role_id) );
-my $del_privilege = __PACKAGE__->_mk_del( 'account.privilege', qw(account_id role_id) );
+my $del_privilege = __PACKAGE__->_mk_del( 'account.privilege', qw(id) );
+my $sel_privilege = "SELECT $privilege_cols FROM $privilege_tablename WHERE p.id = ?";
+my $sel_privilege_all_by_account = "SELECT $account_cols, $privilege_cols, $role_cols FROM $account_tablename JOIN $privilege_tablename ON (a.id = p.account_id) JOIN $role_tablename ON (p.role_id = r.id) ORDER BY a.id, r.id";
+my $sel_privilege_all_by_role = "SELECT $role_cols, $privilege_cols, $account_cols FROM $role_tablename JOIN $privilege_tablename ON (r.id = p.role_id) JOIN $account_tablename ON (p.account_id = a.id) ORDER BY r.id, a.id";
 
 # confirm
 my $ins_confirm = __PACKAGE__->_mk_ins( 'account.confirm', qw(account_id code) );
@@ -107,6 +110,26 @@ sub sel_all_roles {
 sub sel_roles_for_account {
     my ($self, $hr) = @_;
     return $self->_rows( $sel_roles_for_account, $hr->{a_id} );
+}
+
+sub del_privilege {
+    my ($self, $hr) = @_;
+    $self->_do( $del_privilege, $hr->{p_id} );
+}
+
+sub sel_privilege {
+    my ($self, $hr) = @_;
+    return $self->_row( $sel_privilege, $hr->{p_id} );
+}
+
+sub sel_privilege_all_by_account {
+    my ($self, $hr) = @_;
+    return $self->_rows( $sel_privilege_all_by_account );
+}
+
+sub sel_privilege_all_by_role {
+    my ($self, $hr) = @_;
+    return $self->_rows( $sel_privilege_all_by_role );
 }
 
 sub sel_account {

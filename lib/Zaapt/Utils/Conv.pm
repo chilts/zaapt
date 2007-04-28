@@ -49,6 +49,20 @@ sub crunch {
 	return $arg;
 }
 
+sub namify {
+    my ($arg) = @_;
+
+    # try and do some funky things
+    my $name = crunch($arg);         # crunch whitespace to 1
+    $name =~ s{\b&\b}{and}gxms;      # special stuff for '&'
+    $name =~ s{[\'\"]}{}gxms;        # remove quotes
+    $name =~ s{[^A-Za-z0-9]}{-}gxms; # anything note a 'word' char, replace with '-'
+    $name =~ s{\A-+}{}gxms;          # remove multiple -'s at start
+    $name =~ s{-+\z}{}gxms;          # remove multiple -'s at end
+    $name =~ s{-+}{-}gxms;           # crunch multiple -'s to 1 '-'
+    return lc $name;                 # lowercase and finish up!
+}
+
 ## ----------------------------------------------------------------------------
 1;
 ## ----------------------------------------------------------------------------

@@ -4,7 +4,6 @@ use base qw( Zaapt::Store::Pg Zaapt::Model::Blog );
 
 use strict;
 use warnings;
-use Data::Dumper;
 
 use Zaapt::Store::Pg::Account;
 use Zaapt::Store::Pg::Common;
@@ -90,8 +89,6 @@ __PACKAGE__->_mk_sql_for( $table->{label}{schema}, $table->{label} );
 
 ## ----------------------------------------------------------------------------
 
-# print Data::Dumper->Dump([$table], ['table']);
-
 # blog
 __PACKAGE__->mk_selecter( $schema, $table->{blog}{name}, $table->{blog}{prefix}, @{$table->{blog}{cols}} );
 __PACKAGE__->mk_selecter_using( $schema, $table->{blog}{name}, $table->{blog}{prefix}, 'name', @{$table->{blog}{cols}} );
@@ -111,6 +108,8 @@ __PACKAGE__->mk_select_rows( 'sel_entry_latest', "SELECT $blog_cols FROM $blog_j
 
 __PACKAGE__->mk_select_rows( 'sel_entry_archive', "SELECT $blog_cols FROM $blog_joins WHERE b.id = ? AND e.inserted >= ?::DATE AND e.inserted <= ?::DATE + ?::INTERVAL ORDER BY e.inserted DESC", [ 'b_id', '_from', '_from', '_for' ] );
 
+__PACKAGE__->mk_select_rows( 'sel_entry_label', "SELECT $blog_cols FROM $blog_joins $join->{e_l} WHERE b.id = ? AND l.name = ? ORDER BY e.inserted DESC", [ 'b_id', 'l_name' ] );
+
 __PACKAGE__->mk_select_rows( 'sel_label_all_for', "SELECT $table->{label}{sql_sel_cols} FROM $table->{entry}{sql_fqt} $join->{e_l} WHERE e.id = ? ORDER BY l.name", [ 'e_id' ] );
 
 # entry_label
@@ -120,6 +119,7 @@ my $ins_entry_label = __PACKAGE__->_mk_ins( 'blog.entry_label', qw(entry_id labe
 __PACKAGE__->mk_selecter( $schema, $table->{comment}{name}, $table->{comment}{prefix}, @{$table->{comment}{cols}} );
 __PACKAGE__->mk_select_rows( 'sel_comments_for', "SELECT $table->{comment}{sql_sel_cols} FROM $table->{entry}{sql_fqt} $join->{e_c} WHERE e.id = ? AND c.status = ? ORDER BY c.inserted", [ 'e_id', 'c_status' ] );
 __PACKAGE__->mk_select_rows( 'sel_comments_for_blog', "SELECT $table->{entry}{sql_sel_cols}, $table->{comment}{sql_sel_cols} FROM $table->{entry}{sql_fqt} $join->{e_c} WHERE e.blog_id = ? AND c.status = ? ORDER BY c.inserted", [ 'b_id', 'c_status' ] );
+# __PACKAGE__->mk_doer( 'del_comment_where_status', "DELETE FROM $schema.$table->{comment}{name} WHERE status = ?", ['c_status'] );
 
 # trackbacks
 __PACKAGE__->mk_select_rows( 'sel_trackbacks_for', "SELECT $table->{trackback}{sql_sel_cols} FROM $table->{entry}{sql_fqt} $join->{e_tr} WHERE e.id = ? AND tr.status = ? ORDER BY tr.inserted", [ 'e_id', 'tr_status' ] );

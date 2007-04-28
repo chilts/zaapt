@@ -7,14 +7,17 @@
 %# ----------------------------------------------------------------------------
 <%init>
     # see if this looks like a date
-    if ( $page =~ m{ \A \d{4}-\d{2}-\d{2} \z}xms ) {
-        $m->comp('/zaapt/model/blog/view-archive.mhtml', zaapt => $zaapt, b_name => $b_name, from => $page, for => '1 day');
+    if ( $page =~ m{ \A archive: (\d{4}-\d{2}-\d{2}) \z}xms ) {
+        $m->comp('/zaapt/model/blog/view-archive.mhtml', zaapt => $zaapt, b_name => $b_name, from => $1, for => '1 day');
     }
-    elsif ( $page =~ m{ \A \d{4}-\d{2} \z}xms ) {
-        $m->comp('/zaapt/model/blog/view-archive.mhtml', zaapt => $zaapt, b_name => $b_name, from => "$page-01", for => '1 month');
+    elsif ( $page =~ m{ \A archive: (\d{4}-\d{2}) \z}xms ) {
+        $m->comp('/zaapt/model/blog/view-archive.mhtml', zaapt => $zaapt, b_name => $b_name, from => "$1-01", for => '1 month');
     }
-    elsif ( $page =~ m{ \A \d{4} \z}xms ) {
-        $m->comp('/zaapt/model/blog/view-archive.mhtml', zaapt => $zaapt, b_name => $b_name, from => "$page-01-01", for => '1 year');
+    elsif ( $page =~ m{ \A archive: (\d{4}) \z}xms ) {
+        $m->comp('/zaapt/model/blog/view-archive.mhtml', zaapt => $zaapt, b_name => $b_name, from => "$1-01-01", for => '1 year');
+    }
+    elsif ( $page =~ m{ \A label: (.*) \z}xms ) {
+        $m->comp('/zaapt/model/blog/view-label.mhtml', zaapt => $zaapt, b_name => $b_name, l_name => $1 );
     }
     elsif ( $page =~ m{ \A index \z}xms ) {
         # main index page

@@ -2,8 +2,7 @@
 <%args>
     $zaapt
     $b_name
-    $from
-    $for
+    $l_name
 </%args>
 %# ----------------------------------------------------------------------------
 <%init>
@@ -13,10 +12,11 @@
         die "Blog '$b_name' not found.";
         return;
     }
-    my $entries = $model->sel_entry_archive({ b_id => $blog->{b_id}, _from => $from, _for => $for });
+
+    my $entries = $model->sel_entry_label({ b_id => $blog->{b_id}, l_name => $l_name });
 </%init>
 %# ----------------------------------------------------------------------------
-<h1>Entries for Date: <% $from | h %></h1>
+<h1>Entries for Label: <% $l_name | h %></h1>
 
 <p>Found <% scalar @$entries | h %> <% scalar @$entries == 1 ? 'entry' : 'entries' %>.</p>
 

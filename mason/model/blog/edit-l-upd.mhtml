@@ -32,7 +32,7 @@
     # tidy $e_labels up a bit
     $e_labels = Zaapt::Utils::Conv::remove_cr( $e_labels );
     my @labels = split m{\n+}, $e_labels; # don't need m{}xms
-    @labels = map { Zaapt::Utils::Conv::crunch($_) } @labels;
+    @labels = map { Zaapt::Utils::Conv::namify($_) } @labels;
 
     my $i = 1;
     for my $label ( @labels ) {

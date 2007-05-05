@@ -32,7 +32,7 @@
         # main index page
         $m->comp('/zaapt/model/forum/view-info.mhtml',
             zaapt      => $zaapt,
-            a_id       => $id,
+            id         => $id,
             t_name     => $t_name,
         );
     }

@@ -76,13 +76,13 @@
             <& /zaapt/common/icon.mhtml, name => 'script', title => 'A Post' &>
             <& /zaapt/common/a_username.mhtml, a_username => $post->{a_username} &><br />
             <span class="small soft nw">
-            Joined: <& /zaapt/common/date.mhtml, date => $post->{a_inserted} &><br />
+            Joined: <& /zaapt/common/datetime.mhtml, datetime => $post->{a_inserted} &><br />
             Posts: <% $post->{i_posts} | h %><br />
             </span>
         </td>
         <td class="top">
             <& /zaapt/common/render.mhtml, t_name => $post->{t_name}, content => $post->{p_message} &>
-            <p class="footnote"><& /zaapt/common/date.mhtml, date => $post->{p_inserted} &></p>
+            <p class="footnote"><& /zaapt/common/datetime.mhtml, datetime => $post->{p_inserted} &></p>
 %         if ( $post->{i_signature} ) {
             <hr />
             <& /zaapt/common/render.mhtml, t_name => 'bbcode', content => $post->{i_signature} &>

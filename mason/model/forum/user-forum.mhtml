@@ -167,7 +167,7 @@
 %         if ( defined $topic->{po_username} ) {
             <& /zaapt/common/a_username.mhtml, a_username => $topic->{po_username} &>
             <br style="clear: both;" />
-            <span class="footnote nw"><& /zaapt/common/date.mhtml, date => $topic->{tp_updated} &></span>
+            <span class="footnote nw"><& /zaapt/common/datetime.mhtml, datetime => $topic->{tp_updated} &></span>
 %         } else {
             No Posts
 %         }

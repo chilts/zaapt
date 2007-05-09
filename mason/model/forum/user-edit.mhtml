@@ -28,6 +28,7 @@
         { type => 'hidden', name => 'act', value => 'update' },
         { type => 'read', field => 'Posts', value => $info->{i_posts} },
         { type => 'textarea', field => 'Signature', name => 'i_signature', rows => 4, cols => 40, value => $info->{i_signature} },
+        { type => 'html', field => 'Help', value => $m->scomp('help-link.mhtml') },
         { type => 'submit', field => '', value => 'Save Changes' },
     ]
 &>

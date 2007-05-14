@@ -1,0 +1,52 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $id
+    $t_username
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $account_m = $zaapt->get_model('Account');
+    my $friend_m = $zaapt->get_model('Friend');
+
+    my @err;
+
+    my $to = $account_m->sel_account_using_username({ a_username => $t_username });
+
+    unless ( defined $to ) {
+        push @err, "username '$t_username' not found (make sure you use lowercase letters)";
+    }
+
+    unless ( @err ) {
+        # check if you are adding yourself (string comparison since IDs might not be numbers)
+        if ( $id eq $to->{a_id} ) {
+            push @err, "that's kinda strange - you're trying to add yourself as a friend!";
+        }
+    }
+
+    unless ( @err ) {
+        # check to see if they are already a friend
+        my $pair = $friend_m->sel_friend_pair({ a_id => $id, t_id => $to->{a_id} });
+        if ( defined $pair ) {
+            push @err, "this person '$t_username' is already your friend";
+        }
+    }
+
+    unless ( @err ) {
+        $friend_m->ins_friend({ a_id => $id, t_id => $to->{a_id} });
+        $m->redirect('.');
+        return;
+    }
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Add a Friend</h1>
+
+<& /zaapt/common/err.mhtml, err => \@err &>
+
+<& /zaapt/common/form.mhtml, action => 'add.html', elements => [
+        { type => 'text', field => 'Add who?', name => 't_username', value => $t_username },
+        { type => 'submit', field => 'Actions', value => 'Add Friend', cancel => '.' },
+    ]
+&>
+
+%# ----------------------------------------------------------------------------

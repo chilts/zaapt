@@ -1,0 +1,31 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $id
+    $page
+    $t_username => undef
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    if ( $page eq 'index' ) {
+        $m->comp(
+            '/zaapt/model/friend/user-index.mhtml',
+            zaapt => $zaapt,
+            id => $id
+        );
+    }
+    elsif ( $page eq 'add' ) {
+        $m->comp(
+            '/zaapt/model/friend/user-add.mhtml',
+            zaapt => $zaapt,
+            id => $id,
+            t_username => $t_username
+        );
+    }
+    else {
+        $m->clear_buffer();
+        $m->abort(404);
+    }
+    return;
+</%init>
+%# ----------------------------------------------------------------------------

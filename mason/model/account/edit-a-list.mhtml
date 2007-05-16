@@ -30,6 +30,8 @@
             <br />
             <strong><% $account->{a_logins} | h %></strong> logins
             <br />
+            Joined <strong><% $account->{a_inserted} | h %></strong>
+            <br />
             Last <strong><% $account->{a_last} | h %></strong>
         </td>
         <td>

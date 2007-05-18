@@ -8,5 +8,5 @@
 <p><% $article->{a_intro} | h %></p>
 
 <p><a href="<% $article->{a_id} | h %>.html">Read More...</a></p>
-<p class="footnote">Updated: <& /zaapt/common/date.mhtml, date => $article->{a_updated} &></p>
+<p class="footnote">Updated: <& /zaapt/common/datetime.mhtml, datetime => $article->{a_updated} &></p>
 %# ----------------------------------------------------------------------------

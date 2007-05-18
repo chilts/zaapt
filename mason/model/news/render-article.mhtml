@@ -10,6 +10,6 @@
 
 <& /zaapt/common/render.mhtml, t_name => $article->{t_name}, content => $article->{a_article} &>
 
-<p class="footnote">Updated: <& /zaapt/common/date.mhtml, date => $article->{a_updated} &></p>
+<p class="footnote">Updated: <& /zaapt/common/datetime.mhtml, datetime => $article->{a_updated} &></p>
 
 %# ----------------------------------------------------------------------------

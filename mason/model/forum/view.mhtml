@@ -36,6 +36,13 @@
             t_name     => $t_name,
         );
     }
+    elsif ( $page eq 'user-posts' ) {
+        # show all the posts by this user
+        $m->comp('/zaapt/model/forum/view-user-posts.mhtml',
+            zaapt      => $zaapt,
+            id         => $id,
+        );
+    }
     else {
         $m->comp( '/zaapt/model/forum/view-topic.mhtml',
             zaapt     => $zaapt,

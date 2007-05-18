@@ -64,6 +64,7 @@ my $del_post = __PACKAGE__->_mk_del( 'forum.post', 'id' );
 my $sel_post = "SELECT $forum_cols, $topic_cols, $post_cols FROM $forum_tablename $f_tp_join $tp_p_join WHERE p.id = ?";
 my $sel_all_posts_in = "SELECT $forum_cols, $topic_cols, $post_cols, CASE WHEN current_timestamp < p.inserted + '1 hour'::INTERVAL THEN 1 ELSE 0 END AS p_editable, $type_cols, $account_cols, $info_cols FROM $forum_tablename $f_tp_join $tp_p_join $p_t_join $p_a_join $p_i_join WHERE tp.id = ? ORDER BY p.inserted";
 my $sel_all_posts_in_offset = "SELECT $forum_cols, $topic_cols, $post_cols, CASE WHEN current_timestamp < p.inserted + '1 hour'::INTERVAL THEN 1 ELSE 0 END AS p_editable, $type_cols, $account_cols, $info_cols FROM $forum_tablename $f_tp_join $tp_p_join $p_t_join $p_a_join $p_i_join WHERE tp.id = ? ORDER BY p.inserted LIMIT ? OFFSET ?";
+my $sel_post_all_for = "SELECT $forum_cols, $topic_cols, $post_cols, $account_cols FROM $forum_tablename $f_tp_join $tp_p_join $tp_a_join WHERE p.account_id = ? ORDER BY p.inserted DESC";
 my $del_posts_for_topic = __PACKAGE__->_mk_del( 'forum.post', 'topic_id' );
 my $sel_post_count = __PACKAGE__->_mk_count( 'forum.post' );
 
@@ -171,6 +172,11 @@ sub sel_all_posts_in {
         return $self->_rows( $sel_all_posts_in_offset, $hr->{tp_id}, $hr->{_limit}, $hr->{_offset} );
     }
     return $self->_rows( $sel_all_posts_in, $hr->{tp_id} );
+}
+
+sub sel_post_all_for {
+    my ($self, $hr) = @_;
+    return $self->_rows( $sel_post_all_for, $hr->{a_id} );
 }
 
 sub ins_post {

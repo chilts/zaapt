@@ -1,0 +1,50 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $id
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Forum');
+    my $posts = $model->sel_post_all_for({ a_id => $id });
+</%init>
+%# ----------------------------------------------------------------------------
+<h2>All Forum Posts</h2>
+
+% if ( @$posts ) {
+<table>
+    <thead>
+    <tr>
+        <th>Forum</th>
+        <th>Subject / Original Author</th>
+        <th>Post Date</th>
+    </tr>
+    </thead>
+    <tbody>
+%     my $r = 0;
+%     foreach my $post ( @$posts ) {
+    <tr class="r<% $r++%2 %>">
+        <td>
+            <& /zaapt/model/forum/link-forum.mhtml, f_name => $post->{f_name}, f_title => $post->{f_title} &><br />
+            <span class="small soft">
+                Total Posts: <% $post->{f_posts} | h %><br />
+            </span>
+        </td>
+        <td>
+            <& /zaapt/common/icon.mhtml, name => 'script', title => 'Topic Author' &>
+            <& /zaapt/model/forum/link-topic.mhtml, f_name => $post->{f_name}, tp_subject => $post->{tp_subject}, tp_id => $post->{tp_id} &><br />
+            <span class="small soft">
+                Started by: <& /zaapt/common/a_username.mhtml, a_username => $post->{a_username} &><br />
+                Posts: <% $post->{tp_posts} | h %><br />
+            </span>
+        </td>
+        <td class="nw"><& /zaapt/common/datetime.mhtml, datetime => $post->{p_inserted} &></td>
+    </tr>
+%     }
+    </tbody>
+</table>
+% } else {
+<p>This user has not posted anything to the forums yet.</p>
+% }
+
+%# ----------------------------------------------------------------------------

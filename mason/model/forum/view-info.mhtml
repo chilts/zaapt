@@ -11,7 +11,6 @@
     my $info = $model->sel_info({ a_id => $id });
 </%init>
 %# ----------------------------------------------------------------------------
-<div class="z_forum">
 <h1>Forum Info</h1>
 
 <&  /zaapt/common/table.mhtml, rows => [
@@ -19,5 +18,4 @@
         { type => $t_name, field => 'Signature', value => $info->{i_signature} || '' },
     ]
 &>
-</div>
 %# ----------------------------------------------------------------------------

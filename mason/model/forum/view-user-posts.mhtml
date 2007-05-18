@@ -16,7 +16,7 @@
     <thead>
     <tr>
         <th>Forum</th>
-        <th>Subject / Original Author</th>
+        <th>Topic</th>
         <th>Post Date</th>
     </tr>
     </thead>
@@ -35,6 +35,7 @@
             <& /zaapt/model/forum/link-topic.mhtml, f_name => $post->{f_name}, tp_subject => $post->{tp_subject}, tp_id => $post->{tp_id} &><br />
             <span class="small soft">
                 Started by: <& /zaapt/common/a_username.mhtml, a_username => $post->{a_username} &><br />
+                On: <& /zaapt/common/datetime.mhtml, datetime => $post->{p_inserted} &><br />
                 Posts: <% $post->{tp_posts} | h %><br />
             </span>
         </td>

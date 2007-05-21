@@ -1,0 +1,46 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $id
+    $m_id
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Message');
+    my $msg = $model->sel_message({ m_id => $m_id });
+
+    # check that this person is allowed to read this message
+    unless ( $msg->{a_id} eq $id || $msg->{t_id} eq $id ) {
+        $m->clear_buffer();
+        $m->redirect('.');
+        return;
+    }
+
+    # now that we're here, see if this message has already been read
+    unless ( $msg->{m_read} ) {
+        $model->upd_message({ m_id => $m_id, m_read => 1 });
+    }
+
+    # we're going to presume that this message is of type 'bbcode'
+</%init>
+%# ----------------------------------------------------------------------------
+<h2>Message</h2>
+
+<& /zaapt/common/form.mhtml, action => 'edit_q_ins.html', elements => [
+        { type => 'html', field => 'Date', value => $m->scomp( '/zaapt/common/datetime.mhtml', datetime => $msg->{m_inserted}) },
+        { type => 'html', field => 'From', value => $m->scomp( '/zaapt/common/a_username.mhtml', a_username => $msg->{a_username}) },
+        { type => 'html', field => 'To', value => $m->scomp( '/zaapt/common/a_username.mhtml', a_username => $msg->{t_username}) },
+        { type => 'html', field => 'Subject', value => '<strong>' . $m->interp->apply_escapes($msg->{m_subject}, 'h') . '</strong>' },
+        {
+            type => 'html',
+            field => 'Message',
+            value => $m->scomp( '/zaapt/common/render.mhtml', t_name => 'bbcode', content => $msg->{m_message})
+        },
+        {
+            type => 'html',
+            field => 'Actions',
+            value => '<a href="compose.html?t_username=' . $m->interp->apply_escapes($msg->{a_username}, 'u') . '">Reply &raquo;</a>',
+        },
+    ]
+&>
+%# ----------------------------------------------------------------------------

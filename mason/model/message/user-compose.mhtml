@@ -1,0 +1,51 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $id
+    $act => undef
+    $t_username => undef
+    $m_subject  => undef
+    $m_message  => undef
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Message');
+
+    my @err;
+    if ( $act eq 'send' ) {
+        # no need to check if there is something in $m_subject or $m_message
+        # unless they are undefined, put something in them
+        $m_subject = '' unless defined $m_subject;
+        $m_message = '' unless defined $m_message;
+
+        # check that this username exists
+        my $account_model = $zaapt->get_model('Account');
+        my $to = $account_model->sel_account_using_username({ a_username => $t_username });
+        unless ( defined $to ) {
+            push @err, "sorry, this username does not exist, please check your spelling";
+        }
+
+        # everything seems okay, insert into the database
+        unless ( @err ) {
+            $model->ins_message({ a_id => $id, t_id => $to->{a_id}, m_subject => $m_subject, m_message => $m_message, m_read => 0 });
+            $m->clear_buffer();
+            $m->redirect('.');
+            return;
+        }
+    }
+</%init>
+%# ----------------------------------------------------------------------------
+<h2>Compose New Message</h2>
+
+<& /zaapt/common/err.mhtml, err => \@err &>
+
+<& /zaapt/common/form.mhtml, action => '?', elements => [
+        { type => 'hidden', name => 'act', value => 'send' },
+        { type => 'text', field => 'To', name => 't_username', size => 40, maxlength => 40, value => $t_username || '' },
+        { type => 'text', field => 'Subject', name => 'm_subject', size => 40, maxlength => 40, value => $m_subject || '' },
+        { type => 'textarea', field => 'Message', name => 'm_message', rows => 10, cols => 40, value => $m_message || '' },
+        { type => 'submit', field => 'Actions', value => 'Send', cancel => "." },
+    ]
+&>
+
+%# ----------------------------------------------------------------------------

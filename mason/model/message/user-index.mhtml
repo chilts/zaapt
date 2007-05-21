@@ -1,0 +1,25 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $id
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Message');
+    my $new = $model->sel_message_count_new({ t_id => $id });
+    my $read = $model->sel_message_count_read({ t_id => $id });
+    my $sent = $model->sel_message_count_sent({ a_id => $id });
+    my $all = $model->sel_message_count_all({ a_id => $id });
+</%init>
+%# ----------------------------------------------------------------------------
+<h2>Summary</h2>
+
+<p>You have:</p>
+
+<ul>
+    <li><% $new->{_count} || '0' | h %> new message<% $new->{_count} == 1 ? '' : 's' %></li>
+    <li><% $read->{_count} || '0' | h %> read message<% $read->{_count} == 1 ? '' : 's' %></li>
+    <li><% $sent->{_count} || '0' | h %> sent message<% $sent->{_count} == 1 ? '' : 's' %></li>
+    <li><% $all->{_count} || '0' | h %> total message<% $all->{_count} == 1 ? '' : 's' %></li>
+</ul>
+%# ----------------------------------------------------------------------------

@@ -1,0 +1,27 @@
+%# ----------------------------------------------------------------------------
+<h1>Messages</h1>
+
+<a href="compose.html">Compose &raquo;</a>
+
+<table class="data" style="table-layout: fixed;">
+    <thead>
+    <tr>
+        <th>
+            <a href=".">Summary</a>
+        </th>
+        <th>
+            <a href="new.html">New</a>
+        </th>
+        <th>
+            <a href="read.html">Read</a>
+        </th>
+        <th>
+            <a href="sent.html">Sent</a>
+        </th>
+        <th>
+            <a href="all.html">All</a>
+        </th>
+    </tr>
+    </thead>
+</table>
+%# ----------------------------------------------------------------------------

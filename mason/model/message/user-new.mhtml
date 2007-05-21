@@ -1,0 +1,36 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $id
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Message');
+    my $msgs = $model->sel_message_all_new({ t_id => $id });
+</%init>
+%# ----------------------------------------------------------------------------
+<h2>New Messages</h2>
+
+<table class="data">
+    <thead>
+    <tr>
+        <th>From</th>
+        <th>Subject</th>
+        <th>Date</th>
+    </tr>
+    </thead>
+    <tbody>
+% my $row = 0;
+% foreach my $msg ( @$msgs ) {
+    <tr class="r<% $r++%2 %>">
+        <td>
+            <& /zaapt/common/a_username.mhtml, a_username => $msg->{a_username} &>
+            <& /zaapt/common/icon.mhtml, name => 'new', title => 'New' &>
+        </td>
+        <td><a href="./msg:<% $msg->{m_id} | u %>.html"><% $msg->{m_subject} | h %></a></td>
+        <td class="nw r"><& /zaapt/common/datetime.mhtml, datetime => $msg->{m_inserted} &></td>
+    </tr>
+% }
+    </tbody>
+</table>
+%# ----------------------------------------------------------------------------

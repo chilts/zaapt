@@ -1,0 +1,76 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $id
+    $page
+    $act        => undef
+    $m_id       => undef
+    $t_username => undef
+    $m_subject  => undef
+    $m_message  => undef
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    $m->comp( '/zaapt/model/message/user-header.mhtml' );
+
+    if ( $page eq 'index' ) {
+        $m->comp(
+            '/zaapt/model/message/user-index.mhtml',
+            zaapt => $zaapt,
+            id => $id,
+        );
+    }
+    elsif ( $page eq 'new' ) {
+        $m->comp(
+            '/zaapt/model/message/user-new.mhtml',
+            zaapt => $zaapt,
+            id => $id,
+        );
+    }
+    elsif ( $page eq 'read' ) {
+        $m->comp(
+            '/zaapt/model/message/user-read.mhtml',
+            zaapt => $zaapt,
+            id => $id,
+        );
+    }
+    elsif ( $page eq 'sent' ) {
+        $m->comp(
+            '/zaapt/model/message/user-sent.mhtml',
+            zaapt => $zaapt,
+            id => $id,
+        );
+    }
+    elsif ( $page eq 'all' ) {
+        $m->comp(
+            '/zaapt/model/message/user-all.mhtml',
+            zaapt => $zaapt,
+            id => $id,
+        );
+    }
+    elsif ( $page eq 'message' ) {
+        $m->comp(
+            '/zaapt/model/message/user-message.mhtml',
+            zaapt => $zaapt,
+            id    => $id,
+            m_id  => $m_id,
+        );
+    }
+    elsif ( $page eq 'compose' ) {
+        $m->comp(
+            '/zaapt/model/message/user-compose.mhtml',
+            zaapt => $zaapt,
+            id => $id,
+            act => $act,
+            t_username => $t_username,
+            m_subject  => $m_subject,
+            m_message  => $m_message,
+        );
+    }
+    else {
+        $m->clear_buffer();
+        $m->abort(404);
+    }
+    return;
+</%init>
+%# ----------------------------------------------------------------------------

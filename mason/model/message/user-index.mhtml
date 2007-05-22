@@ -22,4 +22,8 @@
     <li><% $sent->{_count} || '0' | h %> sent message<% $sent->{_count} == 1 ? '' : 's' %></li>
     <li><% $all->{_count} || '0' | h %> total message<% $all->{_count} == 1 ? '' : 's' %></li>
 </ul>
+
+% if ( $new->{_count} ) {
+<& /zaapt/model/message/user-new.mhtml, zaapt => $zaapt, id => $id  &>
+% }
 %# ----------------------------------------------------------------------------

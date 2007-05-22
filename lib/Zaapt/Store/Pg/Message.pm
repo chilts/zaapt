@@ -82,7 +82,7 @@ __PACKAGE__->mk_select_row( 'sel_message_count_read', "SELECT count(*) AS _count
 __PACKAGE__->mk_select_row( 'sel_message_count_sent', "SELECT count(*) AS _count FROM message.message WHERE account_id = ?", [ 'a_id' ] );
 
 # ALL messages
-__PACKAGE__->mk_select_row( 'sel_message_count_all', "SELECT count(*) FROM message.message WHERE account_id = ? OR to_id = ?", [ 'a_id', 'a_id' ]);
+__PACKAGE__->mk_select_row( 'sel_message_count_all', "SELECT count(*) AS _count FROM message.message WHERE account_id = ? OR to_id = ?", [ 'a_id', 'a_id' ]);
 
 ## ----------------------------------------------------------------------------
 # methods

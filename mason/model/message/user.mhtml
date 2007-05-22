@@ -60,8 +60,9 @@
         $m->comp(
             '/zaapt/model/message/user-compose.mhtml',
             zaapt => $zaapt,
-            id => $id,
-            act => $act,
+            id         => $id,
+            act        => $act,
+            m_id       => $m_id,
             t_username => $t_username,
             m_subject  => $m_subject,
             m_message  => $m_message,

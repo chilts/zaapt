@@ -2,17 +2,50 @@
 <%args>
     $zaapt
     $id
-    $act => undef
+    $act        => undef
+    $m_id       => undef
     $t_username => undef
     $m_subject  => undef
     $m_message  => undef
 </%args>
 %# ----------------------------------------------------------------------------
+<%once>
+    my $allowed = {
+        act => {
+            send  => 1,
+            reply => 1,
+        },
+    };
+</%once>
+%# ----------------------------------------------------------------------------
 <%init>
+    # don't do anything if we don't know what this action is
+    $act = undef unless exists $allowed->{act}{$act};
+
+    # get the message model
     my $model = $zaapt->get_model('Message');
 
     my @err;
-    if ( $act eq 'send' ) {
+    if ( $act eq 'reply' ) {
+        my $msg = $model->sel_message({ m_id => $m_id });
+
+        # check that this person is allowed to read this message
+        unless ( $msg->{a_id} eq $id || $msg->{t_id} eq $id ) {
+            $m->clear_buffer();
+            $m->redirect('.');
+            return;
+        }
+
+        # so it looks like we can read it, therefore we can reply
+
+        # make sure we send to the other person if we reply to our own message
+        $t_username = $msg->{t_id} eq $id ? $msg->{a_username} : $msg->{t_username};
+
+        # make the subject, but remove initial 'Re: '
+        $m_subject = 'Re: ' . $msg->{m_subject};
+        $m_subject =~ s{ \A (Re:\s)+ }{Re: }xms;
+    }
+    elsif ( $act eq 'send' ) {
         # no need to check if there is something in $m_subject or $m_message
         # unless they are undefined, put something in them
         $m_subject = '' unless defined $m_subject;

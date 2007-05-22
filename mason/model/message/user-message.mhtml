@@ -17,7 +17,8 @@
     }
 
     # now that we're here, see if this message has already been read
-    unless ( $msg->{m_read} ) {
+    # but only mark it if it's _to_ you
+    if ( $msg->{t_id} eq $id and !$msg->{m_read} ) {
         $model->upd_message({ m_id => $m_id, m_read => 1 });
     }
 
@@ -39,7 +40,7 @@
         {
             type => 'html',
             field => 'Actions',
-            value => '<a href="compose.html?t_username=' . $m->interp->apply_escapes($msg->{a_username}, 'u') . '">Reply &raquo;</a>',
+            value => '<a href="compose.html?act=reply&amp;m_id=' . $m->interp->apply_escapes($msg->{m_id}, 'u') . '">Reply &raquo;</a>',
         },
     ]
 &>

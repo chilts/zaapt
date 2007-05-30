@@ -7,12 +7,17 @@
     $zaapt
     $b_name
     $e_name
+    $act        => undef
     $e_id       => undef
     $c_name     => undef
     $c_email    => undef
     $c_homepage => undef
     $c_comment  => undef
 </%args>
+%# ----------------------------------------------------------------------------
+<%once>
+    use Zaapt::Utils::Conv;
+</%once>
 %# ----------------------------------------------------------------------------
 <%init>
     my $model = $zaapt->get_model('Blog');
@@ -32,14 +37,9 @@
 
     my $err = [];
 
-    warn "here";
-
     # see if we have a comment to add
     if ( $blog->{b_comment} ) {
-        warn "blog has comments switched on";
-        warn "e_id=$e_id and entry->{e_id}=$entry->{e_id} are the same";
         if ( defined $e_id and $e_id eq $entry->{e_id} ) {
-            warn "e_id and entry->{e_id} are the same";
 
             unless ( Zaapt::Utils::Valid::has_content($c_name) ) {
                 push @$err, "please specify a name";
@@ -55,9 +55,9 @@
 
             # remove our stub
             $c_homepage =~ s{ \A http:// }{}gxms;
+            $c_comment = Zaapt::Utils::Conv::remove_cr( $c_comment );
 
             unless ( @$err ) {
-                warn "inserting...";
                 $model->ins_comment({
                     e_id        => $e_id,
                     c_name      => $c_name,
@@ -66,12 +66,20 @@
                     c_comment   => $c_comment,
                     c_status    => $entry->{b_moderate} ? 'new' : 'acc',
                 });
-                $m->redirect('?');
+                $m->redirect('?act=ty');
                 return;
             }
         }
     }
     # else, shouldn't really have a comment if the blog doesn't allow it - just ignore
+
+    my $labels;
+    if ( $blog->{b_comment} ) {
+        $labels = $model->sel_label_all_for({ e_id => $entry->{e_id} });
+    }
+    else {
+        $labels = [];
+    }
 
     my $comments;
     if ( $blog->{b_comment} ) {
@@ -92,9 +100,14 @@
 %# ----------------------------------------------------------------------------
 <div class="z_blog">
 
+% if ( $act eq 'ty' ) {
+<p class="info">Thank you for your comment. It is awaiting moderation.</p>
+% }
+
 %# call all these things so if the user wants to override anything, they can
 <& render-entry.mhtml,
-    entry => $entry
+    entry => $entry,
+    labels => $labels,
 &>
 <& render-trackbacks.mhtml,
     entry => $entry,

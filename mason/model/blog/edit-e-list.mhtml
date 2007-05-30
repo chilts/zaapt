@@ -24,7 +24,8 @@
 
 % if ( exists $my_roles->{$blog->{_admin}} ) {
 <p>
-    * <a href="edit-e-add.html?b_id=<% $blog->{b_id} | u %>">Add Entry &raquo;</a>
+    * <a href="edit-e-add.html?b_id=<% $blog->{b_id} | u %>">Add Entry &raquo;</a><br />
+    * <a href="edit-c-list.html?b_id=<% $blog->{b_id} | u %>">Audit Comments &raquo;</a><br />
 </p>
 % }
 

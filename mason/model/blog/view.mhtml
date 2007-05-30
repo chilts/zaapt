@@ -29,7 +29,7 @@
     else {
         # this is a named entry
         $m->comp('/zaapt/model/blog/view-entry.mhtml',
-            %ARGS, # pass everything since there might be a comment
+            %ARGS,
             zaapt => $zaapt,
             b_name => $b_name,
             e_name => $page

@@ -44,7 +44,7 @@
             <td>
                 <strong><% $comment->{e_name} | h %></strong> (<% $comment->{e_inserted} | h %>)<br />
                 <% $comment->{c_name} | h %> &lt;<% $comment->{c_email} | h %>&gt;<br />
-                <a href="">http://<% $comment->{c_homepage} | h %></a><br />
+                <a href="http://<% $comment->{c_homepage} | h %>">http://<% $comment->{c_homepage} | h %></a><br />
                 <% substr($comment->{c_comment}, 0, 255) . '...' | h %><br />
             </td>
             <td>

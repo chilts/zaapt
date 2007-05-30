@@ -6,29 +6,29 @@
     $comments   => []
 </%args>
 %# ----------------------------------------------------------------------------
-<h1><% $entry->{e_title} | h %></h1>
+<h1><a href="<% $entry->{e_name} %>.html"><% $entry->{e_title} | h %></a></h1>
 
 <p>
     Posted by: <& /zaapt/common/a_username.mhtml, a_username => $entry->{a_username} &>
-    <br />
-    Labels:
-% if ( @$labels ) {
-%     foreach my $label ( @$labels ) {
-    <a href="label:<% $label | h %>.html"><% $label | h %></a>
-%     }
-% } else {
-    (none)
-% }
 </p>
 
 <p><strong><% $entry->{e_intro} | h %></strong></p>
 
 <& /zaapt/common/render.mhtml, t_name => $entry->{t_name}, content => $entry->{e_article} &>
 
+<p class="floatright">
+    Labels:
+% if ( @$labels ) {
+%     foreach my $label ( @$labels ) {
+    <a href="./label:<% $label->{l_name} | h %>.html"><% $label->{l_name} | h %></a>
+%     }
+% } else {
+    (none)
+% }
+</p>
 <p>
-    <a href="<% $entry->{e_name} %>.html">Permalink</a> |
-    <a href="<% $entry->{e_name} %>.html#comments">Comments (<% $entry->{e_comments} || '0' | h %>)</a> |
-    <& /zaapt/common/datetime.mhtml, datetime => $entry->{e_inserted} &>
+    <a href="<% $entry->{e_name} %>.html#comments" class="z-comments">Comments (<% $entry->{e_comments} || '0' | h %>)</a>
 </p>
 
+<p class="footnote"><& /zaapt/common/datetime.mhtml, datetime => $entry->{e_updated} &></p>
 %# ----------------------------------------------------------------------------

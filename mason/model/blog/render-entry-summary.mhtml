@@ -4,24 +4,17 @@
     $labels     => []
 </%args>
 %# ----------------------------------------------------------------------------
-<h1><% $entry->{e_title} | h %></h1>
+<h1><a href="<% $entry->{e_name} %>.html"><% $entry->{e_title} | h %></a></h1>
 
-<p class="feint">
-    Labels:
-% if ( @$labels ) {
-%     foreach my $label ( @$labels ) {
-    <a href="<% $label | h %>.html"><% $label | h %></a>
-%     }
-% } else {
-    (none)
-% }
-</p>
+<p class="r">posted by: <& /zaapt/common/a_username.mhtml, a_username => $entry->{a_username} &></p>
 
 <p><strong><% $entry->{e_intro} | h %></strong></p>
 
+<p><a href="<% $entry->{e_name} %>.html">Read more...</a></p>
+
 <p class="r">
-    <a href="<% $entry->{e_name} %>.html" class="readmore">Permalink</a>,
-    <a href="<% $entry->{e_name} %>.html#comments" class="comments">Comments (<% $entry->{e_comments} || '0' | h %>)</a>,
-    <span class="date"><% $entry->{e_inserted} | h %></span>
+    <a href="<% $entry->{e_name} %>.html#comments" class="z-comments">Comments (<% $entry->{e_comments} || '0' | h %>)</a>
 </p>
+
+<p class="footnote"><& /zaapt/common/datetime.mhtml, datetime => $entry->{e_updated} &></p>
 %# ----------------------------------------------------------------------------

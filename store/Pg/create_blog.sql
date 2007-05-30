@@ -17,8 +17,8 @@ CREATE TABLE blog.blog (
     view_id         INTEGER NOT NULL REFERENCES account.role,
     edit_id         INTEGER NOT NULL REFERENCES account.role,
     publish_id      INTEGER NOT NULL REFERENCES account.role,
---    comment_id      INTEGER NOT NULL REFERENCES account.role,
---    trackback_id    INTEGER NOT NULL REFERENCES account.role,
+    comment_id      INTEGER NOT NULL REFERENCES account.role,
+    trackback_id    INTEGER NOT NULL REFERENCES account.role,
 
     UNIQUE(name),
     LIKE base       INCLUDING DEFAULTS
@@ -34,10 +34,10 @@ COMMENT ON COLUMN blog.blog.edit_id IS
     'Edit allows the user manipulate the entries (add/edit/del/labels)';
 COMMENT ON COLUMN blog.blog.publish_id IS
     'Publish allows the user to publish or revoke any entries';
--- COMMENT ON COLUMN blog.blog.comment_id IS
---     'Comment allows the user to audit the comments (accept/reject/delete/edit)';
--- COMMENT ON COLUMN blog.blog.trackback_id IS
---     'TrackBack allows the user to audit the trackbacks (accept/reject/delete/edit)';
+COMMENT ON COLUMN blog.blog.comment_id IS
+    'Comment allows the user to audit the comments (accept/reject/delete/edit)';
+COMMENT ON COLUMN blog.blog.trackback_id IS
+    'TrackBack allows the user to audit the trackbacks (accept/reject/delete/edit)';
 
 -- table: entry
 CREATE SEQUENCE blog.entry_id_seq;

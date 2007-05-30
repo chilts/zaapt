@@ -1,0 +1,32 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $my_roles
+    $b_id
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Blog');
+    my $blog = $model->sel_blog({ b_id => $b_id });
+    unless ( defined $blog ) {
+        $m->redirect('edit-b-list.html');
+        return;
+    }
+    $m->redirect('edit-b-list.html') unless exists $my_roles->{$blog->{_view}};
+    my $comments = $model->sel_comments_for_blog({ b_id => $b_id, c_status => 'new' });
+
+    # either delete or 'acc'/'rej' all the 'new' ones
+    if ( $c_status eq 'del' ) {
+        $model->del_comment_where_status({ c_status => 'new' });
+    }
+    else {
+        if ( exists $allowed->{status}{$c_status} ) {
+            $model->upd_comment({ c_id => $c_id, c_status => $c_status });
+        }
+    }
+
+    my $i = $m->interp();
+    $m->redirect('edit-c-list.html?b_id=' . $i->apply_escapes($b_id, 'u'));
+    return;
+</%init>
+%# ----------------------------------------------------------------------------

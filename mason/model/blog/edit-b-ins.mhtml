@@ -19,6 +19,8 @@
     $_view         => ''
     $_edit         => ''
     $_publish      => ''
+    $_comment      => ''
+    $_trackback    => ''
 </%args>
 %# ----------------------------------------------------------------------------
 <%once>
@@ -65,6 +67,8 @@
             _view         => $_view,
             _edit         => $_edit,
             _publish      => $_publish,
+            _comment      => $_comment,
+            _trackback    => $_trackback,
         });
         $m->redirect("edit-b-list.html");
         return;
@@ -91,9 +95,17 @@
         { type => 'check', field => 'Comment', name => 'b_comment', checked => $b_comment },
         { type => 'check', field => 'Trackback', name => 'b_trackback', checked => $b_trackback },
         { type => 'select', field => 'Admin Role', name => '_admin', options => \@options, selected => $_admin },
+        { type => 'note', value => "Note: Allows this user to delete this entire blog." },
         { type => 'select', field => 'View Role', name => '_view', options => \@options, selected => $_view },
+        { type => 'note', value => "Note: Allows this user to view all blog entries." },
         { type => 'select', field => 'Edit Role', name => '_edit', options => \@options, selected => $_edit },
+        { type => 'note', value => "Note: Allows this user to add, edit and delete blog entries and labels." },
         { type => 'select', field => 'Publish Role', name => '_publish', options => \@options, selected => $_publish },
+        { type => 'note', value => "Note: Allows this user to publish blog entries (not yet implemented)." },
+        { type => 'select', field => 'Comment Role', name => '_comment', options => \@options, selected => $_comment },
+        { type => 'note', value => "Note: Allows this user to moderate comments." },
+        { type => 'select', field => 'Trackback Role', name => '_trackback', options => \@options, selected => $_trackback },
+        { type => 'note', value => "Note: Allows this user to moderate trackbacks." },
         { type => 'submit', field => 'Actions', value => 'Add Blog', cancel => 'edit-b-list.html' },
     ]
 &>

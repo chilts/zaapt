@@ -1,0 +1,64 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $my_roles
+    $b_id
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Blog');
+    my $blog = $model->sel_blog({ b_id => $b_id });
+    unless ( defined $blog ) {
+        $m->redirect('edit-b-list.html');
+        return;
+    }
+    $m->redirect('edit-b-list.html') unless exists $my_roles->{$blog->{_view}};
+    my $comments = $model->sel_comments_for_blog({ b_id => $b_id, c_status => 'new' });
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Audit Comments</h1>
+
+<p><a href="edit-b-list.html">&laquo; Back to Blog List</a></p>
+
+<h2>Blog: <% $blog->{b_name} | h %> - '<% $blog->{b_title} | h %>'</h2>
+
+% if ( !$blog->{b_comment} ) {
+<p>Currently, this blog does not allow comments.</p>
+%     return;
+% }
+
+% if ( exists $my_roles->{super} ) {
+<p>
+    * <a href="edit-c-all.html?b_id=<% $b_id | u %>&amp;c_status=acc">Accept All &raquo;</a><br />
+    * <a href="edit-c-all.html?b_id=<% $b_id | u %>&amp;c_status=rej">Reject All &raquo;</a><br />
+    * <a href="edit-c-all.html?b_id=<% $b_id | u %>&amp;c_status=del">Delete All &raquo;</a><br />
+    (Note: these actions only affect those comments for this blog which have <em>new</em> status.)
+</p>
+% }
+
+<&| /zaapt/common/admin/table-edit.mhtml, title => 'Comment' &>
+
+% my $row = 1;
+% foreach my $comment ( @$comments ) {
+        <tr class="r<% $row=1-$row %>">
+            <td>
+                <strong><% $comment->{e_name} | h %></strong> (<% $comment->{e_inserted} | h %>)<br />
+                <% $comment->{c_name} | h %> &lt;<% $comment->{c_email} | h %>&gt;<br />
+                <a href="">http://<% $comment->{c_homepage} | h %></a><br />
+                <% substr($comment->{c_comment}, 0, 255) . '...' | h %><br />
+            </td>
+            <td>
+%         if ( exists $my_roles->{$blog->{_edit}} ) {
+                * <a href="edit-c-status.html?b_id=<% $b_id | u %>&amp;c_id=<% $comment->{c_id} | u %>&amp;c_status=acc">Accept</a><br />
+                * <a href="edit-c-status.html?b_id=<% $b_id | u %>&amp;c_id=<% $comment->{c_id} | u %>&amp;c_status=rej">Reject</a><br />
+                * <a href="edit-c-status.html?b_id=<% $b_id | u %>&amp;c_id=<% $comment->{c_id} | u %>&amp;c_status=del">Delete</a><br />
+%         } else {
+                -
+%         }
+            </td>
+        </tr>
+% }
+
+</&>
+
+%# ----------------------------------------------------------------------------

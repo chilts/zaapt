@@ -17,7 +17,7 @@ my $table = {
     blog => {
         name => 'blog',
         prefix => 'b',
-        cols => [ qw(id name title description show moderate comment trackback r:admin_id r:view_id r:edit_id r:publish_id ts:inserted ts:updated) ],
+        cols => [ qw(id name title description show moderate comment trackback r:admin_id r:view_id r:edit_id r:publish_id r:comment_id r:trackback_id ts:inserted ts:updated) ],
     },
     entry => {
         name => 'entry',

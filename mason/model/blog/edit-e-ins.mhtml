@@ -29,8 +29,8 @@
     # this content section firstly needs to exist to be able to add a page
     $m->redirect('edit-b-list.html') unless defined $blog;
 
-    # to insert a question, '_admin' is required
-    $m->redirect('edit-b-list.html') unless exists $my_roles->{$blog->{_admin}};
+    # to insert an entry, '_edit' is required
+    $m->redirect('edit-b-list.html') unless exists $my_roles->{$blog->{_edit}};
 
     # check this type exists
     unless ( $zaapt->get_model('Common')->sel_type({ t_id => $t_id }) ) {

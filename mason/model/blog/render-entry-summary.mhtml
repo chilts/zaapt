@@ -16,5 +16,5 @@
     <a href="<% $entry->{e_name} %>.html#comments" class="z-comments">Comments (<% $entry->{e_comments} || '0' | h %>)</a>
 </p>
 
-<p class="footnote"><& /zaapt/common/datetime.mhtml, datetime => $entry->{e_updated} &></p>
+<p class="footnote"><& /zaapt/common/datetime.mhtml, datetime => $entry->{e_inserted} &></p>
 %# ----------------------------------------------------------------------------

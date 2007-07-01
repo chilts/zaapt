@@ -22,12 +22,18 @@
 
 <h2>Blog: <% $blog->{b_name} | h %> - '<% $blog->{b_title} | h %>'</h2>
 
-% if ( exists $my_roles->{$blog->{_admin}} ) {
 <p>
+% if ( exists $my_roles->{$blog->{_edit}} or exists $my_roles->{$blog->{_comment}} ) {
+%     if ( exists $my_roles->{$blog->{_edit}} ) {
     * <a href="edit-e-add.html?b_id=<% $blog->{b_id} | u %>">Add Entry &raquo;</a><br />
+%     }
+%     if ( exists $my_roles->{$blog->{_comment}} ) {
     * <a href="edit-c-list.html?b_id=<% $blog->{b_id} | u %>">Audit Comments &raquo;</a><br />
-</p>
+%     }
+% } else {
+    * No Actions
 % }
+</p>
 
 <table class="edit">
     <thead>

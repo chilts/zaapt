@@ -27,7 +27,7 @@
 %     return;
 % }
 
-% if ( exists $my_roles->{super} ) {
+% if ( exists $my_roles->{_comment} ) {
 <p>
     * <a href="edit-c-all.html?b_id=<% $b_id | u %>&amp;c_status=acc">Accept All &raquo;</a><br />
     * <a href="edit-c-all.html?b_id=<% $b_id | u %>&amp;c_status=rej">Reject All &raquo;</a><br />
@@ -48,7 +48,7 @@
                 <% substr($comment->{c_comment}, 0, 255) . '...' | h %><br />
             </td>
             <td>
-%         if ( exists $my_roles->{$blog->{_edit}} ) {
+%         if ( exists $my_roles->{$blog->{_comment}} ) {
                 * <a href="edit-c-status.html?b_id=<% $b_id | u %>&amp;c_id=<% $comment->{c_id} | u %>&amp;c_status=acc">Accept</a><br />
                 * <a href="edit-c-status.html?b_id=<% $b_id | u %>&amp;c_id=<% $comment->{c_id} | u %>&amp;c_status=rej">Reject</a><br />
                 * <a href="edit-c-status.html?b_id=<% $b_id | u %>&amp;c_id=<% $comment->{c_id} | u %>&amp;c_status=del">Delete</a><br />

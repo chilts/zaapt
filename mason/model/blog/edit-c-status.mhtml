@@ -24,7 +24,7 @@
         $m->redirect('edit-b-list.html');
         return;
     }
-    $m->redirect('edit-b-list.html') unless exists $my_roles->{$blog->{_edit}};
+    $m->redirect('edit-b-list.html') unless exists $my_roles->{$blog->{_comment}};
     my $comment = $model->sel_comment({ c_id => $c_id });
 
     # probably need to check that this comment belongs to this blog (to be sure

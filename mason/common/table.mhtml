@@ -11,6 +11,9 @@
 %     if ( $r->{type} eq 'url' ) {
             <a href="<% $r->{value} | h %>"><% $r->{value} | h %></a>
 
+%     } elsif ( $r->{type} eq 'html' ) {
+            <& $r->{value} &>
+
 %     } elsif ( $r->{type} eq 'bbcode' ) {
             <& /zaapt/common/render.mhtml, t_name => 'bbcode', content => $r->{value} &>
 

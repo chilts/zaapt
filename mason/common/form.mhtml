@@ -7,7 +7,7 @@
 <form action="<% $action || '?' %>" method="post">
 % foreach my $e ( @$elements ) {
 %     if ( $e->{type} eq 'hidden' ) {
-<input type="hidden"<% defined $e->{id} ? q{ id="$e->{id}"} : '' | h %> name="<% $e->{name} | h %>" value="<% $e->{value} | h %>" />
+<input type="hidden"<% defined $e->{id} ? " id=\"$e->{id}\"" : '' %> name="<% $e->{name} | h %>" value="<% $e->{value} | h %>" />
 %     }
 % }
 <table>
@@ -17,7 +17,7 @@
         <td class="key"><% $e->{field} | h %><% length($e->{field}) ? ' :' : '&nbsp;' %></td>
         <td class="val">
 %     if ( $e->{type} eq 'text' ) {
-            <input type="text"<% defined $e->{id} ? q{ id="$e->{id}"} : '' | h %> name="<% $e->{name} | h %>" value="<% $e->{value} | h %>"<% $e->{size} ? " size=\"$e->{size}\"" : ''%><% $e->{maxlength} && " maxlength=\"$e->{maxlength}\"" %> />\
+            <input type="text"<% defined $e->{id} ? " id=\"$e->{id}\"" : '' %> name="<% $e->{name} | h %>" value="<% $e->{value} | h %>"<% $e->{size} ? " size=\"$e->{size}\"" : ''%><% $e->{maxlength} && " maxlength=\"$e->{maxlength}\"" %> />\
 
 %     } elsif ( $e->{type} eq 'password' ) {
             <input type="password" name="<% $e->{name} | h %>" value=""<% $e->{size} ? " size=\"$e->{size}\"" : ''%><% $e->{maxlength} && " maxlength=\"$e->{maxlength}\"" %> />\
@@ -48,6 +48,11 @@
 
 %     } elsif ( $e->{type} eq 'note' ) {
             <% $e->{value} | h %>\
+
+%     } elsif ( $e->{type} eq 'datetime' ) {
+           <input type="hidden" id="<% $e->{id} %>" name="<% $e->{name} | h %>" value="" />
+           <input type="text" name="<% $e->{name} | h %>_date" size="10" maxlength="10" value="<% $e->{date} | h %>" /> dd/mm/yyyy<br />
+           <input type="text" name="<% $e->{name} | h %>_time" size="10" maxlength="8" value="<% $e->{time} | h %>" /> hh:mm:ss (24hr clock)<br />
 
 %     } elsif ( $e->{type} eq 'html' ) {
             <% $e->{value} %>\

@@ -59,8 +59,6 @@ sub _mk_cols {
 sub _mk_sel_col {
     my ($class, $prefix, $col) = @_;
 
-    # print "Doing '$col'...\n";
-
     my $sql = '';
 
     if ( ref $col eq 'ARRAY' ) {
@@ -171,15 +169,21 @@ sub _mk_ins {
 }
 
 sub _mk_col_names {
-    my ($class, $table, @cols) = @_;
+    my ($class, $t, @cols) = @_;
     return '' unless @cols;
 
     my $colnames = ();
 
     foreach my $col ( @cols ) {
+        # skip if the primary key
         next if $col eq 'id';
+        next if ( defined $t->{pk} and ref $col and $col->[0] eq $t->{pk}[0] );
+
+        # skip if field is read-only (timestamp included)
         next if $col =~ m{ \A ts: }xms;
         next if $col =~ m{ \A ro: }xms;
+
+        # process the rest
         if ( $col =~ m{ \A r:(\w+_id) \z }xms )  {
             push @$colnames, $1;
             next;
@@ -200,7 +204,7 @@ sub _mk_col_names {
 }
 
 sub _mk_ins_cols {
-    my ($class, $table, @cols) = @_;
+    my ($class, $prefix, @cols) = @_;
     return '' unless @cols;
 
     my @colnames = ();
@@ -270,10 +274,11 @@ sub _mk_upd {
 }
 
 sub _mk_upd_cols {
-    my ($class, $table, @cols) = @_;
+    my ($class, $t) = @_;
+    my @cols = @{$t->{cols}};
     return '' unless @cols;
 
-    my $colnames = $class->_mk_col_names( $table, @cols );
+    my $colnames = $class->_mk_col_names( $t, @cols );
 
     $colnames->[0] = "$colnames->[0] = COALESCE(?, $colnames->[0])";
     my $sql .= reduce { "$a, $b = COALESCE(?, $b)" } ( @$colnames );
@@ -293,6 +298,7 @@ sub _mk_del {
     return "DELETE FROM $table WHERE $query";
 }
 
+# for 'make hashref names' - in the hash being passed to all the functions
 sub _mk_hr_names {
     my ($class, $prefix, @cols) = @_;
 
@@ -379,9 +385,6 @@ sub mk_inserter {
 
     my @hr_names = $self->_mk_hr_names( $t->{prefix}, @{$t->{cols}}[1..$last] );
 
-    # print "sql=$sql\n";
-    # print "hr=@hr_names\n";
-
     # create the closure
     my $accessor =  sub {
         my ($self, $hr) = @_;
@@ -398,15 +401,19 @@ sub mk_inserter {
 sub mk_updater {
     my ($self, $schema, $t) = @_;
 
-    my $sql = "UPDATE $schema.$t->{name} SET $t->{sql_upd_cols} WHERE id = ?";
+    my $sql = "UPDATE $schema.$t->{name} SET $t->{sql_upd_cols} WHERE " . (defined $t->{pk} ? $t->{pk}[0] : 'id' ) . " = ?";
     my @hr_names = $self->_mk_hr_names( $t->{prefix}, @{$t->{cols}} );
 
-    # remove the 'id' field
+    # remove the first field (usually 'id')
     shift @hr_names;
-    push @hr_names, "$t->{prefix}_id";
 
-    # print "sql=$sql\n";
-    # print "hr=@hr_names\n";
+    # add the 'primary key' field
+    if ( defined $t->{pk} ) {
+        push @hr_names, $t->{pk}[2];
+    }
+    else {
+        push @hr_names, "$t->{prefix}_id";
+    }
 
     my $class = ref $self || $self;
     my $accessor_name = "upd_$t->{name}";
@@ -459,17 +466,19 @@ sub mk_selecter {
     my ($self, $schema, $table, $prefix, $id, @cols) = @_;
 
     my $cols = __PACKAGE__->_mk_sel_cols( $prefix, $id, @cols );
-    my $sql = "SELECT $cols FROM $schema.$table $prefix WHERE $prefix.$id = ?";
+    my $sql = "SELECT $cols FROM $schema.$table $prefix WHERE $prefix." . ( ref $id ? $id->[0] : $id ) . " = ?";
 
     my $class = ref $self || $self;
     my $method_name = "sel_$table";
 
     # don't have to check to see if $method_name is 'DESTROY' since it never will be
 
+    my $field = ref $id ? $id->[2] : "${prefix}_${id}";
+
     # create the closure
     my $method =  sub {
         my ($self, $hr) = @_;
-        return $self->_row( $sql, $hr->{"${prefix}_${id}"} );
+        return $self->_row( $sql, $hr->{$field} );
     };
 
     # inject into package's namespace
@@ -558,7 +567,7 @@ sub _mk_sql_for {
     $t->{sql_fqt} = $self->_mk_sel_fqt($schema, $t->{name}, $t->{prefix}); # fully qualified table
     $t->{sql_sel_cols} = $self->_mk_sel_cols( $t->{prefix}, @{$t->{cols}} );
     $t->{sql_ins_cols} = $self->_mk_ins_cols( $t->{prefix}, @{$t->{cols}} );
-    $t->{sql_upd_cols} = $self->_mk_upd_cols( $t->{prefix}, @{$t->{cols}} );
+    $t->{sql_upd_cols} = $self->_mk_upd_cols( $t );
 
     $t->{qm} = $self->_mk_qm( @{$t->{cols}} );
 }

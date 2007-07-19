@@ -1,0 +1,36 @@
+%# ----------------------------------------------------------------------------
+<%doc>
+
+    In here, you might want to re-read the database for updated information
+    and refresh your session hash/object/whatever, with the fields you need.
+
+    For example, using the in-built account fields, you might want to do
+    something like the following:
+
+    +++ code +++
+
+    my $model = $zaapt->get_model('Account');
+    my $account = $model->sel_account({ a_id => $id });
+
+    $sess->{firstname} = $account->{a_firstname};
+    $sess->{lastname} = $account->{a_lastname};
+    $sess->{email} = $account->{a_email};
+    $sess->{notify} = $account->{a_notify};
+
+    --- code ---
+
+    And you may want to either 'die' or handle it in a different way if you
+    can't find the $id specified.
+
+</%doc>
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt => undef
+    $id
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    die "this component should be overriden";
+    return;
+</%init>
+%# ----------------------------------------------------------------------------

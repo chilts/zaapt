@@ -7,8 +7,11 @@
 %# ----------------------------------------------------------------------------
 <%init>
     # check for the index page
-    if ( $page =~ m{ \A index \z}xms ) {
+    if ( $page eq 'index' ) {
         $m->comp('/zaapt/model/account/view-index.mhtml', zaapt => $zaapt, id => $id);
+    }
+    elsif ( $page eq 'info' ) {
+        $m->comp('/zaapt/model/account/view-info.mhtml', zaapt => $zaapt, id => $id);
     }
     else {
         $m->clear_buffer();

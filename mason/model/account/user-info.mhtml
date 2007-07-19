@@ -1,0 +1,32 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $id
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Account');
+
+    my $account = $model->sel_account({ a_id => $id });
+    unless ( defined $account ) {
+        $m->clear_buffer();
+        $m->abort(404);
+        return;
+    }
+</%init>
+%# ----------------------------------------------------------------------------
+<div class="z_profile">
+<h1>Account Info</h1>
+
+<&  /zaapt/common/table.mhtml, rows => [
+        { field => 'Firstname', value => $account->{a_firstname} },
+        { field => 'Lastname', value => $account->{a_lastname} },
+        { field => 'Username', value => $account->{a_username} },
+        { field => 'Email', value => $account->{a_email} },
+        { field => 'Notifications', value => ( $account->{a_notify} ? 'Yes' : 'No' ) },
+        { field => 'Logins', value => $account->{a_logins} },
+        { field => 'Joined', value => $account->{a_inserted} },
+    ]
+&>
+</div>
+%# ----------------------------------------------------------------------------

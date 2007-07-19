@@ -1,0 +1,116 @@
+%# ----------------------------------------------------------------------------
+<%doc>
+    Note: $my_roles is not a required arg, so make sure the person editing this
+    is allowed to.
+</%doc>
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $id
+    $_act        => ''
+    $a_firstname => ''
+    $a_lastname  => ''
+    $a_email     => ''
+    $a_notify    => 1
+    $a_password  => ''
+    $a_repeat    => ''
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Account');
+    my $account = $model->sel_account({ a_id => $id });
+
+    my $err_info = [];
+    my $err_pass = [];
+
+    if ( $_act eq 'update' ) {
+        # turn notify into a boolean
+        $a_notify = ( $a_notify eq 1 ? 1 : 0 );
+
+        my $empty = 0;
+        foreach ( $a_firstname, $a_lastname, $a_email ) {
+            Zaapt::Utils::Valid::has_content( $_ )
+                or $empty++;
+        }
+        push @$err_info, "At least one field is blank, please enter all fields" if $empty;
+
+        unless ( @$err_info ) {
+            my $model = $zaapt->get_model('Account');
+            $model->upd_account({
+                a_firstname => $a_firstname,
+                a_lastname  => $a_lastname,
+                a_email     => $a_email,
+                a_notify    => $a_notify,
+                a_id        => $id,
+            });
+            $m->comp('/zaapt/common/refresh-session.mhtml', zaapt => $zaapt, id => $id);
+            $m->clear_buffer();
+            $m->redirect('.');
+            return;
+        }
+    }
+    elsif ( $_act eq 'password' ) {
+        # check the passwords are okay
+
+        my $empty = 0;
+        foreach ( $a_password, $a_repeat ) {
+            $empty++ unless m{ \S }xms;
+        }
+        push @$err_pass, "At least one field is blank, please enter all fields" if $empty;
+
+        unless ( $a_password eq $a_repeat ) {
+            push @$err_pass, "Password and the repeat are not the same, please re-type";
+        }
+
+        unless ( length $a_password >= 6 ) {
+            push @$err_pass, "Password must be at least 6 characters long.";
+        }
+
+        unless ( @$err_pass ) {
+            my $model = $zaapt->get_model('Account');
+            $model->upd_password({
+                a_password => $a_password,
+                a_id       => $id,
+            });
+            $m->clear_buffer();
+            $m->redirect('.');
+            return;
+        }
+    }
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Edit your Account Info</h1>
+
+<a href="./">&laquo; Back to Account Info</a>
+
+<& /zaapt/common/err.mhtml, err => $err_info &>
+
+<& /zaapt/common/form.mhtml, action => 'user-upd.html', elements => [
+        { type => 'hidden', name => '_act', value => 'update' },
+        { type => 'text', field => 'Firstname', name => 'a_firstname', size => 30, maxlength => 30, value => $a_firstname },
+        { type => 'text', field => 'Lastname', name => 'a_lastname', size => 30, maxlength => 30, value => $a_lastname },
+        { type => 'text', field => 'Email', name => 'a_email', size => 30, maxlength => 30, value => $a_email },
+        {
+            type => 'radio',
+            field => 'Receive Site Notifications',
+            name => 'a_notify',
+            options => [ { name => 'Yes', value => 1 }, { name => 'No', value => 0 } ],
+            checked => $a_notify,
+        },
+        { type => 'submit', field => '', value => 'Save Changes' },
+    ]
+&>
+
+<h1>Change Password</h1>
+
+<& /zaapt/common/err.mhtml, err => $err_pass &>
+
+<& /zaapt/common/form.mhtml, action => 'user-upd.html', elements => [
+        { type => 'hidden', name => '_act', value => 'password' },
+        { type => 'password', field => 'Password', name => 'a_password', size => 30, maxlength => 30, value => '' },
+        { type => 'password', field => 'Repeat', name => 'a_repeat', size => 30, maxlength => 30, value => '' },
+        { type => 'submit', field => '', value => 'Save Changes' },
+    ]
+&>
+%# ----------------------------------------------------------------------------
+

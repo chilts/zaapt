@@ -1,0 +1,13 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $post
+</%args>
+%# ----------------------------------------------------------------------------
+        <td class="left">
+            <a href="<% $topic->{tp_id} | u %>.html"><% $topic->{tp_subject} | h %></a>
+% if ( $topic->{tp_posts} > $forum->{f_show} ) {
+            <br />
+            <& /zaapt/common/paginator.mhtml, url => "$topic->{tp_id}.html?", btext => 'Page:', to => $topic->{tp_posts}, perpage => $forum->{f_show} &>
+% }
+        </td>
+%# ----------------------------------------------------------------------------

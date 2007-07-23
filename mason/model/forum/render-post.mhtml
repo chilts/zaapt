@@ -1,0 +1,14 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $post
+</%args>
+%# ----------------------------------------------------------------------------
+        <td class="top">
+            <& /zaapt/common/render.mhtml, t_name => $post->{t_name}, content => $post->{p_message} &>
+            <p class="footnote"><& /zaapt/common/datetime.mhtml, datetime => $post->{p_inserted} &></p>
+%         if ( $post->{i_signature} ) {
+            <hr />
+            <& /zaapt/common/render.mhtml, t_name => 'bbcode', content => $post->{i_signature} &>
+%         }
+        </td>
+%# ----------------------------------------------------------------------------

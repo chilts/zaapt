@@ -137,30 +137,14 @@
             <& /zaapt/common/icon.mhtml, name => 'bullet_blue', title => 'Normal Topic' &>
 %         }
         </td>
-        <td class="left">
-            <a href="<% $topic->{tp_id} | u %>.html"><% $topic->{tp_subject} | h %></a>
-% if ( $topic->{tp_posts} > $forum->{f_show} ) {
-            <br />
-            <& /zaapt/common/paginator.mhtml, url => "$topic->{tp_id}.html?", btext => 'Page:', to => $topic->{tp_posts}, perpage => $forum->{f_show} &>
-% }
-%         if ( exists $SESS->{roles}{$forum->{_moderator}} ) {
-            <hr />
-%             if ( $topic->{tp_sticky} ) {
-            <a href="?a=sticky-remove&amp;tp_id=<% $topic->{tp_id} | u %>&amp;p=<% $p | u %>" title="Remove Stickiness"><& /zaapt/common/icon.mhtml, name => 'script', title => 'Remove Stickiness' &> Remove Stickiness</a>
-%             } else {
-            <a href="?a=sticky-add&amp;tp_id=<% $topic->{tp_id} | u %>&amp;p=<% $p | u %>" title="Make Sticky"><& /zaapt/common/icon.mhtml, name => 'script_key', title => 'Make Sticky' &> Make Sticky</a>
-%             }
-            <br />
-%             if ( $topic->{tp_locked} ) {
-            <a href="?a=locked-remove&amp;tp_id=<% $topic->{tp_id} | u %>&amp;p=<% $p | u %>" title="Remove Lock"><& /zaapt/common/icon.mhtml, name => 'script', title => 'Remove Lock' &> Remove Lock</a>
-%             } else {
-            <a href="?a=locked-add&amp;tp_id=<% $topic->{tp_id} | u %>&amp;p=<% $p | u %>" title="Add Lock"><& /zaapt/common/icon.mhtml, name => 'script_link', title => 'Add Lock' &> Add Lock</a>
-%             }
-            <br />
-            <a href="?a=del&amp;tp_id=<% $topic->{tp_id} | u %>&amp;p=<% $p | u %>" title="Delete Topic"><& /zaapt/common/icon.mhtml, name => 'script_delete', title => 'Delete Topic' &> Delete Topic</a>
-            <br />
-%         }
-        </td>
+
+        <& render-user-topic.mhtml,
+            topic => $topic,
+            forum => $forum,
+            is_moderator => exists $SESS->{roles}{$forum->{_moderator}},
+            p => $p
+        &>
+
         <td class="center"><& /zaapt/common/a_username.mhtml, a_username => $topic->{a_username} &><br /></td>
         <td class="center"><% $topic->{tp_posts} | h %></td>
         <td class="right">

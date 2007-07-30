@@ -3,7 +3,7 @@
     $article
 </%args>
 %# ----------------------------------------------------------------------------
-<h1><% $article->{a_title} | h %></H1>
+<h1><% $article->{a_title} | h %></h1>
 %# <p>By: <& /zaapt/common/a_username.mhtml, a_username => $article->{ac_username} &></p>
 
 <p><strong><% $article->{a_intro} | h %></strong></p>

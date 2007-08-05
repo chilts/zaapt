@@ -98,6 +98,7 @@
 <& /zaapt/common/err.mhtml, err => $err &>
 
 <div id="topic"<% @$err ? '' : ' class="hide"' %>>
+<p>
 <& /zaapt/common/form.mhtml, action => '?', elements => [
         { type => 'hidden', name => 'a', value => 'topic' },
         { type => 'text', field => 'Subject', name => 'tp_subject', size => 40, value => $tp_subject || '' },
@@ -106,6 +107,7 @@
         { type => 'submit', field => 'Actions', value => 'Add Topic', cancel_js => "addElementClass('topic', 'hide');" },
     ]
 &>
+</p>
 </div>
 
 <p class="center">

@@ -1,0 +1,21 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $my_roles
+    $g_id
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Gallery');
+    my $gallery = $model->sel_gallery({ g_id => $g_id });
+
+    $m->redirect('edit-b-list.html') unless defined $gallery;
+
+    $m->redirect('edit-b-list.html') unless exists $my_roles->{$gallery->{_admin}};
+
+    $model->del_gallery({ g_id => $g_id });
+
+    $m->redirect("edit-g-list.html");
+    return;
+</%init>
+%# ----------------------------------------------------------------------------

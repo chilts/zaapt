@@ -10,6 +10,8 @@ CREATE TABLE gallery.gallery (
     title           TEXT NOT NULL,
     description     TEXT NOT NULL,
     path            TEXT NOT NULL,
+    original        TEXT NOT NULL,
+    webdir          TEXT NOT NULL,
     show            INTEGER NOT NULL,
     extractexif     BOOLEAN NOT NULL DEFAULT False,
     total           INTEGER NOT NULL DEFAULT 0,

@@ -1,0 +1,67 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $my_roles
+    $g_id
+    $s_size
+    $s_path
+</%args>
+%# ----------------------------------------------------------------------------
+<%once>
+    use URI::Escape;
+</%once>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Gallery');
+    my $gallery = $model->sel_gallery({ g_id => $g_id });
+    unless ( defined $gallery ) {
+        $m->redirect('edit-g-list.html');
+        return;
+    }
+
+    $m->redirect('edit-g-list.html') unless exists $my_roles->{$gallery->{_admin}};
+
+    my $err = [];
+
+    unless ( Zaapt::Utils::Valid::is_positive_integer($s_size, 'size') ) {
+        push @$err, Zaapt::Utils::Valid::err();
+    }
+
+    unless ( Zaapt::Utils::Valid::has_content($s_path, 'path') ) {
+        push @$err, Zaapt::Utils::Valid::err();
+    }
+
+    # check that path, path/original, mapping are all valid dir-like names
+    # ???
+
+    unless ( @$err ) {
+        $model->ins_size({
+            g_id   => $g_id,
+            s_size => $s_size,
+            s_path => $s_path,
+        });
+        $m->redirect('edit-s-list.html?g_id=' . uri_escape($g_id));
+        return;
+    }
+
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Add a Size</h1>
+
+<p><a href="edit-s-list.html?g_id=<% $g_id | u %>">&laquo; Back to Size List</a></p>
+
+<& edit-render-g-title.mhtml, gallery => $gallery &>
+
+<& /zaapt/common/err.mhtml, err => $err &>
+
+<& /zaapt/common/form.mhtml, action => 'edit-s-ins.html', elements => [
+        { type => 'hidden', name => 'g_id', value => $g_id },
+        { type => 'text', field => 'Size (pixels)', name => 's_size', value => $s_size },
+        { type => 'note', value => "Note: This is for both (x,y). The picture will be scaled correctly." },
+        { type => 'text', field => 'Path', name => 's_path', value => $s_path },
+        { type => 'note', value => "Note: This dir is relative to the gallery's main path." },
+        { type => 'submit', field => 'Actions', value => 'Add', cancel => 'edit-s-list.html?g_id=' . uri_escape($g_id) },
+    ]
+&>
+
+%# ----------------------------------------------------------------------------

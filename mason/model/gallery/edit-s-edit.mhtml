@@ -1,0 +1,39 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $my_roles
+    $s_id
+</%args>
+%# ----------------------------------------------------------------------------
+<%once>
+    use URI::Escape;
+</%once>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Gallery');
+    my $size = $model->sel_size({ s_id => $s_id });
+    unless ( defined $size ) {
+        $m->redirect('edit-g-list.html');
+        return;
+    }
+
+    $m->redirect('edit-g-list.html') unless exists $my_roles->{$size->{_admin}};
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Edit a Size</h1>
+
+<p><a href="edit-s-list.html?g_id=<% $size->{g_id} | u %>">&laquo; Back to Size List</a></p>
+
+<& edit-render-g-title.mhtml, gallery => $size &>
+
+<& /zaapt/common/form.mhtml, action => 'edit-s-upd.html', elements => [
+        { type => 'hidden', name => 's_id', value => $size->{s_id} },
+        { type => 'text', field => 'Size (pixels)', name => 's_size', value => $size->{s_size} },
+        { type => 'note', value => "Note: This is for both (x,y). The picture will be scaled correctly." },
+        { type => 'text', field => 'Path', name => 's_path', value => $size->{s_path} },
+        { type => 'note', value => "Note: This dir is relative to the gallery's main path." },
+        { type => 'submit', field => 'Actions', value => 'Save', cancel => 'edit-s-list.html?g_id=' . uri_escape($size->{g_id}) },
+    ]
+&>
+
+%# ----------------------------------------------------------------------------

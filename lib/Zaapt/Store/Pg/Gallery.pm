@@ -14,7 +14,7 @@ my $table = {
     gallery => {
         name => 'gallery',
         prefix => 'g',
-        cols => [ qw(id name title description path show extractexif ro:total r:admin_id r:view_id r:edit_id ts:inserted ts:updated) ],
+        cols => [ qw(id name title description path original webdir show extractexif ro:total r:admin_id r:view_id r:edit_id ts:inserted ts:updated) ],
     },
     picture => {
         name => 'picture',
@@ -74,12 +74,13 @@ __PACKAGE__->mk_selecter_using( $schema, $table->{gallery}{name}, $table->{galle
 __PACKAGE__->mk_select_rows( 'sel_gallery_all', "SELECT $table->{gallery}{sql_sel_cols} FROM $table->{gallery}{sql_fqt} ORDER BY g.id", [] );
 
 # picture
-my $main_cols = "$table->{gallery}{sql_sel_cols}, $table->{entry}{sql_sel_cols}, $table->{detail}{sql_sel_cols}, $table->{field}{sql_sel_cols}";
+my $main_cols = "$table->{gallery}{sql_sel_cols}, $table->{picture}{sql_sel_cols}, $table->{detail}{sql_sel_cols}, $table->{field}{sql_sel_cols}";
 my $main_tables = "$table->{gallery}{sql_fqt} $join->{g_p} $join->{p_d} $join->{d_f}";
 
 __PACKAGE__->mk_select_row( 'sel_picture', "SELECT $main_cols FROM $main_tables WHERE p.id = ?", [ 'p_id' ] );
 __PACKAGE__->mk_select_row( 'sel_picture_in_gallery', "SELECT $main_cols FROM $main_tables WHERE g.id = ? AND p.name = ?", [ 'g_id', 'p_name' ] );
 __PACKAGE__->mk_select_rows( 'sel_picture_all_in', "SELECT $main_cols FROM $main_tables WHERE g.id = ? ORDER BY p.name DESC", [ 'g_id' ] );
+# warn "SELECT $main_cols FROM $main_tables WHERE g.id = ? ORDER BY p.name DESC";
 
 # field
 __PACKAGE__->mk_selecter( $schema, $table->{field}{name}, $table->{field}{prefix}, @{$table->{field}{cols}} );
@@ -87,6 +88,10 @@ __PACKAGE__->mk_select_rows( 'sel_field_all', "SELECT $table->{field}{sql_sel_co
 
 # detail
 __PACKAGE__->mk_selecter( $schema, $table->{detail}{name}, $table->{detail}{prefix}, @{$table->{detail}{cols}} );
+
+# size
+__PACKAGE__->mk_select_row( 'sel_size', "SELECT $table->{gallery}{sql_sel_cols}, $table->{size}{sql_sel_cols} FROM $table->{gallery}{sql_fqt} $join->{g_s} WHERE s.id = ?", [ 's_id' ] );
+__PACKAGE__->mk_select_rows( 'sel_size_all_in', "SELECT $table->{gallery}{sql_sel_cols}, $table->{size}{sql_sel_cols} FROM $table->{gallery}{sql_fqt} $join->{g_s} WHERE g.id = ? ORDER BY s.id", [ 'g_id' ] );
 
 ## ----------------------------------------------------------------------------
 # methods

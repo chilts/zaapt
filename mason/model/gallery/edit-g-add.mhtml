@@ -1,0 +1,50 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $my_roles
+</%args>
+%# ----------------------------------------------------------------------------
+<%once>
+    use URI::Escape;
+</%once>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Gallery');
+    my $roles = $zaapt->get_model('Account')->sel_all_roles();
+    my @options = map { { value => $_->{r_id}, text => $_->{r_name} } } @$roles;
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Add a Gallery</h1>
+
+<p><a href="edit-g-list.html">&laquo; Back to Gallery List</a></p>
+
+<h2>Gallery: ?</h2>
+
+<& /zaapt/common/form.mhtml, action => 'edit-g-ins.html', elements => [
+        { type => 'text', field => 'Name', name => 'g_name', size => 40, value => '' },
+        { type => 'text', field => 'Title', name => 'g_title', size => 40, value => '' },
+        { type => 'textarea', field => 'Description', name => 'g_description', rows => 10, cols => 40, value => '' },
+
+        { type => 'text', field => 'Base Path', name => 'g_path', value => '/path/to' },
+        { type => 'note', value => "Note: This is the base dir where <strong>all</strong> uploaded pictures will be stored." },
+        { type => 'text', field => 'Original', name => 'g_original', value => 'o' },
+        { type => 'note', value => "Note: This dir is relative to the above base path." },
+        { type => 'text', field => 'Web Mapping:', name => 'g_webdir', value => '/path/to/webdir' },
+        { type => 'note', value => "Note: This path is the web address where the above Base Path is mapped to." },
+
+        { type => 'text', field => 'Show', name => 'g_show', size => 3, value => 7 },
+        { type => 'note', value => "Note: Show is used just for the main index." },
+        { type => 'check', field => 'Extract Exif?', name => 'g_extractexif', checked => 1 },
+
+        { type => 'select', field => 'Admin Role', name => '_admin', options => \@options },
+        { type => 'note', value => "Note: Allows this user to delete this entire gallery." },
+        { type => 'select', field => 'View Role', name => '_view', options => \@options },
+        { type => 'note', value => "Note: Allows this user to view all gallery pictures." },
+        { type => 'select', field => 'Edit Role', name => '_edit', options => \@options },
+        { type => 'note', value => "Note: Allows this user to add, edit and delete blog entries and labels." },
+
+        { type => 'submit', field => 'Actions', value => 'Add Gallery', cancel => 'edit-g-list.html' },
+    ]
+&>
+
+%# ----------------------------------------------------------------------------

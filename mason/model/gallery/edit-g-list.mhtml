@@ -1,0 +1,46 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $my_roles
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Gallery');
+    my $galleries = $model->sel_gallery_all();
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Gallery List</h1>
+
+% if ( exists $my_roles->{super} ) {
+<p>
+    * <a href="edit-g-add.html">Add Gallery &raquo;</a><br />
+</p>
+% }
+
+<&| /zaapt/common/admin/table-edit.mhtml, title => 'Gallery' &>
+
+% my $r = 1;
+% foreach my $gallery ( @$galleries ) {
+%     next unless exists $my_roles->{$gallery->{_view}};
+        <tr class="r<% $r++%2 %>">
+            <td>
+                <% $gallery->{g_name} | h %>
+            </td>
+            <td>
+%         if ( exists $my_roles->{$gallery->{_edit}} ) {
+                * <a href="edit-p-add.html?g_id=<% $gallery->{g_id} | u %>">Add Picture</a><br />
+                * <a href="edit-p-list.html?g_id=<% $gallery->{g_id} | u %>">Picture List</a><br />
+                * <a href="edit-s-list.html?g_id=<% $gallery->{g_id} | u %>">Size List</a><br />
+%             if ( exists $my_roles->{$gallery->{_admin}} ) {
+                * <a href="edit-g-del.html?g_id=<% $gallery->{g_id} | u %>">Delete</a><br />
+%             }
+%         } else {
+                -
+%         }
+            </td>
+        </tr>
+% }
+
+</&>
+
+%# ----------------------------------------------------------------------------

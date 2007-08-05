@@ -1,0 +1,67 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $my_roles
+    $g_id
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Gallery');
+    my $gallery = $model->sel_gallery({ g_id => $g_id });
+    unless ( defined $gallery ) {
+        $m->redirect('edit-g-list.html');
+        return;
+    }
+
+    $m->redirect('edit-g-list.html') unless exists $my_roles->{$gallery->{_view}};
+    my $entries = $model->sel_picture_all_in({ g_id => $g_id });
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Picture List</h1>
+
+<p><a href="edit-g-list.html">&laquo; Back to Gallery List</a></p>
+
+<& edit-render-g-title.mhtml, gallery => $gallery &>
+
+<p>
+% if ( exists $my_roles->{$gallery->{_edit}} ) {
+    * <a href="edit-e-add.html?g_id=<% $gallery->{g_id} | u %>">Add Picture &raquo;</a><br />
+% } else {
+    * No Actions
+% }
+</p>
+
+<&| /zaapt/common/admin/table-edit.mhtml, title => 'Picture' &>
+
+% my $r = 1;
+% foreach my $picture ( @$entries ) {
+        <tr class="r<% $r++%2 %>">
+            <td>
+                <% $picture->{p_name} | h %> (<% $picture->{p_inserted} | h %>)<br />
+                <% $picture->{p_comments} || '0' | h %> comments, <% $picture->{p_trackbacks} || '0' | h %> trackbacks<br />
+            </td>
+            <td>
+%         if ( exists $my_roles->{$gallery->{_edit}} ) {
+                * <a href="edit-e-edit.html?p_id=<% $picture->{p_id} | u %>">Edit Picture</a><br />
+                * <a href="edit-l-edit.html?p_id=<% $picture->{p_id} | u %>">Edit Labels</a><br />
+%             if ( exists $my_roles->{$gallery->{_admin}} ) {
+                * <a href="edit-e-del.html?p_id=<% $picture->{p_id} | u %>">Delete</a><br />
+%             }
+%         } else {
+                -
+%         }
+            </td>
+        </tr>
+% }
+% unless ( @$entries ) {
+        <tr class="r0">
+            <td>No pictures in this gallery!</td>
+            <td>
+                * <a href="edit-p-add.html?g_id=<% $gallery->{g_id} | u %>">Add Picture</a>
+            </td>
+        </tr>
+% }
+
+</&>
+
+%# ----------------------------------------------------------------------------

@@ -29,7 +29,7 @@ sub is_valid_name {
     }
 
     if ( $str eq '' ) {
-        $err = 'No name given';
+        $err = "No $name given";
         return;
     }
 
@@ -43,6 +43,7 @@ sub is_valid_name {
 sub is_min_length {
     my ($str, $min_length, $name) = @_;
 
+    $err = undef;
     $name ||= 'string';
 
     unless ( length $str >= $min_length ) {
@@ -55,6 +56,7 @@ sub is_min_length {
 sub is_max_length {
     my ($str, $max_length, $name) = @_;
 
+    $err = undef;
     $name ||= 'string';
 
     unless ( length $str <= $max_length ) {
@@ -67,6 +69,7 @@ sub is_max_length {
 sub has_content {
     my ($str, $name) = @_;
 
+    $err = undef;
     $name ||= 'string';
 
     unless ( defined $str ) {
@@ -90,7 +93,9 @@ sub has_content {
 sub contains_something {
     my ($str, $name) = @_;
 
-    carp "contains_something(): is deprecated";
+    carp "contains_something(): is deprecated, use has_content() instead";
+
+    $err = undef;
 
     unless ( defined $str ) {
         $err = "'$name' is undefined";
@@ -168,7 +173,7 @@ sub is_positive_integer {
 sub is_datetime {
     my ($dt, $name) = @_;
 
-    warn "dt=$dt, name=$name";
+    $err = undef;
 
     unless ( $dt =~ m{ \A (\d{4})\-(\d{2})\-(\d{2}) \s (\d{2}):(\d{2}):(\d{2}) \z }xms ) {
         $err = "'$name' must be of the format 'yyyy-mm-dd hh:mm:ss'";

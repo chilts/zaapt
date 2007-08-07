@@ -1,10 +1,11 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $action => undef
+    $enctype => undef
     $elements
 </%args>
 %# ----------------------------------------------------------------------------
-<form action="<% $action || '?' %>" method="post">
+<form action="<% $action || '?' %>" method="post"<% defined $enctype ? " enctype=\"$enctype\"" : '' %>>
 % foreach my $e ( @$elements ) {
 %     if ( $e->{type} eq 'hidden' ) {
 <input type="hidden"<% defined $e->{id} ? " id=\"$e->{id}\"" : '' %> name="<% $e->{name} | h %>" value="<% $e->{value} | h %>" />
@@ -65,6 +66,9 @@
 
 %     } elsif ( $e->{type} eq 'check' ) {
             <input type="checkbox" name="<% $e->{name} | h %>"<% $e->{checked} && ' checked="checked"' %> />\
+
+%     } elsif ( $e->{type} eq 'file' ) {
+            <input type="file" name="<% $e->{name} | h %>" />\
 
 %     } elsif ( $e->{type} eq 'submit' ) {
             <button class="button" type="submit"><% $e->{value} | h %></button>\

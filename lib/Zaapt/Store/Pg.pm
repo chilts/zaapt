@@ -583,6 +583,21 @@ sub _mk_sql_accessors {
     }
 }
 
+sub begin_work {
+    my ($self) = @_;
+    $self->dbh()->begin_work();
+}
+
+sub commit {
+    my ($self) = @_;
+    $self->dbh()->commit();
+}
+
+sub rollback {
+    my ($self) = @_;
+    $self->dbh()->rollback();
+}
+
 ## ----------------------------------------------------------------------------
 # methods
 

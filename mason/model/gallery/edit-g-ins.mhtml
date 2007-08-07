@@ -91,7 +91,7 @@
         { type => 'textarea', field => 'Description', name => 'g_description', rows => 10, cols => 40, value => $g_description },
 
         { type => 'text', field => 'Base Path', name => 'g_path', value => $g_path },
-        { type => 'note', value => "Note: This is the base dir where <strong>all</strong> uploaded pictures will be stored." },
+        { type => 'note', value => "Note: This is the base dir where all uploaded pictures will be stored." },
         { type => 'text', field => 'Original', name => 'g_original', value => $g_original },
         { type => 'note', value => "Note: This dir is relative to the above base path." },
         { type => 'text', field => 'Web Mapping:', name => 'g_webdir', value => $g_webdir },

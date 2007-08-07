@@ -53,6 +53,7 @@ CREATE TABLE gallery.field (
     id              INTEGER NOT NULL DEFAULT nextval('gallery.field_id_seq'::TEXT) PRIMARY KEY,
     name            TEXT NOT NULL,
     description     TEXT NOT NULL,
+    required        BOOLEAN NOT NULL DEFAULT False,
 
     UNIQUE(name),
     LIKE base       INCLUDING DEFAULTS

@@ -22,7 +22,7 @@ my $table = {
         cols => [
             'id',
             [ 'gallery_id', 'fk', 'g_id' ],
-            qw(name title description ts:inserted ts:updated)
+            qw(name title description filename ts:inserted ts:updated)
         ],
     },
     field => {
@@ -74,8 +74,8 @@ __PACKAGE__->mk_selecter_using( $schema, $table->{gallery}{name}, $table->{galle
 __PACKAGE__->mk_select_rows( 'sel_gallery_all', "SELECT $table->{gallery}{sql_sel_cols} FROM $table->{gallery}{sql_fqt} ORDER BY g.id", [] );
 
 # picture
-my $main_cols = "$table->{gallery}{sql_sel_cols}, $table->{picture}{sql_sel_cols}, $table->{detail}{sql_sel_cols}, $table->{field}{sql_sel_cols}";
-my $main_tables = "$table->{gallery}{sql_fqt} $join->{g_p} $join->{p_d} $join->{d_f}";
+my $main_cols = "$table->{gallery}{sql_sel_cols}, $table->{picture}{sql_sel_cols}";
+my $main_tables = "$table->{gallery}{sql_fqt} $join->{g_p}";
 
 __PACKAGE__->mk_select_row( 'sel_picture', "SELECT $main_cols FROM $main_tables WHERE p.id = ?", [ 'p_id' ] );
 __PACKAGE__->mk_select_row( 'sel_picture_in_gallery', "SELECT $main_cols FROM $main_tables WHERE g.id = ? AND p.name = ?", [ 'g_id', 'p_name' ] );
@@ -84,7 +84,21 @@ __PACKAGE__->mk_select_rows( 'sel_picture_all_in', "SELECT $main_cols FROM $main
 
 # field
 __PACKAGE__->mk_selecter( $schema, $table->{field}{name}, $table->{field}{prefix}, @{$table->{field}{cols}} );
+__PACKAGE__->mk_selecter_using( $schema, $table->{field}{name}, $table->{field}{prefix}, 'name', @{$table->{field}{cols}} );
 __PACKAGE__->mk_select_rows( 'sel_field_all', "SELECT $table->{field}{sql_sel_cols} FROM $table->{field}{sql_fqt} ORDER BY f.id" );
+
+# assure that this field is there
+sub ass_field {
+    my ($self, $hr) = @_;
+
+    # see if we already have it
+    my $field = $self->sel_field_using_name( $hr );
+    return $field if defined $field;
+
+    # not yet in, insert then return it
+    $self->ins_field( $hr );
+    return $self->sel_field_using_name( $hr );
+}
 
 # detail
 __PACKAGE__->mk_selecter( $schema, $table->{detail}{name}, $table->{detail}{prefix}, @{$table->{detail}{cols}} );

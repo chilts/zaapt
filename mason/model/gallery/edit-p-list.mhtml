@@ -14,7 +14,7 @@
     }
 
     $m->redirect('edit-g-list.html') unless exists $my_roles->{$gallery->{_view}};
-    my $entries = $model->sel_picture_all_in({ g_id => $g_id });
+    my $pictures = $model->sel_picture_all_in({ g_id => $g_id });
 </%init>
 %# ----------------------------------------------------------------------------
 <h1>Picture List</h1>
@@ -25,7 +25,7 @@
 
 <p>
 % if ( exists $my_roles->{$gallery->{_edit}} ) {
-    * <a href="edit-e-add.html?g_id=<% $gallery->{g_id} | u %>">Add Picture &raquo;</a><br />
+    * <a href="edit-p-add.html?g_id=<% $gallery->{g_id} | u %>">Add Picture &raquo;</a><br />
 % } else {
     * No Actions
 % }
@@ -34,26 +34,23 @@
 <&| /zaapt/common/admin/table-edit.mhtml, title => 'Picture' &>
 
 % my $r = 1;
-% foreach my $picture ( @$entries ) {
+% foreach my $picture ( @$pictures ) {
         <tr class="r<% $r++%2 %>">
             <td>
                 <% $picture->{p_name} | h %> (<% $picture->{p_inserted} | h %>)<br />
-                <% $picture->{p_comments} || '0' | h %> comments, <% $picture->{p_trackbacks} || '0' | h %> trackbacks<br />
+                <strong><% $picture->{p_title} | h %></strong><br />
             </td>
             <td>
 %         if ( exists $my_roles->{$gallery->{_edit}} ) {
-                * <a href="edit-e-edit.html?p_id=<% $picture->{p_id} | u %>">Edit Picture</a><br />
-                * <a href="edit-l-edit.html?p_id=<% $picture->{p_id} | u %>">Edit Labels</a><br />
-%             if ( exists $my_roles->{$gallery->{_admin}} ) {
-                * <a href="edit-e-del.html?p_id=<% $picture->{p_id} | u %>">Delete</a><br />
-%             }
+                * <a href="edit-p-edit.html?p_id=<% $picture->{p_id} | u %>">Edit Picture</a><br />
+                * <a href="edit-p-del.html?p_id=<% $picture->{p_id} | u %>">Delete</a><br />
 %         } else {
                 -
 %         }
             </td>
         </tr>
 % }
-% unless ( @$entries ) {
+% unless ( @$pictures ) {
         <tr class="r0">
             <td>No pictures in this gallery!</td>
             <td>

@@ -40,7 +40,7 @@
         <tr class="r<% $r++%2 %>">
             <td>
                 <% $size->{s_size} | h %> pixels<br />
-                <% $size->{g_path} | h %>/<strong><% $size->{s_path} | h %></strong><br />
+                <strong><% $size->{s_path} | h %>/</strong><br />
             </td>
             <td>
 %         if ( exists $my_roles->{$gallery->{_admin}} ) {

@@ -25,8 +25,8 @@
 % foreach my $field ( @$fields ) {
         <tr class="r<% $r++%2 %>">
             <td>
-                <% $field->{f_info} | h %><br />
-                <strong><% $field->{f_description} | h %></strong><br />
+                <strong><% $field->{f_info} | h %></strong><br />
+                <% $field->{f_description} | h %><br />
             </td>
             <td>
                 * <a href="edit-f-del.html?f_id=<% $field->{f_id} | u %>">Delete</a><br />

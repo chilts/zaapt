@@ -132,6 +132,7 @@ __PACKAGE__->mk_select_rows( 'sel_field_all', "SELECT $table->{field}{sql_sel_co
 sub _nuke {
     my ($self) = @_;
     $self->dbh()->begin_work();
+    $self->_do("DELETE FROM gallery.required");
     $self->_do("DELETE FROM gallery.detail");
     $self->_do("DELETE FROM gallery.field");
     $self->_do("DELETE FROM gallery.picture");

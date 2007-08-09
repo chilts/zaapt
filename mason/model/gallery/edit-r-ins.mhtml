@@ -1,0 +1,34 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $my_roles
+    $g_id
+    $f_id
+</%args>
+%# ----------------------------------------------------------------------------
+<%once>
+    use URI::Escape;
+</%once>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Gallery');
+    my $gallery = $model->sel_gallery({ g_id => $g_id });
+    unless ( defined $gallery ) {
+        $m->redirect('edit-g-list.html');
+        return;
+    }
+
+    $m->redirect('edit-g-list.html') unless exists $my_roles->{$gallery->{_admin}};
+
+    my $field = $model->sel_field({ f_id => $f_id });
+    $m->redirect('edit-r-list.html?g_id=' . uri_escape($g_id)) unless defined $field;
+
+    # make sure this field is in the database
+    $model->ins_required({
+        g_id          => $gallery->{g_id},
+        f_id          => $field->{f_id},
+    });
+    $m->redirect("edit-r-list.html?g_id=" . uri_escape($g_id));
+    return;
+</%init>
+%# ----------------------------------------------------------------------------

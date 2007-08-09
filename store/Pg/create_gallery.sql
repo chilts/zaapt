@@ -52,10 +52,10 @@ CREATE TRIGGER picture_updated BEFORE UPDATE ON gallery.picture
 CREATE SEQUENCE gallery.field_id_seq;
 CREATE TABLE gallery.field (
     id              INTEGER NOT NULL DEFAULT nextval('gallery.field_id_seq'::TEXT) PRIMARY KEY,
-    name            TEXT NOT NULL,
+    info            TEXT NOT NULL,
     description     TEXT NOT NULL,
 
-    UNIQUE(name),
+    UNIQUE(info),
     LIKE base       INCLUDING DEFAULTS
 );
 CREATE TRIGGER field_updated BEFORE UPDATE ON gallery.field
@@ -86,6 +86,18 @@ CREATE TABLE gallery.size (
     LIKE base       INCLUDING DEFAULTS
 );
 CREATE TRIGGER size_updated BEFORE UPDATE ON gallery.size
+    FOR EACH ROW EXECUTE PROCEDURE updated();
+
+-- table: required
+CREATE SEQUENCE gallery.required_id_seq;
+CREATE TABLE gallery.required (
+    id              INTEGER NOT NULL DEFAULT nextval('gallery.required_id_seq'::TEXT) PRIMARY KEY,
+    gallery_id      INTEGER NOT NULL REFERENCES gallery.gallery,
+    field_id        INTEGER NOT NULL REFERENCES gallery.field,
+
+    LIKE base       INCLUDING DEFAULTS
+);
+CREATE TRIGGER required_updated BEFORE UPDATE ON gallery.required
     FOR EACH ROW EXECUTE PROCEDURE updated();
 
 -- functions

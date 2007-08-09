@@ -28,7 +28,7 @@ my $table = {
     field => {
         name => 'field',
         prefix => 'f',
-        cols => [ qw(id name description ts:inserted ts:updated) ],
+        cols => [ qw(id info description ts:inserted ts:updated) ],
     },
     detail => {
         name => 'detail',
@@ -49,6 +49,16 @@ my $table = {
             qw(size path ts:inserted ts:updated)
         ],
     },
+    required => {
+        name => 'required',
+        prefix => 'r',
+        cols => [
+            'id',
+            [ 'gallery_id', 'fk', 'g_id' ],
+            [ 'field_id', 'fk', 'f_id' ],
+            qw(ts:inserted ts:updated)
+        ],
+    },
 };
 
 my $join = {
@@ -56,6 +66,8 @@ my $join = {
     g_s  => "JOIN $schema.size s ON (g.id = s.gallery_id)",
     p_d  => "JOIN $schema.detail d ON (p.id = d.picture_id)",
     d_f  => "JOIN $schema.field f ON (d.field_id = f.id)",
+    g_r  => "JOIN $schema.required r ON (g.id = r.gallery_id)",
+    r_f  => "JOIN $schema.field f ON (r.field_id = f.id)",
 };
 
 ## ----------------------------------------------------------------------------
@@ -84,7 +96,7 @@ __PACKAGE__->mk_select_rows( 'sel_picture_all_in', "SELECT $main_cols FROM $main
 
 # field
 __PACKAGE__->mk_selecter( $schema, $table->{field}{name}, $table->{field}{prefix}, @{$table->{field}{cols}} );
-__PACKAGE__->mk_selecter_using( $schema, $table->{field}{name}, $table->{field}{prefix}, 'name', @{$table->{field}{cols}} );
+__PACKAGE__->mk_selecter_using( $schema, $table->{field}{name}, $table->{field}{prefix}, 'info', @{$table->{field}{cols}} );
 __PACKAGE__->mk_select_rows( 'sel_field_all', "SELECT $table->{field}{sql_sel_cols} FROM $table->{field}{sql_fqt} ORDER BY f.id" );
 
 # assure that this field is there
@@ -92,12 +104,12 @@ sub ass_field {
     my ($self, $hr) = @_;
 
     # see if we already have it
-    my $field = $self->sel_field_using_name( $hr );
+    my $field = $self->sel_field_using_info( $hr );
     return $field if defined $field;
 
     # not yet in, insert then return it
     $self->ins_field( $hr );
-    return $self->sel_field_using_name( $hr );
+    return $self->sel_field_using_info( $hr );
 }
 
 # detail
@@ -106,6 +118,14 @@ __PACKAGE__->mk_selecter( $schema, $table->{detail}{name}, $table->{detail}{pref
 # size
 __PACKAGE__->mk_select_row( 'sel_size', "SELECT $table->{gallery}{sql_sel_cols}, $table->{size}{sql_sel_cols} FROM $table->{gallery}{sql_fqt} $join->{g_s} WHERE s.id = ?", [ 's_id' ] );
 __PACKAGE__->mk_select_rows( 'sel_size_all_in', "SELECT $table->{gallery}{sql_sel_cols}, $table->{size}{sql_sel_cols} FROM $table->{gallery}{sql_fqt} $join->{g_s} WHERE g.id = ? ORDER BY s.id", [ 'g_id' ] );
+
+# required
+__PACKAGE__->mk_select_row( 'sel_required', "SELECT $table->{gallery}{sql_sel_cols}, $table->{required}{sql_sel_cols}, $table->{field}{sql_sel_cols} FROM $table->{gallery}{sql_fqt} $join->{g_r} $join->{r_f} WHERE r.id = ?", [ 'r_id' ] );
+__PACKAGE__->mk_select_rows( 'sel_required_all_in', "SELECT $table->{gallery}{sql_sel_cols}, $table->{required}{sql_sel_cols}, $table->{field}{sql_sel_cols} FROM $table->{gallery}{sql_fqt} $join->{g_r} $join->{r_f} WHERE g.id = ? ORDER BY r.id", [ 'g_id' ] );
+
+__PACKAGE__->mk_selecter( $schema, $table->{field}{name}, $table->{field}{prefix}, @{$table->{field}{cols}} );
+__PACKAGE__->mk_selecter_using( $schema, $table->{field}{name}, $table->{field}{prefix}, 'name', @{$table->{field}{cols}} );
+__PACKAGE__->mk_select_rows( 'sel_field_all', "SELECT $table->{field}{sql_sel_cols} FROM $table->{field}{sql_fqt} ORDER BY f.id" );
 
 ## ----------------------------------------------------------------------------
 # methods

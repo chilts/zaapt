@@ -1,0 +1,48 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $my_roles
+    $f_info        => ''
+    $f_description => ''
+</%args>
+%# ----------------------------------------------------------------------------
+<%once>
+    use URI::Escape;
+</%once>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Gallery');
+    $m->redirect('edit-g-list.html') unless exists $my_roles->{super};
+
+    my $err = [];
+
+    unless ( Zaapt::Utils::Valid::has_content($f_info, 'Info') ) {
+        push @$err, Zaapt::Utils::Valid::err();
+    }
+
+    unless ( @$err ) {
+        # make sure this field is in the database
+        my $field = $model->ins_field({
+            f_info => $f_info,
+            f_description => $f_description
+        });
+        $m->redirect("edit-f-list.html");
+        return;
+    }
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Add a Required Field</h1>
+
+<p><a href="edit-f-list.html">&laquo; Back to Field List</a></p>
+
+<h2>Field: ?</h2>
+
+<& /zaapt/common/err.mhtml, err => $err &>
+
+<& /zaapt/common/form.mhtml, action => 'edit-f-ins.html', elements => [
+        { type => 'text', field => 'Info', name => 'f_info', value => $f_info },
+        { type => 'textarea', field => 'Description', name => 'f_description', rows => 10, cols => 40, value => $f_description },
+        { type => 'submit', field => 'Actions', value => 'Add', cancel => 'edit-f-list.html' },
+    ]
+&>
+%# ----------------------------------------------------------------------------

@@ -1,0 +1,61 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $my_roles
+    $g_id
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    use Data::Dumper;
+
+    my $model = $zaapt->get_model('Gallery');
+    my $gallery = $model->sel_gallery({ g_id => $g_id });
+    unless ( defined $gallery ) {
+        $m->redirect('edit-g-list.html');
+        return;
+    }
+
+    $m->redirect('edit-g-list.html') unless exists $my_roles->{$gallery->{_view}};
+    my $fields = $model->sel_field_all();
+    my $requireds = $model->sel_required_all_in({ g_id => $g_id });
+
+    # make a hash of the required IDs
+    my %required;
+    foreach ( @$requireds ) {
+        $required{$_->{f_id}} = $_->{r_id};
+    }
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Required Field List</h1>
+
+<p><a href="edit-g-list.html">&laquo; Back to Gallery List</a></p>
+
+<& edit-render-g-title.mhtml, gallery => $gallery &>
+
+<&| /zaapt/common/admin/table-edit.mhtml, title => 'Required Field' &>
+
+% my $r = 1;
+% foreach my $field ( @$fields ) {
+%       next unless ( $field->{r_gallery_id} == $gallery->{g_id} or !defined $field->{r_gallery_id} );
+        <tr class="r<% $r++%2 %>">
+            <td>
+                <strong><% $field->{f_info} | h %></strong><br />
+                <% $field->{f_description} | h %><br />
+                Status: <strong><% exists $required{$field->{f_id}} ? 'Required' : '-' %></strong><br />
+            </td>
+            <td>
+%         if ( exists $my_roles->{$gallery->{_admin}} ) {
+%             if ( exists $required{$field->{f_id}} ) {
+                * <a href="edit-r-del.html?r_id=<% $required{$field->{f_id}} | u %>">Remove from Required</a><br />
+%             } else {
+                * <a href="edit-r-ins.html?g_id=<% $gallery->{g_id} | u %>&amp;f_id=<% $field->{f_id} | u %>">Require this Field</a><br />
+%             }
+%         } else {
+                -
+%         }
+            </td>
+        </tr>
+% }
+
+</&>
+%# ----------------------------------------------------------------------------

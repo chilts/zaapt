@@ -11,11 +11,12 @@
 %# ----------------------------------------------------------------------------
 <h1>Gallery List</h1>
 
-% if ( exists $my_roles->{super} ) {
 <p>
+% if ( exists $my_roles->{super} ) {
     * <a href="edit-g-add.html">Add Gallery &raquo;</a><br />
-</p>
 % }
+    * <a href="edit-f-list.html">Field List &raquo;</a><br />
+</p>
 
 <&| /zaapt/common/admin/table-edit.mhtml, title => 'Gallery' &>
 
@@ -29,8 +30,9 @@
             <td>
 %         if ( exists $my_roles->{$gallery->{_edit}} ) {
                 * <a href="edit-p-add.html?g_id=<% $gallery->{g_id} | u %>">Add Picture</a><br />
-                * <a href="edit-p-list.html?g_id=<% $gallery->{g_id} | u %>">Picture List</a><br />
                 * <a href="edit-s-list.html?g_id=<% $gallery->{g_id} | u %>">Size List</a><br />
+                * <a href="edit-r-list.html?g_id=<% $gallery->{g_id} | u %>">Required Fields List</a><br />
+                * <a href="edit-p-list.html?g_id=<% $gallery->{g_id} | u %>">Picture List</a><br />
 %             if ( exists $my_roles->{$gallery->{_admin}} ) {
                 * <a href="edit-g-del.html?g_id=<% $gallery->{g_id} | u %>">Delete</a><br />
 %             }

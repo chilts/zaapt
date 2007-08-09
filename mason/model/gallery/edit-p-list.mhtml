@@ -52,7 +52,7 @@
 % }
 % unless ( @$pictures ) {
         <tr class="r0">
-            <td>No pictures in this gallery!</td>
+            <td>no pictures yet in this gallery</td>
             <td>
                 * <a href="edit-p-add.html?g_id=<% $gallery->{g_id} | u %>">Add Picture</a>
             </td>

@@ -151,12 +151,12 @@
             # retrieve this latest 'picture.id'
             my $p_id = $model->_currval('gallery.picture_id_seq');
 
-            foreach my $f_name ( keys %$exif_data ) {
-                my $field = $model->ass_field({ f_name => "EXIF:$f_name", f_description => 'EXIF' });
+            foreach my $f_info ( keys %$exif_data ) {
+                my $field = $model->ass_field({ f_info => "EXIF:$f_info", f_description => 'EXIF' });
                 $model->ins_detail({
                     p_id    => $p_id,
                     f_id    => $field->{f_id},
-                    d_value => $exif_data->{$f_name},
+                    d_value => $exif_data->{$f_info},
                 });
             }
         }

@@ -56,6 +56,13 @@
             </td>
         </tr>
 % }
-
+% unless ( @$fields ) {
+        <tr class="r0">
+            <td>no fields yet defined</td>
+            <td>
+                * <a href="edit-f-list.html">Field List</a>
+            </td>
+        </tr>
+% }
 </&>
 %# ----------------------------------------------------------------------------

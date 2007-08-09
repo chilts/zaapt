@@ -46,7 +46,7 @@
             <td>
 %         if ( exists $my_roles->{$gallery->{_admin}} ) {
 %             if ( exists $required{$field->{f_id}} ) {
-                * <a href="edit-r-del.html?r_id=<% $required{$field->{f_id}} | u %>">Remove from Required</a><br />
+                * <a href="edit-r-del.html?r_id=<% $required{$field->{f_id}} | u %>">Remove</a><br />
 %             } else {
                 * <a href="edit-r-ins.html?g_id=<% $gallery->{g_id} | u %>&amp;f_id=<% $field->{f_id} | u %>">Require this Field</a><br />
 %             }

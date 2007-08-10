@@ -1,0 +1,51 @@
+!1 Database Conventions
+
+!2 Primary Keys
+
+All tables have a \i{Primary Key} called 'id'.
+
+
+!2 Column Names
+
+If you see any of the following used as a column name, then they will be used
+in the same way, consistent across all columns with that same name.
+
+\b{name}
+
+This is a field which consists only of letters, numbers, the underscore or the
+hyphen. It \b{must} start with a letter.
+
+In a lot of cases, the 'name' column is unique by itself, or maybe unique in
+conjunction with a foriegn key to another table.
+
+\b{title}
+
+A one line description which may be used for display purposes.
+
+\b{description}
+
+A multi-line description which may be used for display purposes. Generally, no
+interpretation of this field is performed and hence is usually displayed in one
+paragraph.
+
+\b{<something>_id}
+
+This is a foreign key to the table '<something>', which in most cases is within
+that group of tables. Popular foreign keys are 'account_id' or 'type_id'.
+
+\b{boolean columns}
+
+These usually start with 'is...' or 'has...' (or another one word question).
+
+!2 Timestamps
+
+All tables inherit from the 'base' table and inherit the following structure:
+
+ CREATE TABLE base (
+     inserted        TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+     updated         TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+ );
+
+Each table also has a trigger to poke the 'updated' column on all updates.
+
+(Ends)

@@ -1,0 +1,72 @@
+!1 Thin Layers
+
+All too often, CMS's try to take the general route. \i{"Everything is an
+object"} they cry. \i{"How fast is it?"} we cry back.
+
+Zaapt takes the view that every single layer from the database to the front end
+is thin. It also takes the view that fewer queries are better than many, even
+if you retrieve a little more data than you'll actually use.
+
+!2 The Layers Themselves, from the Bottom Up
+
+!3 The Database
+
+The database is structured so that if something is a blog entry, then it is a
+blog entry. If something is a content page, then it is a content page. Unlike
+other CMS's there is no such thing as an 'object'. After trying that once with
+another CMS and once making one myself I decided against doing it that way.
+
+This means that if we want to retrieve a 'something' from the database, we know
+\i{exactly} where to get it from rather than having to know what it is first
+and then retrieving it.
+
+!3 The Database API
+
+\b{"KISS - Keep It Simple See (or is that 'Stupid')"}
+
+The model layer is basically the database API. It is small, thin and
+fast. There is no object modelling system at play either in Zaapt itself nor in
+any abstract DB object mapping system. It uses plain DBI and that's your
+lot. 
+
+\b{"Join tables in the database, not in the code!"}
+
+Generally, you'll pull a lot more from the database than what you require in
+each query but this is at the same time allowing you to do far less queries. If
+you need an interesting set of data from the database, extend the model library
+to retrieve it for you.
+
+\b{"Let Zaapt do the Content Management"}
+
+Zaapt's controllers do a great many tasks so you don't have to. Just setting up
+a simple admin area using Zaapt's in-built Mason components will let you do
+most of the things you want. This is a fairly thin layer of management set on
+top of the database API
+
+\b{"Let the Programmer do the Site Structure"}
+
+Zaapt takes the view that it is a CMS, hence it's a \i{System} that \i{Manages}
+the \i{Content} (see above). How many times have you had a CMS which the client
+plays with, breaks things and rings you up to fix it. In Zaapt, they can't
+break it - in fact, they can't break anything at all. Why? Because they can
+only managed the content, not the site structure.
+
+Instead, the programmer defines the site structure since it is they who has to
+think about the low level things too - like speed and caching.
+
+In Zaapt, there is no conventional configuration. Instead, you just write the
+Mason components you need. Already you're at the programmer's level and
+therefore you can already do whatever you like. You're still just a small step
+above the database.
+
+\b{"Rapid Display Rendering"}
+
+The in-built default views for a lot of the content may suffice. In cases where
+it doesn't, it's only a small step away from displaying it exactly how you
+like. Usually it's just a case of overriding one of the \c{render-*.mhtml}
+Mason components, so immediately you can write absolutely any type of HTML you
+like.
+
+It's small, easily changed and fast.
+
+(Ends)

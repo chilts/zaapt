@@ -42,6 +42,14 @@
             </td>
         </tr>
 % }
+% unless ( @$galleries ) {
+        <tr class="r0">
+            <td>no galleries found</td>
+            <td>
+                * <a href="edit-g-add.html">Add Gallery</a>
+            </td>
+        </tr>
+% }
 
 </&>
 

@@ -48,12 +48,29 @@
     }
 
     # no Gallery of this name should already exist
+    my $gallery;
     unless ( @$err ) {
-        my $gallery = $model->sel_gallery_using_name({ g_name => $g_name });
+        $gallery = $model->sel_gallery_using_name({ g_name => $g_name });
         push @$err, "Gallery name '$g_name' already exists." if defined $gallery;
     }
 
     $g_extractexif = Zaapt::Utils::Conv::to_bool( $g_extractexif );
+
+    # make sure that the path directory exists
+    unless ( @$err ) {
+        unless ( -d $g_path ) {
+            if ( ! mkdir $g_path ) {
+                push @$err, "directory 'g_path' doesn't exist and couldn't be created";
+            }
+        }
+
+        # create the 'original' directory
+        unless ( -d "$g_path/$g_original" ) {
+            if ( ! mkdir "$g_path/$g_original" ) {
+                push @$err, "directory '$g_path/$g_original' doesn't exist and couldn't be created";
+            }
+        }
+    }
 
     unless ( @$err ) {
         $model->ins_gallery({

@@ -31,6 +31,15 @@
         push @$err, Zaapt::Utils::Valid::err();
     }
 
+    # check that we have this directory
+    unless ( @$err ) {
+        unless ( -d "$gallery->{g_path}/$s_path" ) {
+            if ( ! mkdir "$gallery->{g_path}/$s_path" ) {
+                push @$err, "directory '$gallery->{g_path}/$s_path' doesn't exist and couldn't be created";
+            }
+        }
+    }
+
     # check that path, path/original, mapping are all valid dir-like names
     # ???
 

@@ -152,7 +152,7 @@
             my $p_id = $model->_currval('gallery.picture_id_seq');
 
             foreach my $f_info ( keys %$exif_data ) {
-                my $field = $model->ass_field({ f_info => "EXIF:$f_info", f_description => 'EXIF' });
+                my $field = $model->ass_field({ f_info => $f_info, f_isexif => 1, f_description => 'EXIF Data' });
                 $model->ins_detail({
                     p_id    => $p_id,
                     f_id    => $field->{f_id},

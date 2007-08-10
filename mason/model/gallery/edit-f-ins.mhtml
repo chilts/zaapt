@@ -23,8 +23,9 @@
     unless ( @$err ) {
         # make sure this field is in the database
         my $field = $model->ins_field({
-            f_info => $f_info,
-            f_description => $f_description
+            f_info        => $f_info,
+            f_description => $f_description,
+            f_isexif      => 0,
         });
         $m->redirect("edit-f-list.html");
         return;

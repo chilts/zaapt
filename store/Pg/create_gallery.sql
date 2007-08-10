@@ -54,8 +54,9 @@ CREATE TABLE gallery.field (
     id              INTEGER NOT NULL DEFAULT nextval('gallery.field_id_seq'::TEXT) PRIMARY KEY,
     info            TEXT NOT NULL,
     description     TEXT NOT NULL,
+    isexif          BOOLEAN NOT NULL DEFAULT False,
 
-    UNIQUE(info),
+    UNIQUE(info, isexif),
     LIKE base       INCLUDING DEFAULTS
 );
 CREATE TRIGGER field_updated BEFORE UPDATE ON gallery.field

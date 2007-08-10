@@ -28,7 +28,7 @@ my $table = {
     field => {
         name => 'field',
         prefix => 'f',
-        cols => [ qw(id info description ts:inserted ts:updated) ],
+        cols => [ qw(id info description isexif ts:inserted ts:updated) ],
     },
     detail => {
         name => 'detail',
@@ -97,13 +97,14 @@ __PACKAGE__->mk_select_rows( 'sel_picture_all_in', "SELECT $main_cols FROM $main
 __PACKAGE__->mk_selecter( $schema, $table->{field}{name}, $table->{field}{prefix}, @{$table->{field}{cols}} );
 __PACKAGE__->mk_selecter_using( $schema, $table->{field}{name}, $table->{field}{prefix}, 'info', @{$table->{field}{cols}} );
 __PACKAGE__->mk_select_rows( 'sel_field_all', "SELECT $table->{field}{sql_sel_cols} FROM $table->{field}{sql_fqt} ORDER BY f.id" );
+__PACKAGE__->mk_select_row( 'sel_field_using', "SELECT $table->{field}{sql_sel_cols} FROM $table->{field}{sql_fqt} WHERE f.info = ? AND f.isexif = ?", [ 'f_info', 'f_isexif' ] );
 
 # assure that this field is there
 sub ass_field {
     my ($self, $hr) = @_;
 
     # see if we already have it
-    my $field = $self->sel_field_using_info( $hr );
+    my $field = $self->sel_field_using( $hr );
     return $field if defined $field;
 
     # not yet in, insert then return it

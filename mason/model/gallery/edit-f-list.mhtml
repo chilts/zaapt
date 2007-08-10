@@ -13,7 +13,7 @@
 
 <p><a href="edit-g-list.html">&laquo; Back to Gallery List</a></p>
 
-<h2>All Fields</h2>
+<h2>User Defined Fields</h2>
 
 <&| /zaapt/common/admin/table-edit.mhtml, title => 'Field' &>
 
@@ -23,6 +23,7 @@
 
 % my $r = 1;
 % foreach my $field ( @$fields ) {
+%     next if $field->{f_isexif};
         <tr class="r<% $r++%2 %>">
             <td>
                 <strong><% $field->{f_info} | h %></strong><br />
@@ -42,4 +43,37 @@
         </tr>
 % }
 </&>
+
+<h2>EXIF Fields</h2>
+
+<&| /zaapt/common/admin/table-edit.mhtml, title => 'Field' &>
+
+% my $r = 1;
+% foreach my $field ( @$fields ) {
+%     next unless $field->{f_isexif};
+        <tr class="r<% $r++%2 %>">
+            <td>
+                <strong><% $field->{f_info} | h %></strong><br />
+                <% $field->{f_description} | h %><br />
+            </td>
+            <td>
+                * <a href="edit-f-del.html?f_id=<% $field->{f_id} | u %>">Delete</a><br />
+            </td>
+        </tr>
+% }
+% unless ( @$fields ) {
+        <tr class="r0">
+            <td>no fields yet defined</td>
+            <td>
+                * <a href="edit-f-add.html">Add Field &raquo;</a>
+            </td>
+        </tr>
+% }
+</&>
+
+% if ( 0 ) {
+<pre>
+<% Dumper($fields) | h %>
+</pre>
+% }
 %# ----------------------------------------------------------------------------

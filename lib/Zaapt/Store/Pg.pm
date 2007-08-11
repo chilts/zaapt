@@ -28,6 +28,7 @@ sub store_name { return __PACKAGE__; }
 
 sub _mk_cols {
     my ($class, $letter, @colnames) = @_;
+    warn "_mk_cols() is deprecated, use _mk_sel_cols() instead";
     return '' unless @colnames;
 
     my $first = shift @colnames;
@@ -525,7 +526,7 @@ sub mk_select_rows {
 sub mk_selecter_using {
     my ($self, $schema, $table, $prefix, $col, @cols) = @_;
 
-    my $cols = __PACKAGE__->_mk_cols( $prefix, @cols );
+    my $cols = __PACKAGE__->_mk_sel_cols( $prefix, @cols );
     my $sql = "SELECT $cols FROM $schema.$table $prefix WHERE $prefix.$col = ?";
 
     my $class = ref $self || $self;

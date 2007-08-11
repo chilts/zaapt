@@ -1,0 +1,29 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $g_name
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Gallery');
+    my $gallery = $model->sel_gallery_using_name({ g_name => $g_name });
+    unless ( defined $gallery ) {
+        die "gallery '$g_name' not found";
+        return;
+    }
+
+    my $pictures = $model->sel_picture_all_in({ g_id => $gallery->{g_id} });
+</%init>
+%# ----------------------------------------------------------------------------
+<h1><% $gallery->{g_title} | h %></h1>
+
+<p><% $gallery->{g_description} | h %></p>
+
+% if ( @$pictures ) {
+%     foreach my $picture ( @$pictures ) {
+<& render-picture-summary.mhtml, gallery => $gallery, picture => $picture &>
+%     }
+% } else {
+<p>Currently, there are no pictures in this gallery.</p>
+% }
+%# ----------------------------------------------------------------------------

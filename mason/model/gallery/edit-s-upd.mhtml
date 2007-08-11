@@ -3,6 +3,7 @@
     $zaapt
     $my_roles
     $s_id
+    $s_title
     $s_size
     $s_path
 </%args>
@@ -56,6 +57,7 @@
 
 <& /zaapt/common/form.mhtml, action => 'edit-s-ins.html', elements => [
         { type => 'hidden', name => 's_id', value => $size->{s_id} },
+        { type => 'text', field => 'Title', name => 's_title', value => $size->{s_title} },
         { type => 'text', field => 'Size (pixels)', name => 's_size', value => $s_size },
         { type => 'note', value => "Note: This is for both (x,y). The picture will be scaled correctly." },
         { type => 'text', field => 'Path', name => 's_path', value => $s_path },

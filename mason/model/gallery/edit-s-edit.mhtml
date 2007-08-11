@@ -28,6 +28,7 @@
 
 <& /zaapt/common/form.mhtml, action => 'edit-s-upd.html', elements => [
         { type => 'hidden', name => 's_id', value => $size->{s_id} },
+        { type => 'text', field => 'Title', name => 's_title', value => $size->{s_title} },
         { type => 'text', field => 'Size (pixels)', name => 's_size', value => $size->{s_size} },
         { type => 'note', value => "Note: This is for both (x,y). The picture will be scaled correctly." },
         { type => 'text', field => 'Path', name => 's_path', value => $size->{s_path} },

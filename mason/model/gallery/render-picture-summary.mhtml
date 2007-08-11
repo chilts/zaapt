@@ -1,0 +1,12 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $gallery
+    $picture
+</%args>
+%# ----------------------------------------------------------------------------
+<h2><a href="./picture:<% $picture->{p_name} | u %>.html"><% $picture->{p_title} | h %></a></h2>
+
+<p><% $picture->{p_description} | h %></p>
+
+<p class="footnote"><& /zaapt/common/datetime.mhtml, datetime => $picture->{p_inserted} &></p>
+%# ----------------------------------------------------------------------------

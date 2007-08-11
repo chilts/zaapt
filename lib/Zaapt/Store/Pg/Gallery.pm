@@ -46,7 +46,7 @@ my $table = {
         cols => [
             'id',
             [ 'gallery_id', 'fk', 'g_id' ],
-            qw(size path ts:inserted ts:updated)
+            qw(title size path ts:inserted ts:updated)
         ],
     },
     required => {
@@ -92,6 +92,9 @@ my $main_tables = "$table->{gallery}{sql_fqt} $join->{g_p}";
 __PACKAGE__->mk_select_row( 'sel_picture', "SELECT $main_cols FROM $main_tables WHERE p.id = ?", [ 'p_id' ] );
 __PACKAGE__->mk_select_row( 'sel_picture_in_gallery', "SELECT $main_cols FROM $main_tables WHERE g.id = ? AND p.name = ?", [ 'g_id', 'p_name' ] );
 __PACKAGE__->mk_select_rows( 'sel_picture_all_in', "SELECT $main_cols FROM $main_tables WHERE g.id = ? ORDER BY p.name DESC", [ 'g_id' ] );
+__PACKAGE__->mk_selecter_using( $schema, $table->{picture}{name}, $table->{picture}{prefix}, 'name', @{$table->{picture}{cols}} );
+
+__PACKAGE__->mk_select_rows( 'sel_picture_detail_all', "SELECT $table->{field}{sql_sel_cols}, $table->{detail}{sql_sel_cols} FROM $table->{picture}{sql_fqt} $join->{p_d} $join->{d_f} WHERE p.id = ?", [ 'p_id' ] );
 
 # field
 __PACKAGE__->mk_selecter( $schema, $table->{field}{name}, $table->{field}{prefix}, @{$table->{field}{cols}} );

@@ -1,0 +1,35 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $my_roles
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Session');
+    my $sessions = $model->sel_session_all();
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Session List</h1>
+
+<&| /zaapt/common/admin/table-edit.mhtml, title => 'Session' &>
+
+% my $row = 1;
+% foreach my $session ( @$sessions ) {
+        <tr class="r<% $row++%2 %>">
+            <td>
+                <% $session->{s_id} | h %><br />
+                ins: <% $session->{s_inserted} | h %><br />
+                upd: <% $session->{s_updated} | h %>
+            </td>
+            <td>-</td>
+        </tr>
+% }
+% unless ( @$sessions ) {
+        <tr class="r0">
+            <td>no session found</td>
+            <td>* none</td>
+        </tr>
+% }
+
+</&>
+%# ----------------------------------------------------------------------------

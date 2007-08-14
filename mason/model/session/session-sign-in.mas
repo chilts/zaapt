@@ -1,0 +1,48 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $sess_rh
+    $dbh
+    $tablename => 'session.session'
+    $domain
+</%args>
+%# ----------------------------------------------------------------------------
+<%once>
+    my $DEBUG = 0;
+</%once>
+%# ----------------------------------------------------------------------------
+<%init>
+    warn "session-sign-in.mas: entry" if $DEBUG;
+
+    # if this person is already signed in, what are we doing here? We already
+    # have a good cookie and a valid session.
+
+    if ( $sess_rh->{_signed_in} ) {
+        warn "session-sign-in.mas: has been called, but the user is already signed in - please check why";
+        return;
+    }
+
+    # create a new session (if this dies, we die)
+    warn "session-sign-in.mas: creating the session..." if $DEBUG;
+    tie %$sess_rh, 'Apache::Session::Postgres', undef, {
+        Handle => $dbh,
+        TableName => $tablename,
+        Commit => 0, # since we have AutoCommit set to 1 in the database connect
+    };
+
+    # remember that we're signed in
+    $sess_rh->{_signed_in} = 1;
+
+    # send the cookie with the new session_id
+    warn "session-sign-in.mas: sending the cookie back" if $DEBUG;
+    Apache::Cookie->new(
+        $r,
+        name => 'session_id',
+        value => $sess_rh->{_session_id},
+        domain => $domain,
+        path => "/",
+        expires => '+8h',
+    )->bake();
+
+    warn "session-sign-in.mas: exit" if $DEBUG;
+</%init>
+%# ----------------------------------------------------------------------------

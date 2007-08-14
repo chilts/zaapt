@@ -1,0 +1,100 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $sess_rh
+    $dbh
+    $tablename => 'session.session'
+    $domain
+</%args>
+%# ----------------------------------------------------------------------------
+<%once>
+    my $DEBUG = 0;
+</%once>
+%# ----------------------------------------------------------------------------
+<%init>
+    warn "session-begin.mas: entry" if $DEBUG;
+
+    # see if there is a cookie available
+    my $cookies = Apache::Cookie->fetch();
+    my $session_id = exists $cookies->{session_id} ? $cookies->{session_id}->value() : undef;
+
+    warn "just got the cookies and session_id ($session_id)" if $DEBUG;
+
+    # if no session at all, quit now
+    unless ( defined $session_id ) {
+        warn "no session_id cookie" if $DEBUG;
+        return;
+    }
+
+    # check it is valid, if not, remove it and finish
+    unless ( $session_id =~ m{ \A [a-f0-9]{32} \z }xms ) {
+        warn "invalid session_id ($session_id)" if $DEBUG;
+
+        # invalid session_id, so tell the browser to get rid of it
+        $session_id = undef;
+        Apache::Cookie->new(
+            $r,
+            name => 'session_id',
+            domain => $domain,
+            path => "/",
+            expires => '-2d',
+        )->bake();
+        return;
+    }
+
+    warn "retrieving the session from the database" if $DEBUG;
+
+    # get this session data from the database
+    eval {
+        tie %$sess_rh, 'Apache::Session::Postgres', $session_id, {
+            Handle => $dbh,
+            TableName => $tablename,
+            Commit => 0, # since we have AutoCommit set to 1 in the database connect
+        };
+    };
+
+    # if something went wrong getting the session
+    if ( $@ ) {
+        # die if something nasty went wrong (okay if the session doesn't exist)
+        die $@ unless $@ =~ /Object does not exist/;
+
+        warn "error retrieving this session: $@";
+
+        # delete the cookie which gaves us the invalid session id and finish
+        Apache::Cookie->new(
+            $r,
+            name => 'session_id',
+            value => '',
+            domain => $domain,
+            path => "/",
+            expires => '-2d',
+        )->bake();
+
+        return;
+    }
+
+    warn "session hash fine: " . Data::Dumper->Dump([$sess_rh], ['sess']) if $DEBUG;
+
+    # now we have a valid hash from the session table, check that the user is signed in
+    unless ( $sess_rh->{_signed_in} ) {
+        # we have a cookie AND a valid session id, but the user is not signed
+        # in - this is strange. We can tidy this all up by expiring the cookie and deleting the
+        # session
+
+        warn "cookie and session valid, but user not signed in" if $DEBUG;
+
+        # expire cookie
+        Apache::Cookie->new(
+            $r,
+            name => 'session_id',
+            value => '',
+            domain => $domain,
+            path => "/",
+            expires => '-2d',
+        )->bake();
+
+        # delete session
+        tied(%$sess_rh)->delete();
+    }
+    warn "session-begin.mas: exit" if $DEBUG;
+</%init>
+%# ----------------------------------------------------------------------------

@@ -1,0 +1,44 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $sess_rh
+    $dbh       => undef
+    $tablename => 'session.session'
+    $domain
+</%args>
+%# ----------------------------------------------------------------------------
+<%once>
+    my $DEBUG = 0;
+</%once>
+%# ----------------------------------------------------------------------------
+<%init>
+    warn "session-sign-out.mas: entry" if $DEBUG;
+
+    # if this person is not signed in, what are we doing here?
+    unless ( $sess_rh->{_signed_in} ) {
+        warn "has been called, but the user is not signed in - something wrong" if $DEBUG;
+        return;
+    }
+
+    # this user is currently signed in, so sign them out (just to be safe) and remove the
+    # session completely from the store
+    $sess_rh->{_signed_in} = 0;
+    tied(%$sess_rh)->delete();
+
+    # remove the 'session_id' cookie
+    warn "session-sign-out.mas: removing the session_id cookie" if $DEBUG;
+    my $cookies = Apache::Cookie->fetch();
+    if (  exists $cookies->{session_id} ) {
+        # expire it by 2 days
+        Apache::Cookie->new(
+            $r,
+            name => 'session_id',
+            value => '',
+            domain => $domain,
+            path => "/",
+            expires => '-2d',
+        )->bake();
+    }
+
+    warn "session-sign-out.mas: exit" if $DEBUG;
+</%init>
+%# ----------------------------------------------------------------------------

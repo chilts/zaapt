@@ -13,10 +13,14 @@ sub new {
     my $self = {};
     bless $self, ref $class || $class;
 
-    # remember the store separately and then all the other args
-    $self->{store} = $args->{store}; # store is the actual store, like 'Pg', 'MySQL' etc
-    $self->{args} = $args;
-    delete $self->{args}{store};
+    # remember certain args
+    # - store: 'Pg', 'MySQL'
+    # - dbh: a DBI object (like from DBD::Pg)
+    # - map: a mapping of names to packages
+    foreach ( qw(store map dbh) ) {
+        $self->{$_} = $args->{$_}
+            if defined $args->{$_};
+    }
 
     # so far, we have no models
     $self->{models} = {};
@@ -30,15 +34,22 @@ sub get_model {
     # return it if we already have it
     return $self->{models}{$model} if exists $self->{models}{$model};
 
-    # or create one, save it and return that
+    # or see if there is a mapping for this $model
+    if ( exists $self->{map}{$model} ) {
+        eval "use $self->{map}{$model}";
+        $self->{models}{$model} = "$self->{map}{$model}"->new({ dbh => $self->{dbh} });
+        $self->{models}{$model}->parent( $self );
+    }
+
+    # or create one (depending on the $model string), save it and return that
     if ( $model =~ m{ \A \w+ \z }xms ) {
         eval "use Zaapt::Store::$self->{store}::$model";
-        $self->{models}{$model} = "Zaapt::Store::$self->{store}::$model"->new( $self->{args} );
+        $self->{models}{$model} = "Zaapt::Store::$self->{store}::$model"->new({ dbh => $self->{dbh} });
         $self->{models}{$model}->parent( $self );
     }
     elsif ( $model =~ m{ \A \w+(::\w+)* \z }xms ) {
         eval "use $model";
-        $self->{models}{$model} = $model->new( $self->{args} );
+        $self->{models}{$model} = $model->new({ dbh => $self->{dbh} });
         $self->{models}{$model}->parent( $self );
     }
     else {

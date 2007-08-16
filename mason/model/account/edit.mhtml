@@ -4,8 +4,8 @@
 <h2>General Account</h2>
 
 <ul>
-    <li><a href="edit-a-list.html">Account List</a></li>
-    <li><a href="edit-r-list.html">Role List</a></li>
+    <li><a href="edit-a-list.html">Account List</a> [ <a href="edit-a-add.html">Add Account</a> ]</li>
+    <li><a href="edit-r-list.html">Role List</a> [ <a href="edit-r-add.html">Add Role</a> ]</li>
     <li><a href="edit-p-list.html">Privilege List</a> [ <a href="edit-p-list-by-account.html">By Account</a> | <a href="edit-p-list-by-role.html">By Role</a> ]</a></li>
 </ul>
 

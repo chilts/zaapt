@@ -1,0 +1,91 @@
+%# ----------------------------------------------------------------------------
+<%once>
+    use XML::RSS;
+    my $tm = {
+        '01' => 'Jan', '02' => 'Feb', '03' => 'Mar', '04' => 'Apr',
+        '05' => 'May', '06' => 'Jun', '07' => 'Jul', '08' => 'Aug',
+        '09' => 'Sep', '10' => 'Oct', '11' => 'Nov', '12' => 'Dec',
+    };
+</%once>
+%# ----------------------------------------------------------------------------
+<%doc>
+
+    The input args are:
+    - $m        - the HTML::Mason object
+    - $zaapt    - the Zaapt object
+    - $b_name   - the name of the blog
+    - $l_name   - the label to show
+    - $domain   - e.g. 'zaapt.org.nz' (no http:// or trailing slash)
+    - $path     - e.g. 'blog' (no preceeding/trailing slashes)
+    - _fulltest - to specify whether to show just the intro or full text
+
+</%doc>
+%# ----------------------------------------------------------------------------
+<%args>
+    $m
+    $zaapt
+    $b_name
+    $l_name
+    $domain
+    $path
+    $_fulltext => 0
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    # $r->content_type('text/xml');
+
+    my $model = $zaapt->get_model('Blog');
+    my $blog = $model->sel_blog_using_name({ b_name => $b_name });
+    unless ( defined $blog ) {
+        die "Blog '$b_name' not found.";
+        return;
+    }
+    my $entries = $model->sel_entry_label({ b_id => $blog->{b_id}, l_name => $l_name });
+
+    my $date = $entries->[-1]{e_inserted};
+    $date =~ /(\d{4})-(\d{2})-(\d{2}) (\d{2}:\d{2}:\d{2})/;
+    $date = "$3 $tm->{$2} $1 $4 +1200";
+
+    my $rss = new XML::RSS (version => '2.0');
+    $rss->channel(
+        title        => $blog->{b_description},
+        link         => "http://$domain/",
+        language     => 'en',
+        description  => $blog->{b_description},
+        copyright    => "Copyright $domain",
+        pubDate      => $date,
+        lastBuildDate => $date,
+    );
+
+    foreach my $entry ( @$entries ) {
+        # add the plain text intro
+        $entry->{e_html} = "<p>$entry->{e_intro}</p>";
+
+        # see if we want everything
+        if ( $_fulltext ) {
+            # call the render component so we get the correct HTML back
+            $entry->{e_html} .= $m->scomp(
+                '/zaapt/common/render.mhtml',
+                t_name => $entry->{t_name},
+                content => $entry->{e_article},
+            );
+        }
+
+        $entry->{e_inserted} =~ /(\d{4})-(\d{2})-(\d{2}) (\d{2}:\d{2}:\d{2})/;
+        $entry->{e_inserted} = "$3 $tm->{$2} $1 $4 +1200";
+
+        $rss->add_item(
+            title => $entry->{e_title},
+            link => "http://$domain/$path/$entry->{e_name}.html",
+            permaLink => "http://$domain/$path/$entry->{e_name}.html",
+            description => $entry->{e_html},
+            dc => {
+                creator => $domain,
+            },
+            pubDate => $a->{e_inserted},
+        );
+    }
+    print $rss->as_string();
+    return;
+</%init>
+%# ----------------------------------------------------------------------------

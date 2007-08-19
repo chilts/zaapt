@@ -48,7 +48,7 @@
 
     my $rss = new XML::RSS (version => '2.0');
     $rss->channel(
-        title        => $blog->{b_description},
+        title        => "$blog->{b_name} - label '$l_name'",
         link         => "http://$domain/",
         language     => 'en',
         description  => $blog->{b_description},
@@ -57,7 +57,7 @@
         lastBuildDate => $date,
     );
 
-    foreach my $entry ( @$entries ) {
+    foreach my $entry ( reverse @$entries ) {
         # add the plain text intro
         $entry->{e_html} = "<p>$entry->{e_intro}</p>";
 

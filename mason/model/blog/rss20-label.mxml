@@ -78,11 +78,11 @@
             title => $entry->{e_title},
             link => "http://$domain/$path/$entry->{e_name}.html",
             permaLink => "http://$domain/$path/$entry->{e_name}.html",
-            description => $entry->{e_html},
+            description => HTML::Entities::encode( $entry->{e_html} ),
             dc => {
                 creator => $domain,
             },
-            pubDate => $a->{e_inserted},
+            pubDate => $entry->{e_inserted},
         );
     }
     print $rss->as_string();

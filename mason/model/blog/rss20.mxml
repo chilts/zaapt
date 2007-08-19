@@ -27,8 +27,6 @@
 <%init>
     # $r->content_type('text/xml');
 
-    warn "/zaapt/model/blog/rss20.xml is deprecated, use /zaapt/model/blog/rss20.mxml instead";
-
     my $model = $zaapt->get_model('Blog');
     my $blog = $model->sel_blog_using_name({ b_name => $b_name });
     unless ( defined $blog ) {

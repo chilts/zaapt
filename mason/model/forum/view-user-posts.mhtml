@@ -6,10 +6,10 @@
 %# ----------------------------------------------------------------------------
 <%init>
     my $model = $zaapt->get_model('Forum');
-    my $posts = $model->sel_post_all_for({ a_id => $id });
+    my $posts = $model->sel_post_all_for({ a_id => $id, _limit => 25, _offset => 0 });
 </%init>
 %# ----------------------------------------------------------------------------
-<h2>All Forum Posts</h2>
+<h2>Latest Forum Posts</h2>
 
 % if ( @$posts ) {
 <table>
@@ -30,16 +30,15 @@
                 Total Posts: <% $post->{f_posts} | h %><br />
             </span>
         </td>
-        <td>
+        <td><div style="overflow: auto;">
             <& /zaapt/common/icon.mhtml, name => 'script', title => 'Topic Author' &>
             <& /zaapt/model/forum/link-topic.mhtml, f_name => $post->{f_name}, tp_subject => $post->{tp_subject}, tp_id => $post->{tp_id} &><br />
             <span class="small soft">
-                Started by: <& /zaapt/common/a_username.mhtml, a_username => $post->{a_username} &><br />
-                On: <& /zaapt/common/datetime.mhtml, datetime => $post->{p_inserted} &><br />
+                Topic started: <& /zaapt/common/datetime.mhtml, datetime => $post->{tp_inserted} &><br />
                 Posts: <% $post->{tp_posts} | h %><br />
             </span>
-        </td>
-        <td class="nw"><& /zaapt/common/datetime.mhtml, datetime => $post->{p_inserted} &></td>
+        </div></td>
+        <td class="nw right"><span class="footnote"><& /zaapt/common/datetime.mhtml, datetime => $post->{p_inserted} &></span></td>
     </tr>
 %     }
     </tbody>

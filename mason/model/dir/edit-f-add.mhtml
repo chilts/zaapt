@@ -26,11 +26,10 @@
 
 <& /zaapt/common/form.mhtml, action => 'edit-f-ins.html', enctype => 'multipart/form-data', elements => [
         { type => 'hidden', name => 'd_id', value => $d_id },
+        { type => 'file', field => 'File', name => 'image' },
         { type => 'text', field => 'Name', name => 'f_name', size => 40, value => '' },
         { type => 'text', field => 'Title', name => 'f_title', size => 40, value => '' },
         { type => 'textarea', field => 'Description', name => 'f_description', rows => 10, cols => 40, value => '' },
-
-        { type => 'file', field => 'File', name => 'image' },
 
         { type => 'submit', field => 'Actions', value => 'Add', cancel => 'edit-f-list.html?d_id=' . uri_escape($d_id) },
     ]

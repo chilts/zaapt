@@ -37,13 +37,14 @@
 % foreach my $file ( @$files ) {
     <tr class="r<% $r++%2 %>">
         <td>
-            <% $file->{p_name} | h %> (<% $file->{p_inserted} | h %>)<br />
-            <strong><% $file->{p_title} | h %></strong><br />
+            <% $file->{f_name} | h %> (<% $file->{f_inserted} | h %>)<br />
+            <strong><% $file->{f_title} | h %></strong><br />
+            new filename: <strong><% $file->{f_name} | h %>.<% $file->{f_ext} | h %></strong><br />
+            original filename: <strong><% $file->{f_filename} | h %></strong><br />
         </td>
         <td>
 %     if ( exists $my_roles->{$dir->{_edit}} ) {
-        * <a href="edit-f-edit.html?p_id=<% $file->{p_id} | u %>">Edit File</a><br />
-        * <a href="edit-f-del.html?p_id=<% $file->{p_id} | u %>">Delete</a><br />
+        * <a href="edit-f-del.html?f_id=<% $file->{f_id} | u %>">Delete</a><br />
 %     } else {
         -
 %     }

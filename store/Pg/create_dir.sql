@@ -12,9 +12,9 @@ CREATE TABLE dir.dir (
     path            TEXT NOT NULL,
     webdir          TEXT NOT NULL,
     total           INTEGER NOT NULL DEFAULT 0,
-    admin_id        INTEGER NOT NULL REFERENCES account.permission,
-    view_id         INTEGER NOT NULL REFERENCES account.permission,
-    edit_id         INTEGER NOT NULL REFERENCES account.permission,
+    admin_id        INTEGER NOT NULL REFERENCES account.role,
+    view_id         INTEGER NOT NULL REFERENCES account.role,
+    edit_id         INTEGER NOT NULL REFERENCES account.role,
 
     UNIQUE(name),
     LIKE base       INCLUDING DEFAULTS
@@ -45,5 +45,40 @@ CREATE TABLE dir.file (
 );
 CREATE TRIGGER file_updated BEFORE UPDATE ON dir.file
     FOR EACH ROW EXECUTE PROCEDURE updated();
+
+-- functions
+
+-- function: file_ai
+CREATE FUNCTION dir.file_ai() RETURNS trigger as '
+    BEGIN
+        UPDATE dir.dir SET total = total + 1 WHERE id = NEW.dir_id;
+        RETURN NEW;
+    END;
+' LANGUAGE plpgsql;
+CREATE TRIGGER file_ai AFTER INSERT ON dir.file
+    FOR EACH ROW EXECUTE PROCEDURE dir.file_ai();
+
+-- function: file_au
+CREATE OR REPLACE FUNCTION dir.file_au() RETURNS trigger as '
+    BEGIN
+        IF OLD.dir_id <> NEW.dir_id THEN
+            UPDATE dir.dir SET total = total - 1 WHERE id = OLD.dir_id;
+            UPDATE dir.dir SET total = total + 1 WHERE id = NEW.dir_id;
+        END IF;
+        RETURN NEW;
+    END;
+' LANGUAGE plpgsql;
+CREATE TRIGGER file_au BEFORE UPDATE ON dir.file
+    FOR EACH ROW EXECUTE PROCEDURE dir.file_au();
+
+-- function: file_ad
+CREATE OR REPLACE FUNCTION dir.file_ad() RETURNS trigger as '
+    BEGIN
+        UPDATE dir.dir SET total = total - 1 WHERE id = OLD.dir_id;
+        RETURN NEW;
+    END;
+' LANGUAGE plpgsql;
+CREATE TRIGGER file_ad AFTER DELETE ON dir.file
+    FOR EACH ROW EXECUTE PROCEDURE dir.file_ad();
 
 -- ----------------------------------------------------------------------------

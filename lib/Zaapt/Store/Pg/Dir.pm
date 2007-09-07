@@ -21,14 +21,14 @@ my $table = {
         prefix => 'f',
         cols => [
             'id',
-            [ 'dir_id', 'fk', 'g_id' ],
+            [ 'dir_id', 'fk', 'd_id' ],
             qw(name ext title description filename ts:inserted ts:updated)
         ],
     },
 };
 
 my $join = {
-    d_f  => "JOIN $schema.dir d ON (d.id = f.dir_id)",
+    d_f  => "JOIN $schema.file f ON (d.id = f.dir_id)",
 };
 
 ## ----------------------------------------------------------------------------
@@ -47,7 +47,7 @@ my $main_tables = "$table->{dir}{sql_fqt} $join->{d_f}";
 # dir
 __PACKAGE__->mk_selecter( $schema, $table->{dir}{name}, $table->{dir}{prefix}, @{$table->{dir}{cols}} );
 __PACKAGE__->mk_selecter_using( $schema, $table->{dir}{name}, $table->{dir}{prefix}, 'name', @{$table->{dir}{cols}} );
-__PACKAGE__->mk_select_rows( 'sel_dir_all', "SELECT $table->{dir}{sql_sel_cols} FROM $table->{dir}{sql_fqt} ORDER BY g.id", [] );
+__PACKAGE__->mk_select_rows( 'sel_dir_all', "SELECT $table->{dir}{sql_sel_cols} FROM $table->{dir}{sql_fqt} ORDER BY d.id", [] );
 
 # file
 __PACKAGE__->mk_selecter( $schema, $table->{file}{name}, $table->{file}{prefix}, @{$table->{file}{cols}} );

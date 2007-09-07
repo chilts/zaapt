@@ -15,7 +15,7 @@
 
     $model->del_dir({ d_id => $d_id });
 
-    $m->redirect("edit-g-list.html");
+    $m->redirect("edit-d-list.html");
     return;
 </%init>
 %# ----------------------------------------------------------------------------

@@ -1,0 +1,64 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $my_roles
+    $d_id
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Dir');
+    my $dir = $model->sel_dir({ d_id => $d_id });
+    unless ( defined $dir ) {
+        $m->redirect('edit-d-list.html');
+        return;
+    }
+
+    $m->redirect('edit-d-list.html') unless exists $my_roles->{$dir->{_view}};
+    my $files = $model->sel_file_all_in({ d_id => $d_id });
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>File List</h1>
+
+<p><a href="edit-d-list.html">&laquo; Back to Dir List</a></p>
+
+<& edit-render-d-title.mhtml, dir => $dir &>
+
+<p>
+% if ( exists $my_roles->{$dir->{_edit}} ) {
+    * <a href="edit-f-add.html?d_id=<% $dir->{d_id} | u %>">Add File &raquo;</a><br />
+% } else {
+    * No Actions
+% }
+</p>
+
+<&| /zaapt/common/admin/table-edit.mhtml, title => 'File' &>
+
+% my $r = 1;
+% foreach my $file ( @$files ) {
+    <tr class="r<% $r++%2 %>">
+        <td>
+            <% $file->{p_name} | h %> (<% $file->{p_inserted} | h %>)<br />
+            <strong><% $file->{p_title} | h %></strong><br />
+        </td>
+        <td>
+%     if ( exists $my_roles->{$dir->{_edit}} ) {
+        * <a href="edit-f-edit.html?p_id=<% $file->{p_id} | u %>">Edit File</a><br />
+        * <a href="edit-f-del.html?p_id=<% $file->{p_id} | u %>">Delete</a><br />
+%     } else {
+        -
+%     }
+        </td>
+    </tr>
+% }
+% unless ( @$files ) {
+    <tr class="r0">
+        <td>no files yet in this dir</td>
+        <td>
+            * <a href="edit-f-add.html?d_id=<% $dir->{d_id} | u %>">Add File</a>
+        </td>
+    </tr>
+% }
+
+</&>
+
+%# ----------------------------------------------------------------------------

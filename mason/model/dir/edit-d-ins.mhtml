@@ -1,0 +1,106 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $my_roles
+    $d_name        => ''
+    $d_title       => ''
+    $d_description => ''
+    $d_path        => ''
+    $d_original    => ''
+    $d_webdir      => ''
+    $d_show        => ''
+    $d_extractexif => ''
+    $_admin        => ''
+    $_view         => ''
+    $_edit         => ''
+</%args>
+%# ----------------------------------------------------------------------------
+<%once>
+    use Zaapt::Utils::Valid;
+    use Zaapt::Utils::Conv;
+    use URI::Escape;
+</%once>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Dir');
+
+    $m->redirect('edit-d-list.html') unless exists $my_roles->{super};
+
+    my $err = [];
+
+    unless ( Zaapt::Utils::Valid::is_valid_name($d_name, 'Name') ) {
+        push @$err, Zaapt::Utils::Valid::err();
+    }
+
+    # check that path, path/original, mapping are all valid dir-like names
+    unless ( Zaapt::Utils::Valid::has_content($d_path, 'Path') ) {
+        push @$err, Zaapt::Utils::Valid::err();
+    }
+    unless ( Zaapt::Utils::Valid::has_content($d_webdir, 'Web Mapping') ) {
+        push @$err, Zaapt::Utils::Valid::err();
+    }
+
+    # no Dir of this name should already exist in the database
+    my $dir;
+    unless ( @$err ) {
+        $dir = $model->sel_dir_using_name({ d_name => $d_name });
+        push @$err, "Dir name '$d_name' already exists." if defined $dir;
+    }
+
+    # make sure that the path directory exists
+    unless ( @$err ) {
+        unless ( -d $d_path ) {
+            if ( ! mkdir $d_path ) {
+                push @$err, "directory 'd_path' doesn't exist and couldn't be created";
+            }
+        }
+    }
+
+    unless ( @$err ) {
+        $model->ins_dir({
+            d_name        => $d_name,
+            d_title       => $d_title,
+            d_description => $d_description,
+            d_path        => $d_path,
+            d_webdir      => $d_webdir,
+            _admin        => $_admin,
+            _view         => $_view,
+            _edit         => $_edit,
+        });
+        $m->redirect("edit-d-list.html");
+        return;
+    }
+
+    my $roles = $zaapt->get_model('Account')->sel_all_roles();
+    my @options = map { { value => $_->{r_id}, text => $_->{r_name} } } @$roles;
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Add a Dir</h1>
+
+<p><a href="edit-d-list.html">&laquo; Back to Dir List</a></p>
+
+<h2>Dir: ?</h2>
+
+<& /zaapt/common/err.mhtml, err => $err &>
+
+<& /zaapt/common/form.mhtml, action => 'edit-d-ins.html', elements => [
+        { type => 'text', field => 'Name', name => 'd_name', size => 40, value => $d_name },
+        { type => 'text', field => 'Title', name => 'd_title', size => 40, value => $d_title },
+        { type => 'textarea', field => 'Description', name => 'd_description', rows => 10, cols => 40, value => $d_description },
+
+        { type => 'text', field => 'Base Path', name => 'd_path', value => $d_path },
+        { type => 'note', value => "Note: This is the base dir where all uploaded pictures will be stored." },
+        { type => 'text', field => 'Web Mapping:', name => 'd_webdir', value => $d_webdir },
+        { type => 'note', value => "Note: This path is the web address where the above Base Path is mapped to." },
+
+        { type => 'select', field => 'Admin Role', name => '_admin', options => \@options },
+        { type => 'note', value => "Note: Allows this user to delete this entire dir." },
+        { type => 'select', field => 'View Role', name => '_view', options => \@options },
+        { type => 'note', value => "Note: Allows this user to view all dir pictures." },
+        { type => 'select', field => 'Edit Role', name => '_edit', options => \@options },
+        { type => 'note', value => "Note: Allows this user to add, edit and delete blog entries and labels." },
+
+        { type => 'submit', field => 'Actions', value => 'Add Dir', cancel => 'edit-d-list.html' },
+    ]
+&>
+%# ----------------------------------------------------------------------------

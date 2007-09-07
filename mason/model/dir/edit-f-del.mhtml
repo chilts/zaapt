@@ -1,0 +1,19 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $my_roles
+    $f_id
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Dir');
+    my $file = $model->sel_file({ f_id => $f_id });
+
+    $m->redirect('edit-f-list.html') unless defined $file;
+
+    $model->del_file({ f_id => $f_id });
+
+    $m->redirect("edit-f-list.html");
+    return;
+</%init>
+%# ----------------------------------------------------------------------------

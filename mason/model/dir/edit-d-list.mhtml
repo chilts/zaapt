@@ -1,0 +1,54 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $my_roles
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Dir');
+    my $dirs = $model->sel_dir_all();
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Dir List</h1>
+
+<p>
+% if ( exists $my_roles->{super} ) {
+    * <a href="edit-d-add.html">Add Dir &raquo;</a><br />
+% }
+    * <a href="edit-f-list.html">Field List &raquo;</a><br />
+</p>
+
+<&| /zaapt/common/admin/table-edit.mhtml, title => 'Dir' &>
+
+% my $r = 1;
+% foreach my $dir ( @$dirs ) {
+%     next unless exists $my_roles->{$dir->{_view}};
+        <tr class="r<% $r++%2 %>">
+            <td>
+                <% $dir->{g_name} | h %>
+            </td>
+            <td>
+%         if ( exists $my_roles->{$dir->{_edit}} ) {
+                * <a href="edit-d-add.html?d_id=<% $dir->{d_id} | u %>">Add File</a><br />
+                * <a href="edit-d-list.html?d_id=<% $dir->{d_id} | u %>">File List</a><br />
+%             if ( exists $my_roles->{$dir->{_admin}} ) {
+                * <a href="edit-d-del.html?d_id=<% $dir->{d_id} | u %>">Delete</a><br />
+%             }
+%         } else {
+                -
+%         }
+            </td>
+        </tr>
+% }
+% unless ( @$dirs ) {
+        <tr class="r0">
+            <td>no dirs found</td>
+            <td>
+                * <a href="edit-d-add.html">Add Dir</a>
+            </td>
+        </tr>
+% }
+
+</&>
+
+%# ----------------------------------------------------------------------------

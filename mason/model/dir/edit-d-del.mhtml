@@ -1,0 +1,21 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $my_roles
+    $d_id
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Dir');
+    my $dir = $model->sel_dir({ d_id => $d_id });
+
+    $m->redirect('edit-d-list.html') unless defined $dir;
+
+    $m->redirect('edit-d-list.html') unless exists $my_roles->{$dir->{_admin}};
+
+    $model->del_dir({ d_id => $d_id });
+
+    $m->redirect("edit-g-list.html");
+    return;
+</%init>
+%# ----------------------------------------------------------------------------

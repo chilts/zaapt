@@ -40,23 +40,26 @@
 
 % my $row = 1;
 % foreach my $comment ( @$comments ) {
-        <tr class="r<% $row=1-$row %>">
-            <td>
-                <strong><% $comment->{e_name} | h %></strong> (<% $comment->{e_inserted} | h %>)<br />
-                <% $comment->{c_name} | h %> &lt;<% $comment->{c_email} | h %>&gt;<br />
-                <a href="http://<% $comment->{c_homepage} | h %>">http://<% $comment->{c_homepage} | h %></a><br />
-                <% substr($comment->{c_comment}, 0, 255) . '...' | h %><br />
-            </td>
-            <td>
-%         if ( exists $my_roles->{$blog->{_comment}} ) {
-                * <a href="edit-c-status.html?b_id=<% $b_id | u %>&amp;c_id=<% $comment->{c_id} | u %>&amp;c_status=acc">Accept</a><br />
-                * <a href="edit-c-status.html?b_id=<% $b_id | u %>&amp;c_id=<% $comment->{c_id} | u %>&amp;c_status=rej">Reject</a><br />
-                * <a href="edit-c-status.html?b_id=<% $b_id | u %>&amp;c_id=<% $comment->{c_id} | u %>&amp;c_status=del">Delete</a><br />
-%         } else {
-                -
-%         }
-            </td>
-        </tr>
+    <tr class="r<% $row=1-$row %>">
+        <td>
+            <strong><% $comment->{e_name} | h %></strong> (<% $comment->{e_inserted} | h %>)<br />
+            <% $comment->{c_name} | h %> &lt;<% $comment->{c_email} | h %>&gt;<br />
+            <a href="http://<% $comment->{c_homepage} | h %>">http://<% $comment->{c_homepage} | h %></a><br />
+            <% substr($comment->{c_comment}, 0, 255) . '...' | h %><br />
+        </td>
+        <td>
+%     if ( exists $my_roles->{$blog->{_comment}} ) {
+            * <a href="edit-c-status.html?b_id=<% $b_id | u %>&amp;c_id=<% $comment->{c_id} | u %>&amp;c_status=acc">Accept</a><br />
+            * <a href="edit-c-status.html?b_id=<% $b_id | u %>&amp;c_id=<% $comment->{c_id} | u %>&amp;c_status=rej">Reject</a><br />
+            * <a href="edit-c-status.html?b_id=<% $b_id | u %>&amp;c_id=<% $comment->{c_id} | u %>&amp;c_status=del">Delete</a><br />
+%     } else {
+            -
+%     }
+        </td>
+    </tr>
+% }
+% unless ( @$comments ) {
+    <tr><td>No comments</td><td>-</td></tr>
 % }
 
 </&>

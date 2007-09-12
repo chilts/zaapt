@@ -373,6 +373,8 @@ sub _row {
 sub mk_inserter {
     my ($self, $schema, $t) = @_;
 
+    # warn "mk_inserter() is deprecated, use _mk_inserter() instead"
+
     my $last = @{$t->{cols}} - 1;
     # my ($schema, $table, $prefix, @cols) = ($t->{name}, $t->{prefix}, @{$t->{cols}}[1..$last]);
 
@@ -385,6 +387,72 @@ sub mk_inserter {
     # don't have to check to see if $accessor_name is 'DESTROY' since it never will be
 
     my @hr_names = $self->_mk_hr_names( $t->{prefix}, @{$t->{cols}}[1..$last] );
+
+    # create the closure
+    my $accessor =  sub {
+        my ($self, $hr) = @_;
+        return $self->_do( $sql, map { $hr->{$_} } @hr_names );
+    };
+
+    # inject into package's namespace
+    unless ( defined &{"${class}::$accessor_name"} ) {
+        no strict 'refs';
+        *{"${class}::$accessor_name"} = $accessor;
+    }
+}
+
+sub _mk_inserter {
+    my ($self, $schema, $t) = @_;
+
+    my $last = @{$t->{cols}} - 1;
+    # my ($schema, $table, $prefix, @cols) = ($t->{name}, $t->{prefix}, @{$t->{cols}}[1..$last]);
+
+    # my $sql = __PACKAGE__->_mk_ins( "$schema.$t->{name}", @cols );
+    my $sql = "INSERT INTO $schema.$t->{name}($t->{sql_ins_cols}) VALUES($t->{qm})";
+
+    my $class = ref $self || $self;
+    my $accessor_name = "ins_$t->{name}";
+
+    # don't have to check to see if $accessor_name is 'DESTROY' since it never will be
+
+    my @hr_names = $self->_mk_hr_names( $t->{prefix}, @{$t->{cols}}[1..$last] );
+
+    # create the closure
+    my $accessor =  sub {
+        my ($self, $hr) = @_;
+        return $self->_do( $sql, map { $hr->{$_} } @hr_names );
+    };
+
+    # inject into package's namespace
+    unless ( defined &{"${class}::$accessor_name"} ) {
+        no strict 'refs';
+        *{"${class}::$accessor_name"} = $accessor;
+    }
+}
+
+sub _mk_updater {
+    my ($self, $schema, $t) = @_;
+
+    # warn "mk_updater() is deprecated, use _mk_updater() instead"
+
+    my $sql = "UPDATE $schema.$t->{name} SET $t->{sql_upd_cols} WHERE " . (defined $t->{pk} ? $t->{pk}[0] : 'id' ) . " = ?";
+    my @hr_names = $self->_mk_hr_names( $t->{prefix}, @{$t->{cols}} );
+
+    # remove the first field (usually 'id')
+    shift @hr_names;
+
+    # add the 'primary key' field
+    if ( defined $t->{pk} ) {
+        push @hr_names, $t->{pk}[2];
+    }
+    else {
+        push @hr_names, "$t->{prefix}_id";
+    }
+
+    my $class = ref $self || $self;
+    my $accessor_name = "upd_$t->{name}";
+
+    # don't have to check to see if $accessor_name is 'DESTROY' since it never will be
 
     # create the closure
     my $accessor =  sub {
@@ -434,7 +502,7 @@ sub mk_updater {
     }
 }
 
-sub mk_deleter {
+sub _mk_deleter {
     my ($self, $schema, $table, $prefix, $id) = @_;
 
     # my $sql = "DELETE FROM $schema.$table WHERE $id = ?";
@@ -458,8 +526,40 @@ sub mk_deleter {
     }
 }
 
+sub mk_deleter {
+    my ($self, $schema, $table, $prefix, $id) = @_;
+
+    # warn "mk_deleter() is deprecated, use _mk_deleter() instead"
+
+    # my $sql = "DELETE FROM $schema.$table WHERE $id = ?";
+    my $sql = __PACKAGE__->_mk_del("$schema.$table", $id);
+
+    my $class = ref $self || $self;
+    my $method_name = "del_$table";
+
+    # don't have to check to see if $method_name is 'DESTROY' since it never will be
+
+    # create the closure
+    my $method =  sub {
+        my ($self, $hr) = @_;
+        return $self->_do( $sql, $hr->{"${prefix}_${id}"} );
+    };
+
+    # inject into package's namespace
+    unless ( defined &{"${class}::$method_name"} ) {
+        no strict 'refs';
+        *{"${class}::$method_name"} = $method;
+    }
+}
+
+sub _mk_selecter {
+    my ($self, $schema, $t) = @_;
+    __PACKAGE__->mk_selecter( $schema, $t->{name}, $t->{prefix}, @{$t->{cols}} );
+}
+
 sub mk_selecter_from {
     my ($self, $schema, $t) = @_;
+    warn "mk_selecter_from() is deprecated, use _mk_selecter() instead";
     __PACKAGE__->mk_selecter( $schema, $t->{name}, $t->{prefix}, @{$t->{cols}} );
 }
 
@@ -523,6 +623,12 @@ sub mk_select_rows {
     }
 }
 
+# easier way of doing the thing below
+sub _mk_selecter_using {
+    my ($self, $schema, $table, $col) = @_;
+    __PACKAGE__->mk_selecter_using( $schema, $table->{name}, $table->{prefix}, $col, @{$table->{cols}} );
+}
+
 sub mk_selecter_using {
     my ($self, $schema, $table, $prefix, $col, @cols) = @_;
 
@@ -576,11 +682,20 @@ sub _mk_sql_for {
 # injects the accessors into the package's namespace
 sub _mk_sql_accessors {
     my ($self, $schema, $table) = @_;
+    # warn "_mk_sql_accessors() is deprecated, use _mk_accessors() instead"
     foreach my $t ( values %$table ) {
-        my $last = @{$t->{cols}} - 1;
         __PACKAGE__->mk_inserter( $schema, $t );
         __PACKAGE__->mk_updater( $schema, $t );
         __PACKAGE__->mk_deleter( $schema, $t->{name}, $t->{prefix}, @{$t->{cols}}[0] );
+    }
+}
+
+sub _mk_db_accessors {
+    my ($self, $schema, $table) = @_;
+    foreach my $t ( values %$table ) {
+        __PACKAGE__->_mk_inserter( $schema, $t );
+        __PACKAGE__->_mk_updater( $schema, $t );
+        __PACKAGE__->_mk_deleter( $schema, $t->{name}, $t->{prefix}, @{$t->{cols}}[0] );
     }
 }
 

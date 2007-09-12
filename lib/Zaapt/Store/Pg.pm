@@ -381,11 +381,6 @@ sub mk_inserter {
     # my $sql = __PACKAGE__->_mk_ins( "$schema.$t->{name}", @cols );
     my $sql = "INSERT INTO $schema.$t->{name}($t->{sql_ins_cols}) VALUES($t->{qm})";
 
-    my $class = ref $self || $self;
-    my $accessor_name = "ins_$t->{name}";
-
-    # don't have to check to see if $accessor_name is 'DESTROY' since it never will be
-
     my @hr_names = $self->_mk_hr_names( $t->{prefix}, @{$t->{cols}}[1..$last] );
 
     # create the closure
@@ -394,11 +389,7 @@ sub mk_inserter {
         return $self->_do( $sql, map { $hr->{$_} } @hr_names );
     };
 
-    # inject into package's namespace
-    unless ( defined &{"${class}::$accessor_name"} ) {
-        no strict 'refs';
-        *{"${class}::$accessor_name"} = $accessor;
-    }
+    $self->_inject_method("ins_$t->{name}", $method);
 }
 
 sub _mk_inserter {
@@ -410,11 +401,6 @@ sub _mk_inserter {
     # my $sql = __PACKAGE__->_mk_ins( "$schema.$t->{name}", @cols );
     my $sql = "INSERT INTO $schema.$t->{name}($t->{sql_ins_cols}) VALUES($t->{qm})";
 
-    my $class = ref $self || $self;
-    my $accessor_name = "ins_$t->{name}";
-
-    # don't have to check to see if $accessor_name is 'DESTROY' since it never will be
-
     my @hr_names = $self->_mk_hr_names( $t->{prefix}, @{$t->{cols}}[1..$last] );
 
     # create the closure
@@ -423,11 +409,7 @@ sub _mk_inserter {
         return $self->_do( $sql, map { $hr->{$_} } @hr_names );
     };
 
-    # inject into package's namespace
-    unless ( defined &{"${class}::$accessor_name"} ) {
-        no strict 'refs';
-        *{"${class}::$accessor_name"} = $accessor;
-    }
+    $self->_inject_method("ins_$t->{name}", $method);
 }
 
 sub _mk_updater {
@@ -449,22 +431,13 @@ sub _mk_updater {
         push @hr_names, "$t->{prefix}_id";
     }
 
-    my $class = ref $self || $self;
-    my $accessor_name = "upd_$t->{name}";
-
-    # don't have to check to see if $accessor_name is 'DESTROY' since it never will be
-
     # create the closure
     my $accessor =  sub {
         my ($self, $hr) = @_;
         return $self->_do( $sql, map { $hr->{$_} } @hr_names );
     };
 
-    # inject into package's namespace
-    unless ( defined &{"${class}::$accessor_name"} ) {
-        no strict 'refs';
-        *{"${class}::$accessor_name"} = $accessor;
-    }
+    $self->_inject_method("upd_$t->{name}", $method);
 }
 
 sub mk_updater {
@@ -484,22 +457,13 @@ sub mk_updater {
         push @hr_names, "$t->{prefix}_id";
     }
 
-    my $class = ref $self || $self;
-    my $accessor_name = "upd_$t->{name}";
-
-    # don't have to check to see if $accessor_name is 'DESTROY' since it never will be
-
     # create the closure
     my $accessor =  sub {
         my ($self, $hr) = @_;
         return $self->_do( $sql, map { $hr->{$_} } @hr_names );
     };
 
-    # inject into package's namespace
-    unless ( defined &{"${class}::$accessor_name"} ) {
-        no strict 'refs';
-        *{"${class}::$accessor_name"} = $accessor;
-    }
+    $self->_inject_method("upd_$t->{name}", $method);
 }
 
 sub _mk_deleter {
@@ -508,22 +472,13 @@ sub _mk_deleter {
     # my $sql = "DELETE FROM $schema.$table WHERE $id = ?";
     my $sql = __PACKAGE__->_mk_del("$schema.$table", $id);
 
-    my $class = ref $self || $self;
-    my $method_name = "del_$table";
-
-    # don't have to check to see if $method_name is 'DESTROY' since it never will be
-
     # create the closure
     my $method =  sub {
         my ($self, $hr) = @_;
         return $self->_do( $sql, $hr->{"${prefix}_${id}"} );
     };
 
-    # inject into package's namespace
-    unless ( defined &{"${class}::$method_name"} ) {
-        no strict 'refs';
-        *{"${class}::$method_name"} = $method;
-    }
+    $self->_inject_method("del_$table", $method);
 }
 
 sub mk_deleter {
@@ -534,22 +489,13 @@ sub mk_deleter {
     # my $sql = "DELETE FROM $schema.$table WHERE $id = ?";
     my $sql = __PACKAGE__->_mk_del("$schema.$table", $id);
 
-    my $class = ref $self || $self;
-    my $method_name = "del_$table";
-
-    # don't have to check to see if $method_name is 'DESTROY' since it never will be
-
     # create the closure
     my $method =  sub {
         my ($self, $hr) = @_;
         return $self->_do( $sql, $hr->{"${prefix}_${id}"} );
     };
 
-    # inject into package's namespace
-    unless ( defined &{"${class}::$method_name"} ) {
-        no strict 'refs';
-        *{"${class}::$method_name"} = $method;
-    }
+    $self->_inject_method("del_$table", $method);
 }
 
 sub _mk_selecter {
@@ -569,29 +515,17 @@ sub mk_selecter {
     my $cols = __PACKAGE__->_mk_sel_cols( $prefix, $id, @cols );
     my $sql = "SELECT $cols FROM $schema.$table $prefix WHERE $prefix." . ( ref $id ? $id->[0] : $id ) . " = ?";
 
-    my $class = ref $self || $self;
-    my $method_name = "sel_$table";
-
-    # don't have to check to see if $method_name is 'DESTROY' since it never will be
-
-    my $field = ref $id ? $id->[2] : "${prefix}_${id}";
-
     # create the closure
     my $method =  sub {
         my ($self, $hr) = @_;
         return $self->_row( $sql, $hr->{$field} );
     };
 
-    # inject into package's namespace
-    unless ( defined &{"${class}::$method_name"} ) {
-        no strict 'refs';
-        *{"${class}::$method_name"} = $method;
-    }
+    $self->_inject_method("sel_$table", $method);
 }
 
 sub mk_select_row {
-    my ($class, $method_name, $stm, $hr_names) = @_;
-    $class = ref $class || $class;
+    my ($self, $method_name, $stm, $hr_names) = @_;
 
     # create the closure
     my $method =  sub {
@@ -599,16 +533,11 @@ sub mk_select_row {
         return $self->_row( $stm, map { $hr->{$_} } @$hr_names );
     };
 
-    # inject into package's namespace
-    unless ( defined &{"${class}::$method_name"} ) {
-        no strict 'refs';
-        *{"${class}::$method_name"} = $method;
-    }
+    $self->_inject_method($method_name, $method);
 }
 
 sub mk_select_rows {
-    my ($class, $method_name, $stm, $hr_names) = @_;
-    $class = ref $class || $class;
+    my ($self, $method_name, $stm, $hr_names) = @_;
 
     # create the closure
     my $method =  sub {
@@ -616,11 +545,7 @@ sub mk_select_rows {
         return $self->_rows( $stm, map { $hr->{$_} } @$hr_names );
     };
 
-    # inject into package's namespace
-    unless ( defined &{"${class}::$method_name"} ) {
-        no strict 'refs';
-        *{"${class}::$method_name"} = $method;
-    }
+    $self->_inject_method($method_name, $method);
 }
 
 # easier way of doing the thing below
@@ -636,9 +561,6 @@ sub mk_selecter_using {
     my $sql = "SELECT $cols FROM $schema.$table $prefix WHERE $prefix.$col = ?";
 
     my $class = ref $self || $self;
-    my $method_name = "sel_${table}_using_${col}";
-
-    # don't have to check to see if $method_name is 'DESTROY' since it never will be
 
     # create the closure
     my $method =  sub {
@@ -646,11 +568,7 @@ sub mk_selecter_using {
         return $self->_row( $sql, $hr->{"${prefix}_${col}"} );
     };
 
-    # inject into package's namespace
-    unless ( defined &{"${class}::$method_name"} ) {
-        no strict 'refs';
-        *{"${class}::$method_name"} = $method;
-    }
+    $self->_inject_method("sel_${table}_using_${col}", $method);
 }
 
 sub _mk_sel_fqt {
@@ -720,6 +638,22 @@ sub rollback {
 sub get_sth {
     my ($self, $stm) = @_;
     return $self->{dbh}->prepare_cached( $stm );
+}
+
+## ----------------------------------------------------------------------------
+# utility methods which are non-SQL things
+
+sub _inject_method {
+    my ($self, $method_name, $method) = @_;
+
+    # don't have to check to see if $method_name is 'DESTROY' since it never will be
+    my $class = ref $self || $self;
+
+    # inject into package's namespace
+    unless ( defined &{"${class}::$method_name"} ) {
+        no strict 'refs';
+        *{"${class}::$method_name"} = $method;
+    }
 }
 
 ## ----------------------------------------------------------------------------

@@ -384,7 +384,7 @@ sub mk_inserter {
     my @hr_names = $self->_mk_hr_names( $t->{prefix}, @{$t->{cols}}[1..$last] );
 
     # create the closure
-    my $accessor =  sub {
+    my $method =  sub {
         my ($self, $hr) = @_;
         return $self->_do( $sql, map { $hr->{$_} } @hr_names );
     };
@@ -404,7 +404,7 @@ sub _mk_inserter {
     my @hr_names = $self->_mk_hr_names( $t->{prefix}, @{$t->{cols}}[1..$last] );
 
     # create the closure
-    my $accessor =  sub {
+    my $method =  sub {
         my ($self, $hr) = @_;
         return $self->_do( $sql, map { $hr->{$_} } @hr_names );
     };
@@ -432,7 +432,7 @@ sub _mk_updater {
     }
 
     # create the closure
-    my $accessor =  sub {
+    my $method =  sub {
         my ($self, $hr) = @_;
         return $self->_do( $sql, map { $hr->{$_} } @hr_names );
     };
@@ -458,7 +458,7 @@ sub mk_updater {
     }
 
     # create the closure
-    my $accessor =  sub {
+    my $method =  sub {
         my ($self, $hr) = @_;
         return $self->_do( $sql, map { $hr->{$_} } @hr_names );
     };
@@ -513,7 +513,8 @@ sub mk_selecter {
     my ($self, $schema, $table, $prefix, $id, @cols) = @_;
 
     my $cols = __PACKAGE__->_mk_sel_cols( $prefix, $id, @cols );
-    my $sql = "SELECT $cols FROM $schema.$table $prefix WHERE $prefix." . ( ref $id ? $id->[0] : $id ) . " = ?";
+    my $field = ref $id ? $id->[0] : $id;
+    my $sql = "SELECT $cols FROM $schema.$table $prefix WHERE $prefix.$field = ?";
 
     # create the closure
     my $method =  sub {

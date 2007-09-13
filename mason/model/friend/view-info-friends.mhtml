@@ -1,0 +1,26 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $id
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Friend');
+
+    my $friends = $model->sel_friend_for({ a_id => $id });
+</%init>
+%# ----------------------------------------------------------------------------
+
+<h2>This Member has these Friends</h2>
+
+% if ( @$friends ) {
+<ul>
+%     foreach my $friend ( @$friends ) {
+    <li><& /zaapt/common/a_username.mhtml, a_username => $friend->{t_username} &></li>
+%     }
+</ul>
+% } else {
+<p>This member hasn't added any friends yet.</p>
+% }
+
+%# ----------------------------------------------------------------------------

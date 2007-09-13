@@ -9,6 +9,12 @@
     if ( $page eq 'info' ) {
         $m->comp('/zaapt/model/friend/view-info.mhtml', zaapt => $zaapt, id => $id);
     }
+    elsif ( $page eq 'info-friends' ) {
+        $m->comp('/zaapt/model/friend/view-info-friends.mhtml', zaapt => $zaapt, id => $id);
+    }
+    elsif ( $page eq 'info-back' ) {
+        $m->comp('/zaapt/model/friend/view-info-back.mhtml', zaapt => $zaapt, id => $id);
+    }
     else {
         $m->clear_buffer();
         $m->abort(404);

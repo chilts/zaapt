@@ -1,0 +1,26 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $id
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Friend');
+
+    my $tos = $model->sel_friend_to({ t_id => $id });
+</%init>
+%# ----------------------------------------------------------------------------
+
+<h2>Members Who Consider this Member a Friend</h2>
+
+% if ( @$tos ) {
+<ul>
+%     foreach my $to ( @$tos ) {
+    <li><& /zaapt/common/a_username.mhtml, a_username => $to->{a_username} &></li>
+%     }
+</ul>
+% } else {
+<p>No-one has yet added this member as a friend.</p>
+% }
+
+%# ----------------------------------------------------------------------------

@@ -11,7 +11,7 @@
 </%init>
 %# ----------------------------------------------------------------------------
 
-<h2>Members Who Consider this Member a Friend</h2>
+<h2>Friends Back</h2>
 
 % if ( @$tos ) {
 <ul>

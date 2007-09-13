@@ -11,7 +11,7 @@
 </%init>
 %# ----------------------------------------------------------------------------
 
-<h2>This Member has these Friends</h2>
+<h2>Friends List</h2>
 
 % if ( @$friends ) {
 <ul>

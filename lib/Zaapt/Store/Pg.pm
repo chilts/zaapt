@@ -519,7 +519,7 @@ sub mk_selecter {
     # create the closure
     my $method =  sub {
         my ($self, $hr) = @_;
-        return $self->_row( $sql, $hr->{$field} );
+        return $self->_row( $sql, $hr->{"${prefix}_${id}"} );
     };
 
     $self->_inject_method("sel_$table", $method);

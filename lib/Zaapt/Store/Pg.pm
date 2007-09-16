@@ -60,8 +60,6 @@ sub _mk_cols {
 sub _mk_sel_col {
     my ($class, $prefix, $col) = @_;
 
-    my $sql = '';
-
     if ( ref $col eq 'ARRAY' ) {
         my $type = $col->[1];
         if ( $type eq 'virtual' ) {

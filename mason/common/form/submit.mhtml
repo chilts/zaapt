@@ -1,0 +1,29 @@
+%# ----------------------------------------------------------------------------
+<%doc>
+
+    If you set 'cancel' to a true value, then one of location|href|js must also
+    be defined.
+
+</%doc>
+%# ----------------------------------------------------------------------------
+<%args>
+    $e
+    $value => ''
+</%args>
+%# ----------------------------------------------------------------------------
+<button class="button" type="submit"><% $value | h %></button>\
+% if ( $e->{cancel} ) {
+%     if ( defined $e->{location} ) {
+<button class="button" type="button" onclick="document.location='<% $e->{location} %>';">Cancel</button>\
+%     } elsif ( defined $e->{href} ) {
+<button class="button" type="button" onclick="document.location='<% $e->{cancel_href} %>';">Cancel</button>\
+%     } elsif ( defined $e->{js} ) {
+<button class="button" type="button" onclick="<% $e->{cancel_js} %>">Cancel</button>\
+%     } else {
+%         die "One of 'location', 'href' or 'js' must be defined.";
+%     }
+% }
+% if ( defined $e->{reset} ) {
+<button class="button" type="reset">Reset</button>\
+% }
+%# ----------------------------------------------------------------------------

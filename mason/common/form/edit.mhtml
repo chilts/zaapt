@@ -1,0 +1,52 @@
+%# ----------------------------------------------------------------------------
+<%doc>
+
+    This component will soon be deprecated in favour of form-edit.mhtml. That
+    one is slightly nicer and can also take a has of args which should be
+    filled in if it exists.
+
+</%doc>
+%# ----------------------------------------------------------------------------
+<%args>
+    $action    => undef
+    $multipart => 0
+    $elements
+    $values    => {}
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my @hiddens = grep { $_->{type} eq 'hidden' } @$elements;
+    my @normals = grep { $_->{type} ne 'hidden' } @$elements;
+</%init>
+%# ----------------------------------------------------------------------------
+<form action="<% $action || '?' %>" method="post"<% $multipart ? ' enctype="multipart/form-data"' : '' %>>
+% foreach my $e ( @hiddens ) {
+<input
+    type="hidden"<% defined $e->{id} ? " id=\"$e->{id}\"" : '' %>
+    name="<% $e->{name} | h %>"
+% if ( defined $values->{$e->{name}} or defined $e->{def} ) {
+    value="<% defined $values->{$e->{name}} ? $values->{$e->{name}} : $e->{def} | h %>"
+% }
+/>
+% }
+<table class="edit">
+<tbody>
+% foreach my $e ( @normals ) {
+    <tr>
+        <td class="key"><% $e->{field} | h %><% length($e->{field}) ? ' :' : '&nbsp;' %></td>
+        <td class="val">
+
+%#    choose the value passed in, or default to whatever the element says
+%     $m->comp( "$e->{type}.mhtml", e => $e, value => defined $values->{$e->{name}} ? $values->{$e->{name}} : $e->{def} );
+
+%     if ( defined $e->{note} ) {
+        <br /><% $e->{note} | h %>\
+%     }
+
+        </td>
+    </tr>
+% }
+</tbody>
+</table>
+</form>
+%# ----------------------------------------------------------------------------

@@ -1,0 +1,29 @@
+%# ----------------------------------------------------------------------------
+<%doc>
+
+    Slight change from the old form.mhtml, radio options now use 'text' as
+    opposed to 'name' for display purposes.
+
+</%doc>
+%# ----------------------------------------------------------------------------
+<%args>
+    $e
+    $value => ''
+</%args>
+%# ----------------------------------------------------------------------------
+% foreach my $o ( @{$e->{options}} ) {
+<input\
+ type="radio"\
+<% defined $o->{id} ? " id=\"$o->{id}\"" : '' %>\
+ name="<% $e->{name} | h %>"\
+ value="<% $o->{value} | h %>"\
+<% $e->{checked} eq $o->{value} ? ' checked="checked"' : '' %>\
+ />
+%     if ( $e->{is_html} ) {
+    <% $o->{text} %>
+%     } else {
+    <% $o->{text} | h %>
+%     }
+    <% $e->{br} && '<br />' %>
+% }
+%# ----------------------------------------------------------------------------

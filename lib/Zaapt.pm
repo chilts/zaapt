@@ -34,21 +34,32 @@ sub get_model {
     # return it if we already have it
     return $self->{models}{$model} if exists $self->{models}{$model};
 
-    # or see if there is a mapping for this $model
+    # see if there is a mapping for this $model
     if ( exists $self->{map}{$model} ) {
         eval "use $self->{map}{$model}";
+        if ( $@ ) {
+            die "Couldn't load Model '$self->{map}{$model}' module";
+        }
         $self->{models}{$model} = "$self->{map}{$model}"->new({ dbh => $self->{dbh} });
         $self->{models}{$model}->parent( $self );
     }
 
-    # or create one (depending on the $model string), save it and return that
-    if ( $model =~ m{ \A \w+ \z }xms ) {
+    # or create one if just a name
+    elsif ( $model =~ m{ \A \w+ \z }xms ) {
         eval "use Zaapt::Store::$self->{store}::$model";
+        if ( $@ ) {
+            die "Couldn't load Model 'Zaapt::Store::$self->{store}::$model' module";
+        }
         $self->{models}{$model} = "Zaapt::Store::$self->{store}::$model"->new({ dbh => $self->{dbh} });
         $self->{models}{$model}->parent( $self );
     }
+
+    # or create one from the '$model'
     elsif ( $model =~ m{ \A \w+(::\w+)* \z }xms ) {
         eval "use $model";
+        if ( $@ ) {
+            die "Couldn't load Model '$model' module";
+        }
         $self->{models}{$model} = $model->new({ dbh => $self->{dbh} });
         $self->{models}{$model}->parent( $self );
     }

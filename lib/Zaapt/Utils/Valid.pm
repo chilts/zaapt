@@ -24,17 +24,17 @@ sub is_valid_name {
 
     # check that the name has been given
     unless ( defined $str ) {
-        $err = 'Name is undefined';
+        $err = "'$name' is undefined";
         return;
     }
 
     if ( $str eq '' ) {
-        $err = "No $name given";
+        $err = "no '$name' given";
         return;
     }
 
     unless ( $str =~ m{ \A [a-z0-9][a-z0-9\-]* \z }xms ) {
-        $err = "Name must contain only lowercase 'a-z', '0-9', '-' and must start with a letter or a number.";
+        $err = "'$name' must contain only lowercase 'a-z', '0-9', '-' and must start with a letter or a number.";
         return;
     }
     return 1;

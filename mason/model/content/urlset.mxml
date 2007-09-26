@@ -13,8 +13,6 @@
 </%args>
 %# ----------------------------------------------------------------------------
 <%init>
-    warn "urlset.xml: deprecated, use urlset.mxml";
-
     $domain ||= $location;
 
     my $base_url = "$scheme$domain";

@@ -28,10 +28,14 @@
     $zaapt
     $n_name
     $domain
-    $path
+    $path   => undef
+    $scheme => 'http://'
 </%args>
 %# ----------------------------------------------------------------------------
 <%init>
+    my $base_url = "$scheme$domain";
+    $base_url .= $path if defined $path;
+
     my $model = $zaapt->get_model('News');
     my $news = $model->sel_news_using_name({ n_name => $n_name });
     unless ( defined $news ) {
@@ -63,7 +67,7 @@
         $rss->add_item(
             title => $article->{a_title},
             link => "http://$domain/$path/$article->{a_id}.html",
-            permaLink => "http://$domain/$path/$article->{a_id}.html",
+            permaLink => "$base_url/$article->{a_id}.html",
             description => HTML::Entities::encode($article->{a_intro}),
             dc => {
                 creator => $domain,

@@ -1,0 +1,46 @@
+%# ----------------------------------------------------------------------------
+<%doc>
+
+    The input args are:
+    - $zaapt  - the obvious
+    - $n_name - the news section to do
+    - $domain - e.g. 'kiwiwriters.org' (no http:// or trailing slash)
+    - $path   - e.g. 'news/site' (no preceeding/trailing slashes)
+
+    Note: this component does not assume it is a top-level call, for example,
+    it might be being called via an C<$m->scomp();> Therefore, if you require a
+    C<$r->content_type('text/xml');> you should set it yourself in the calling
+    component.
+
+</%doc>
+%# ----------------------------------------------------------------------------
+<%once>
+    use Zaapt::Utils::UrlSet;
+</%once>
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $n_name
+    $domain
+    $path
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('News');
+    my $news = $model->sel_news_using_name({ n_name => $n_name });
+    unless ( defined $news ) {
+        die "News '$n_name' not found.";
+        return;
+    }
+
+    my $articles = $model->sel_all_articles_in({ n_id => $news->{n_id} });
+
+    my $urlset = Zaapt::Utils::UrlSet->new();
+    foreach my $article ( @$articles ) {
+        $urlset->add({ loc => "http://$domain/$article->{a_id}.html" });
+    }
+
+    print $urlset->as_xml();
+    return;
+</%init>
+%# ----------------------------------------------------------------------------

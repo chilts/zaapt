@@ -36,6 +36,7 @@ my $del_article = __PACKAGE__->_mk_del( 'news.article', 'id' );
 my $sel_article = "SELECT $news_cols, $article_cols, $type_cols FROM $news_tablename $n_a_join $e_t_join WHERE a.id = ?";
 my $sel_article_in_news = "SELECT $news_cols, $article_cols, $type_cols FROM $news_tablename $n_a_join $e_t_join WHERE n.id = ? AND a.id = ?";
 my $sel_all_articles_in = "SELECT $news_cols, $article_cols, $type_cols FROM $news_tablename $n_a_join $e_t_join WHERE n.id = ? ORDER BY a.inserted DESC";
+my $sel_article_all_in = "SELECT $news_cols, $article_cols, $type_cols FROM $news_tablename $n_a_join $e_t_join WHERE n.id = ? ORDER BY a.inserted DESC";
 my $sel_latest_articles = "SELECT $news_cols, $article_cols, $type_cols FROM $news_tablename $n_a_join $e_t_join WHERE n.id = ? ORDER BY a.inserted DESC LIMIT ?";
 my $sel_archiva_articles = "SELECT $news_cols, $article_cols, $type_cols FROM $news_tablename $n_a_join $e_t_join WHERE n.id = ? AND a.inserted >= ?::DATE AND a.inserted <= ?::DATE + ?::INTERVAL ORDER BY a.inserted DESC";
 
@@ -94,7 +95,13 @@ sub sel_article_in_news {
 
 sub sel_all_articles_in {
     my ($self, $hr) = @_;
+    warn "sel_all_articles_in(): deprecated, use 'sel_article_all_in'";
     return $self->_rows( $sel_all_articles_in, $hr->{n_id} );
+}
+
+sub sel_article_all_in {
+    my ($self, $hr) = @_;
+    return $self->_rows( $sel_article_all_in, $hr->{n_id} );
 }
 
 sub sel_latest_articles {

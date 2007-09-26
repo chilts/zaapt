@@ -32,8 +32,6 @@
 </%args>
 %# ----------------------------------------------------------------------------
 <%init>
-    warn "rss20.xml: deprecated, use rss20.mxml instead";
-
     my $model = $zaapt->get_model('News');
     my $news = $model->sel_news_using_name({ n_name => $n_name });
     unless ( defined $news ) {

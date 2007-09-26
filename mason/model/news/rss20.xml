@@ -32,8 +32,6 @@
 </%args>
 %# ----------------------------------------------------------------------------
 <%init>
-    # $r->content_type('text/xml');
-
     my $model = $zaapt->get_model('News');
     my $news = $model->sel_news_using_name({ n_name => $n_name });
     unless ( defined $news ) {

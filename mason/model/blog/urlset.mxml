@@ -21,15 +21,12 @@
 <%args>
     $zaapt
     $b_name
-    $location
     $domain
     $path   => undef
     $scheme => 'http://'
 </%args>
 %# ----------------------------------------------------------------------------
 <%init>
-    $domain ||= $location;
-
     my $base_url = "$scheme$domain";
     $base_url .= $path if defined $path;
 

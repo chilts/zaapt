@@ -6,7 +6,6 @@
 <%args>
     $zaapt
     $c_name
-    $location
     $domain
     $path   => undef
     $scheme => 'http://'
@@ -14,8 +13,6 @@
 %# ----------------------------------------------------------------------------
 <%init>
     warn "urlset.xml: deprecated, use urlset.mxml";
-
-    $domain ||= $location;
 
     my $base_url = "$scheme$domain";
     $base_url .= $path if defined $path;

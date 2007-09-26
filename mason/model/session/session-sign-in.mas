@@ -4,6 +4,7 @@
     $dbh
     $tablename => 'session.session'
     $domain
+    $expires => '+8h'
 </%args>
 %# ----------------------------------------------------------------------------
 <%once>
@@ -34,14 +35,17 @@
 
     # send the cookie with the new session_id
     warn "session-sign-in.mas: sending the cookie back" if $DEBUG;
-    Apache::Cookie->new(
+
+    my $cookie = Apache::Cookie->new(
         $r,
         name => 'session_id',
         value => $sess_rh->{_session_id},
         domain => $domain,
         path => "/",
-        expires => '+8h',
-    )->bake();
+    );
+
+    $cookie->expires( $expires ) if defined $expires;
+    $cookie->bake();
 
     warn "session-sign-in.mas: exit" if $DEBUG;
 </%init>

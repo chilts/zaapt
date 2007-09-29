@@ -28,7 +28,7 @@
 %# ----------------------------------------------------------------------------
 <%init>
     my $base_url = "$scheme$domain";
-    $base_url .= $path if defined $path;
+    $base_url .= "/$path" if defined $path;
 
     my $model = $zaapt->get_model('News');
     my $news = $model->sel_news_using_name({ n_name => $n_name });
@@ -41,7 +41,7 @@
 
     my $urlset = Zaapt::Utils::UrlSet->new();
     foreach my $article ( @$articles ) {
-        $urlset->add({ loc => "http://$domain/$article->{a_id}.html" });
+        $urlset->add({ loc => "$base_url/$article->{a_id}.html" });
     }
 
     print $urlset->as_xml();

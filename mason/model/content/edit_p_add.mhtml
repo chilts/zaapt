@@ -18,7 +18,8 @@
     # need admin
     $m->redirect('edit_c_list.html') unless exists $my_roles->{$content->{_admin}};
 
-    my $page_types = $model->sel_all_types();
+    my $common = $zaapt->get_model('Common');
+    my $page_types = $common->sel_type_all();
     my @options = map { { value => $_->{t_id}, text => $_->{t_name} } } @$page_types;
 </%init>
 %# ----------------------------------------------------------------------------

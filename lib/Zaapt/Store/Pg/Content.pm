@@ -1,113 +1,71 @@
-## -------------------------------------------------------------------*-perl-*-
+## ----------------------------------------------------------------------------
 package Zaapt::Store::Pg::Content;
 use base qw( Zaapt::Store::Pg Zaapt::Model::Content );
 
 use strict;
 use warnings;
 
+use Zaapt::Store::Pg::Common;
+
 ## ----------------------------------------------------------------------------
 # constants
 
-# table names
-my $content_tablename = "content.content c";
-my $page_tablename = "content.page p";
-my $type_tablename = "common.type t";
+# schema name
+my $schema = 'content';
 
-# helper
-my $content_cols = __PACKAGE__->_mk_cols( 'c', qw(id name title description r:admin_id r:view_id r:edit_id r:publish_id) );
-my $page_cols = __PACKAGE__->_mk_cols( 'p', qw(id content_id type_id name content) );
-my $type_cols = __PACKAGE__->_mk_cols( 't', qw(id name) );
+my $tables = {
+    content => {
+        schema => 'content',
+        name => 'content',
+        prefix => 'c',
+        cols => [ qw(id name title description r:admin_id r:view_id r:edit_id r:publish_id ts:inserted ts:updated) ],
+    },
+    page => {
+        schema => 'content',
+        name => 'page',
+        prefix => 'p',
+        cols => [
+            'id',
+            [ 'content_id', 'fk', 'c_id' ],
+            [ 'type_id', 'fk', 't_id' ],
+            qw(name content ts:inserted ts:updated)
+        ],
+    },
+    type => Zaapt::Store::Pg::Common->_get_table( 'type' ),
+};
 
-# joins
-my $c_p_join = "JOIN $page_tablename ON (c.id = p.content_id)";
-my $p_t_join = "JOIN $type_tablename ON (t.id = p.type_id)";
-
-# content
-my $ins_content = __PACKAGE__->_mk_ins( 'content.content', qw(name title description admin_id view_id edit_id publish_id) );
-my $sel_content = "SELECT $content_cols FROM $content_tablename WHERE c.id = ?";
-my $sel_content_using_name = "SELECT $content_cols FROM $content_tablename WHERE c.name = ?";
-my $sel_content_all = "SELECT $content_cols FROM $content_tablename ORDER BY c.name";
-my $del_content = __PACKAGE__->_mk_del( 'content.content', 'id' );
-
-# page
-my $ins_page = __PACKAGE__->_mk_ins( 'content.page', 'content_id', 'type_id', 'name', 'content' );
-my $upd_page = __PACKAGE__->_mk_upd( 'content.page', 'id', qw(content_id type_id name content));
-my $del_page = __PACKAGE__->_mk_del( 'content.page', 'id' );
-my $sel_page = "SELECT $content_cols, $page_cols, $type_cols FROM $content_tablename $c_p_join $p_t_join WHERE p.id = ?";
-my $sel_page_using_name = "SELECT $content_cols, $page_cols, $type_cols FROM $content_tablename $c_p_join $p_t_join WHERE c.id = ? AND p.name = ?";
-my $sel_all_pages_in = "SELECT $content_cols, $page_cols, $type_cols FROM $content_tablename $c_p_join $p_t_join WHERE c.id = ? ORDER BY p_name";
-my $sel_all_pages = "SELECT $page_cols FROM $page_tablename ORDER BY c_name, p_name";
-
-# type
-my $sel_all_types = "SELECT $type_cols FROM $type_tablename ORDER BY name";
+# need to add the join to common.type back in
+my $join = {
+    c_p => "JOIN $schema.page p ON (c.id = p.content_id)",
+    p_t => "JOIN $tables->{type}{schema}.$tables->{type}{name} $tables->{type}{prefix} ON (p.type_id = $tables->{type}{prefix}.id)",
+};
 
 ## ----------------------------------------------------------------------------
-# methods
 
-sub ins_content {
-    my ($self, $hr) = @_;
-    $self->_do( $ins_content, $hr->{c_name}, $hr->{c_title}, $hr->{c_description}, $hr->{_admin}, $hr->{_view}, $hr->{_edit}, $hr->{_publish} );
-}
+# creates {sql_fqt} and {sql_sel_cols}
+__PACKAGE__->_mk_sql( $schema, $tables );
 
-sub sel_content_all {
-    my ($self) = @_;
-    return $self->_rows( $sel_content_all );
-}
+# generate the Perl method accessors
+__PACKAGE__->_mk_db_accessors( $schema, $tables );
 
-sub sel_content {
-    my ($self, $hr) = @_;
-    return $self->_row( $sel_content, $hr->{c_id} );
-}
+## ----------------------------------------------------------------------------
+# simple accessors
 
-sub sel_content_using_name {
-    my ($self, $hr) = @_;
-    return $self->_row( $sel_content_using_name, $hr->{c_name} );
-}
+# create some reusable sql
+my $main_cols = "$tables->{content}{sql_sel_cols}, $tables->{page}{sql_sel_cols}, $tables->{type}{sql_sel_cols}";
+my $main_tables = "$tables->{content}{sql_fqt} $join->{c_p} $join->{p_t}";
 
-sub del_content {
-    my ($self, $hr) = @_;
-    $self->_do( $del_content, $hr->{c_id} );
-}
+# content
+__PACKAGE__->_mk_selecter( $schema, $tables->{content} );
+__PACKAGE__->_mk_selecter_using( $schema, $tables->{content}, 'name' );
+__PACKAGE__->mk_select_rows( 'sel_content_all', "SELECT $tables->{content}{sql_sel_cols} FROM $tables->{content}{sql_fqt} ORDER BY c.id" );
 
-sub ins_page {
-    my ($self, $hr) = @_;
-    $self->_do( $ins_page, $hr->{c_id}, $hr->{t_id}, $hr->{p_name}, $hr->{p_content} );
-}
+# page
+__PACKAGE__->mk_select_row( 'sel_page', "SELECT $main_cols FROM $main_tables WHERE p.id = ?", [ 'p_id' ] );
+__PACKAGE__->mk_select_row( 'sel_page_using_name', "SELECT $main_cols FROM $main_tables WHERE p.name = ?", [ 'p_name' ] );
+__PACKAGE__->mk_select_rows( 'sel_page_all_in', "SELECT $main_cols FROM $main_tables WHERE c.id = ? ORDER BY p.name", [ 'c_id' ] );
 
-sub sel_all_pages_in {
-    my ($self, $hr) = @_;
-    return $self->_rows( $sel_all_pages_in, $hr->{c_id} );
-}
-
-sub sel_page_using_name {
-    my ($self, $hr) = @_;
-    return $self->_row( $sel_page_using_name, $hr->{c_id}, $hr->{p_name} );
-}
-
-sub upd_page {
-    my ($self, $hr) = @_;
-    $self->_do( $upd_page, $hr->{c_id}, $hr->{t_id}, $hr->{p_name}, $hr->{p_content}, $hr->{p_id} );
-}
-
-sub del_page {
-    my ($self, $hr) = @_;
-    $self->_do( $del_page, $hr->{p_id} );
-}
-
-sub sel_page {
-    my ($self, $hr) = @_;
-    return $self->_row( $sel_page, $hr->{p_id} );
-}
-
-sub sel_all_pages {
-    my ($self) = @_;
-    return $self->_rows( $sel_all_pages );
-}
-
-sub sel_all_types {
-    my ($self) = @_;
-    return $self->_rows( $sel_all_types );
-}
+## ----------------------------------------------------------------------------
 
 sub _nuke {
     my ($self) = @_;

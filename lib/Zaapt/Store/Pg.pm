@@ -26,6 +26,13 @@ sub store_name { return __PACKAGE__; }
 ## ----------------------------------------------------------------------------
 # helper methods
 
+sub _get_table {
+    my ($class, $tablename) = @_;
+    my $tables = $class->_get_tables();
+    return unless exists $tables->{$tablename};
+    return $tables->{$tablename};
+}
+
 sub _mk_cols {
     my ($class, $letter, @colnames) = @_;
     warn "_mk_cols() is deprecated, use _mk_sel_cols() instead";
@@ -361,6 +368,7 @@ sub _rows {
 
 sub _row {
     my ($self, $stm, @bind_values) = @_;
+
     my $sth = $self->get_sth( $stm );
     $sth->execute( @bind_values );
     my $row = $sth->fetchrow_hashref();
@@ -523,6 +531,8 @@ sub mk_selecter {
     $self->_inject_method("sel_$table", $method);
 }
 
+# need to add a 'mk_selecter_all'
+
 sub mk_select_row {
     my ($self, $method_name, $stm, $hr_names) = @_;
 
@@ -537,6 +547,8 @@ sub mk_select_row {
 
 sub mk_select_rows {
     my ($self, $method_name, $stm, $hr_names) = @_;
+
+    $hr_names = [] unless ref $hr_names eq 'ARRAY';
 
     # create the closure
     my $method =  sub {

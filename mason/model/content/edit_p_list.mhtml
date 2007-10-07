@@ -13,7 +13,7 @@
         return;
     }
     $m->redirect('edit_c_list.html') unless exists $my_roles->{$content->{_view}};
-    my $pages = $model->sel_all_pages_in({ c_id => $c_id });
+    my $pages = $model->sel_page_all_in({ c_id => $c_id });
 </%init>
 %# --- HTML -------------------------------------------------------------------
 <h1>Page List</h1>
@@ -39,7 +39,7 @@
 % my $row = 1;
 % foreach my $page ( @$pages ) {
         <tr class="r<% $row=1-$row %>">
-            <td><% $page->{p_name} | h %></td>
+            <td><% $page->{p_name} | h %> (<% $page->{t_name} %>)</td>
             <td>
 %         if ( exists $my_roles->{$page->{_edit}} ) {
                 * <a href="edit_p_edit.html?p_id=<% $page->{p_id} | u %>">Edit Page</a><br />

@@ -6,6 +6,7 @@
 </%args>
 %# ----------------------------------------------------------------------------
 <%init>
+    use Data::Dumper;
     my $model = $zaapt->get_model('Content');
     my $content = $model->sel_content_using_name({ c_name => $c_name });
 
@@ -14,6 +15,8 @@
         return;
     }
 
+    warn Dumper($content);
+
     my $page_model = $model->sel_page_using_name({ c_id => $content->{c_id}, p_name => $page });
 
     unless ( defined $page_model ) {
@@ -21,6 +24,8 @@
         $m->abort(404);
         return;
     }
+
+    warn Dumper($page_model);
 </%init>
 %# ----------------------------------------------------------------------------
 <& /zaapt/common/render.mhtml, t_name => $page_model->{t_name}, content => $page_model->{p_content} &>

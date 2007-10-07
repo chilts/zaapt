@@ -17,7 +17,7 @@
     $m->redirect('edit_m_list.html') unless defined $menu;
     $m->redirect('edit_m_list.html?m_id=$menu->{m_id}') unless exists $my_roles->{$menu->{_admin}};
 
-    my $roles = $zaapt->get_model('Account')->sel_all_roles();
+    my $roles = $zaapt->get_model('Account')->sel_role_all();
     my @options = map { { value => $_->{r_id}, text => $_->{r_name} } } @$roles;
 </%init>
 %# ----------------------------------------------------------------------------

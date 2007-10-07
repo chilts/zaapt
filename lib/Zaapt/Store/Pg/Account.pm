@@ -104,12 +104,6 @@ sub sel_role {
     return $self->_row( $sel_role, $hr->{r_id} );
 }
 
-sub sel_all_roles { # deprecated
-    my ($self, $hr) = @_;
-    warn "Account::sel_all_roles(): is deprecated";
-    return $self->_rows( $sel_all_roles );
-}
-
 sub sel_role_all {
     my ($self, $hr) = @_;
     return $self->_rows( $sel_role_all );

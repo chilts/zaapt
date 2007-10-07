@@ -10,7 +10,7 @@
 %# ----------------------------------------------------------------------------
 <%init>
     my $model = $zaapt->get_model('Content');
-    my $roles = $zaapt->get_model('Account')->sel_all_roles();
+    my $roles = $zaapt->get_model('Account')->sel_role_all();
     my @options = map { { value => $_->{r_id}, text => $_->{r_name} } } @$roles;
 </%init>
 %# ----------------------------------------------------------------------------

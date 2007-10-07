@@ -34,7 +34,6 @@ my $tables = {
     type => Zaapt::Store::Pg::Common->_get_table( 'type' ),
 };
 
-# need to add the join to common.type back in
 my $join = {
     c_p => "JOIN $schema.page p ON (c.id = p.content_id)",
     p_t => "JOIN $tables->{type}{schema}.$tables->{type}{name} $tables->{type}{prefix} ON (p.type_id = $tables->{type}{prefix}.id)",

@@ -13,7 +13,7 @@
         return;
     }
 
-    my $questions = $model->sel_all_questions_in({ f_id => $faq->{f_id} });
+    my $questions = $model->sel_question_all_in({ f_id => $faq->{f_id} });
 </%init>
 %# ----------------------------------------------------------------------------
 <div class="z_faq">

@@ -13,7 +13,7 @@
         return;
     }
     $m->redirect('edit_f_list.html') unless exists $my_roles->{$faq->{_view}};
-    my $questions = $model->sel_all_questions_in({ f_id => $f_id });
+    my $questions = $model->sel_question_all_in({ f_id => $f_id });
 </%init>
 %# --- HTML -------------------------------------------------------------------
 <h1>Question List</h1>

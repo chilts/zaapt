@@ -58,6 +58,11 @@
             push @err, "sorry, this username does not exist, please check your spelling";
         }
 
+        # check that the user has something in the subject
+        unless ( Zaapt::Utils::Valid::has_content($m_subject, 'Subject') ) {
+            $m_subject = '(no subject)';
+        }
+
         # everything seems okay, insert into the database
         unless ( @err ) {
             $model->ins_message({ a_id => $id, t_id => $to->{a_id}, m_subject => $m_subject, m_message => $m_message, m_read => 0 });

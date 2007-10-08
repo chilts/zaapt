@@ -13,7 +13,7 @@
         return;
     }
     $m->redirect('edit_m_list.html') unless exists $my_roles->{$menu->{_view}};
-    my $items = $model->sel_all_items_in({ m_id => $m_id });
+    my $items = $model->sel_item_all_in({ m_id => $m_id });
 </%init>
 %# --- HTML -------------------------------------------------------------------
 <h1>Item List</h1>

@@ -30,7 +30,7 @@
         return;
     }
 
-    my $items = $model->sel_all_items_in({ m_id => $menu->{m_id} });
+    my $items = $model->sel_item_all_in({ m_id => $menu->{m_id} });
 </%init>
 %# ----------------------------------------------------------------------------
 <div class="z_menu">

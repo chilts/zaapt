@@ -42,7 +42,7 @@ CREATE TABLE forum.topic (
     sticky          BOOLEAN NOT NULL DEFAULT False,
     locked          BOOLEAN NOT NULL DEFAULT False,
     posts           INTEGER NOT NULL DEFAULT 0,
-    poster_id       INTEGER NOT NULL REFERENCES account.account,
+    poster_id       INTEGER REFERENCES account.account,
 
     LIKE base       INCLUDING DEFAULTS
 );

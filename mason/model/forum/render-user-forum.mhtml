@@ -1,0 +1,96 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $forum
+    $err
+    $tp_subject
+    $p_message
+    $topics
+    $last
+    $p
+</%args>
+%# ----------------------------------------------------------------------------
+<h1><% $forum->{f_title} | h %></h1>
+
+<p class="right"><& widget-stats.mhtml, zaapt => $zaapt &></p>
+<p>
+    <span class="floatright"><a href="#" onclick="removeElementClass('topic', 'hide');"><& /zaapt/common/icon.mhtml, name => 'script_add', title => 'New Topic' &> New Topic &raquo;&raquo;</a></span>
+    <a href="../">&laquo; Back to Main Forums</a>
+</p>
+
+<& /zaapt/common/err.mhtml, err => $err &>
+
+<div id="topic"<% @$err ? '' : ' class="hide"' %>>
+<p>
+<& /zaapt/common/form.mhtml, action => '?', elements => [
+        { type => 'hidden', name => 'a', value => 'topic' },
+        { type => 'text', field => 'Subject', name => 'tp_subject', size => 40, value => $tp_subject || '' },
+        { type => 'textarea', field => 'Message', name => 'p_message', rows => 10, cols => 40, value => $p_message || '' },
+        { type => 'html', field => 'Help', value => $m->scomp('help-link.mhtml') },
+        { type => 'submit', field => 'Actions', value => 'Add Topic', cancel_js => "addElementClass('topic', 'hide');" },
+    ]
+&>
+</p>
+</div>
+
+<p class="center">
+<& /zaapt/common/paginator.mhtml, url => '?', btext => 'Page:', to => $forum->{f_topics}, perpage => $forum->{f_show}, current => $p &>
+</p>
+
+% if ( @$topics ) {
+
+<table width="100%">
+    <tr>
+        <th colspan="2">Topics</th>
+        <th>Author</th>
+        <th>Posts</th>
+        <th>Last Post</th>
+    </tr>
+%     my $r = 0;
+%     foreach my $topic ( @$topics ) {
+    <tr class="r<% $r=1-$r %>">
+        <td class="center">
+%         if ( $topic->{tp_sticky} ) {
+            <& /zaapt/common/icon.mhtml, name => 'script_key', title => 'Sticky' &>
+%         }
+%         if ( $topic->{tp_locked} ) {
+            <& /zaapt/common/icon.mhtml, name => 'script_link', title => 'Locked' &>
+%         }
+%         if ( $last lt $topic->{tp_updated} ) {
+            <& /zaapt/common/icon.mhtml, name => 'script_add', title => 'New Posts' &>
+%         } else {
+            <& /zaapt/common/icon.mhtml, name => 'bullet_blue', title => 'Normal Topic' &>
+%         }
+        </td>
+
+        <& render-user-topic.mhtml,
+            topic => $topic,
+            forum => $forum,
+            is_moderator => exists $SESS->{roles}{$forum->{_moderator}},
+            p => $p
+        &>
+
+        <td class="center"><& /zaapt/common/a_username.mhtml, a_username => $topic->{a_username} &><br /></td>
+        <td class="center"><% $topic->{tp_posts} | h %></td>
+        <td class="right">
+%         if ( defined $topic->{po_username} ) {
+            <& /zaapt/common/a_username.mhtml, a_username => $topic->{po_username} &>
+            <br style="clear: both;" />
+            <span class="footnote nw"><& /zaapt/common/datetime.mhtml, datetime => $topic->{tp_updated} &></span>
+%         } else {
+            No Posts
+%         }
+        </td>
+    </tr>
+%     }
+</table>
+% } else {
+<p>There are currently no topics here.</p>
+% }
+
+<h2>Key</h2>
+<& /zaapt/common/icon.mhtml, name => 'script_key', title => 'Sticky' &> Sticky Topic<br />
+<& /zaapt/common/icon.mhtml, name => 'script_link', title => 'Locked' &> Locked Topic<br />
+<& /zaapt/common/icon.mhtml, name => 'script_add', title => 'New Posts' &> New Posts<br />
+<& /zaapt/common/icon.mhtml, name => 'bullet_blue', title => 'Normal Topic' &> No New Posts<br />
+%# ----------------------------------------------------------------------------

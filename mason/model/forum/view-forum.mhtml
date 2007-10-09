@@ -19,72 +19,10 @@
     my $topics = $model->sel_all_topics_in({ f_id => $forum->{f_id}, _offset => ($p-1) * $forum->{f_show}, _limit => $forum->{f_show} });
 </%init>
 %# ----------------------------------------------------------------------------
-<div class="z_forum">
-<h1><% $forum->{f_title} | h %></h1>
-
-<p class="right"><& widget-stats.mhtml, zaapt => $zaapt &></p>
-<p>
-    <span class="floatright">Please <& /zaapt/common/sign-in-url.mhtml, text => 'sign in' &> to post.</span>
-    <a href="../">&laquo; Back to Main Forums</a>
-</p>
-
-<p class="center">
-<& /zaapt/common/paginator.mhtml, url => '?', btext => 'Page:', to => $forum->{f_topics}, perpage => $forum->{f_show}, current => $p &>
-</p>
-
-% if ( @$topics ) {
-
-<table width="100%">
-    <tr>
-        <th colspan="2">Topics</th>
-        <th>Author</th>
-        <th>Posts</th>
-        <th>Last Post</th>
-    </tr>
-%     my $r = 0;
-%     foreach my $topic ( @$topics ) {
-    <tr class="r<% $r=1-$r %>">
-        <td class="center">
-%         if ( $topic->{tp_sticky} ) {
-            <& /zaapt/common/icon.mhtml, name => 'script_key', title => 'Sticky' &>
-%         }
-%         if ( $topic->{tp_locked} ) {
-            <& /zaapt/common/icon.mhtml, name => 'script_link', title => 'Locked' &>
-%         }
-          <& /zaapt/common/icon.mhtml, name => 'bullet_blue', title => 'Normal Topic' &>
-        </td>
-
-        <& render-view-topic.mhtml,
-            topic => $topic,
-            forum => $forum,
-            p => $p
-        &>
-
-        <td class="center"><& /zaapt/common/a_username.mhtml, a_username => $topic->{a_username} &><br /></td>
-        <td class="center"><% $topic->{tp_posts} | h %></td>
-        <td class="right">
-%         if ( defined $topic->{po_username} ) {
-            <& /zaapt/common/a_username.mhtml, a_username => $topic->{po_username} &>
-            <br style="clear: both;" />
-            <span class="footnote nw"><& /zaapt/common/datetime.mhtml, datetime => $topic->{tp_updated} &></span>
-%         } else {
-            No Posts
-%         }
-        </td>
-    </tr>
-%     }
-</table>
-% } else {
-<p>There are currently no topics here.</p>
-% }
-
-<p>
-    <a href="../">&laquo; Back to Main Forums</a>
-</p>
-
-<h2>Key</h2>
-<& /zaapt/common/icon.mhtml, name => 'script_key', title => 'Sticky' &> Sticky Topic<br />
-<& /zaapt/common/icon.mhtml, name => 'script_link', title => 'Locked' &> Locked Topic<br />
-<& /zaapt/common/icon.mhtml, name => 'bullet_blue', title => 'Normal Topic' &> No New Posts<br />
-</div>
+<& render-view-forum.mhtml,
+    zaapt  => $zaapt,
+    forum  => $forum,
+    topics => $topics,
+    p      => $p,
+&>
 %# ----------------------------------------------------------------------------

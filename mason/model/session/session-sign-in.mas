@@ -36,7 +36,7 @@
     # send the cookie with the new session_id
     warn "session-sign-in.mas: sending the cookie back" if $DEBUG;
 
-    my $cookie = Apache::Cookie->new(
+    my $cookie = Apache2::Cookie->new(
         $r,
         name => 'session_id',
         value => $sess_rh->{_session_id},
@@ -45,7 +45,8 @@
     );
 
     $cookie->expires( $expires ) if defined $expires;
-    $cookie->bake();
+    warn $cookie->as_string() if $DEBUG;
+    $cookie->bake( $r );
 
     warn "session-sign-in.mas: exit" if $DEBUG;
 </%init>

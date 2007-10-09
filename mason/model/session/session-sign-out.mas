@@ -26,17 +26,17 @@
 
     # remove the 'session_id' cookie
     warn "session-sign-out.mas: removing the session_id cookie" if $DEBUG;
-    my $cookies = Apache::Cookie->fetch();
+    my $cookies = Apache2::Cookie->fetch();
     if (  exists $cookies->{session_id} ) {
         # expire it by 2 days
-        Apache::Cookie->new(
+        Apache2::Cookie->new(
             $r,
             name => 'session_id',
             value => '',
             domain => $domain,
             path => "/",
             expires => '-2d',
-        )->bake();
+        )->bake( $r );
     }
 
     warn "session-sign-out.mas: exit" if $DEBUG;

@@ -14,7 +14,7 @@
     warn "session-begin.mas: entry" if $DEBUG;
 
     # see if there is a cookie available
-    my $cookies = Apache::Cookie->fetch();
+    my $cookies = Apache2::Cookie->fetch();
     my $session_id = exists $cookies->{session_id} ? $cookies->{session_id}->value() : undef;
 
     warn "just got the cookies and session_id ($session_id)" if $DEBUG;
@@ -31,7 +31,7 @@
 
         # invalid session_id, so tell the browser to get rid of it
         $session_id = undef;
-        Apache::Cookie->new(
+        Apache2::Cookie->new(
             $r,
             name => 'session_id',
             domain => $domain,
@@ -60,14 +60,14 @@
         warn "error retrieving this session: $@";
 
         # delete the cookie which gaves us the invalid session id and finish
-        Apache::Cookie->new(
+        Apache2::Cookie->new(
             $r,
             name => 'session_id',
             value => '',
             domain => $domain,
             path => "/",
             expires => '-2d',
-        )->bake();
+        )->bake( $r );
 
         return;
     }
@@ -83,7 +83,7 @@
         warn "cookie and session valid, but user not signed in" if $DEBUG;
 
         # expire cookie
-        Apache::Cookie->new(
+        Apache2::Cookie->new(
             $r,
             name => 'session_id',
             value => '',

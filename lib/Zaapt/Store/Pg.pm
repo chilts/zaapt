@@ -30,7 +30,10 @@ sub _get_table {
     my ($class, $tablename) = @_;
     my $tables = $class->_get_tables();
     return unless exists $tables->{$tablename};
-    return $tables->{$tablename};
+
+    # get a COPY of the table and return a reference to the copy
+    my %table = %{ $tables->{$tablename} };
+    return \%table;
 }
 
 sub _mk_cols {

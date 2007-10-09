@@ -8,12 +8,14 @@ use warnings;
 ## ----------------------------------------------------------------------------
 # constants
 
-my $table = {
+my $schema = 'account';
+
+my $tables = {
     account => {
-        schema => 'account',
+        schema => $schema,
         name   => 'account',
         prefix => 'a',
-        cols   => [ qw(id username) ],
+        cols   => [ qw(id username firstname lastname email notify salt password confirmed admin logins last ts:inserted ts:updated) ],
     },
 };
 
@@ -68,11 +70,7 @@ my $sel_roles_for_account = "SELECT a.username AS a_username, r.id AS r_id, r.na
 ## ----------------------------------------------------------------------------
 # methods
 
-sub get_table_details {
-    my ($class, $tablename) = @_;
-    return unless exists $table->{$tablename};
-    return $table->{$tablename};
-}
+sub _get_tables { return $tables; }
 
 sub ins_account {
     my ($self, $hr) = @_;

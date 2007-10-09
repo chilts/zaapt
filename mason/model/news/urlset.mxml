@@ -37,7 +37,7 @@
         return;
     }
 
-    my $articles = $model->sel_all_articles_in({ n_id => $news->{n_id} });
+    my $articles = $model->sel_article_all_in({ n_id => $news->{n_id} });
 
     my $urlset = Zaapt::Utils::UrlSet->new();
     foreach my $article ( @$articles ) {

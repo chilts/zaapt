@@ -12,7 +12,7 @@
     # since this is a widget, we shouldn't abort, but just not display anything
     return unless defined $news;
 
-    my $articles = $model->sel_latest_articles({ n_id => $news->{n_id}, _limit => 1 });
+    my $articles = $model->sel_article_latest({ n_id => $news->{n_id}, _limit => 1 });
 </%init>
 %# ----------------------------------------------------------------------------
 <em>Latest News</em>

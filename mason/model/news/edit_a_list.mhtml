@@ -13,7 +13,7 @@
         return;
     }
     $m->redirect('edit_n_list.html') unless exists $my_roles->{$news->{_view}};
-    my $articles = $model->sel_all_articles_in({ n_id => $n_id });
+    my $articles = $model->sel_article_all_in({ n_id => $n_id });
 </%init>
 %# --- HTML -------------------------------------------------------------------
 <h1>Article List</h1>

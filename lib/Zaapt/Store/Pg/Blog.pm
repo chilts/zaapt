@@ -58,6 +58,9 @@ my $table = {
             qw(url blogname title excerpt status ts:inserted ts:updated)
         ],
     },
+    account => Zaapt::Store::Pg::Account->_get_table( 'account' ),
+    type  => Zaapt::Store::Pg::Common->_get_table( 'type' ),
+    label => Zaapt::Store::Pg::Common->_get_table( 'label' ),
 };
 
 my $join = {
@@ -76,16 +79,6 @@ __PACKAGE__->_mk_sql( $schema, $table );
 
 # generate the SQL ins/upd/del (no sel)
 __PACKAGE__->_mk_sql_accessors( $schema, $table );
-
-# add the 'foreign' tables
-$table->{account} = Zaapt::Store::Pg::Account->get_table_details('account');
-__PACKAGE__->_mk_sql_for( $table->{account}{schema}, $table->{account} );
-
-$table->{type} = Zaapt::Store::Pg::Common->get_table_details('type');
-__PACKAGE__->_mk_sql_for( $table->{type}{schema}, $table->{type} );
-
-$table->{label} = Zaapt::Store::Pg::Common->get_table_details('label');
-__PACKAGE__->_mk_sql_for( $table->{label}{schema}, $table->{label} );
 
 ## ----------------------------------------------------------------------------
 
@@ -112,9 +105,6 @@ __PACKAGE__->mk_select_rows( 'sel_entry_label', "SELECT $blog_cols FROM $blog_jo
 
 __PACKAGE__->mk_select_rows( 'sel_label_all_for', "SELECT $table->{label}{sql_sel_cols} FROM $table->{entry}{sql_fqt} $join->{e_l} WHERE e.id = ? ORDER BY l.name", [ 'e_id' ] );
 
-# entry_label
-my $ins_entry_label = __PACKAGE__->_mk_ins( 'blog.entry_label', qw(entry_id label_id) );
-
 # comment
 __PACKAGE__->mk_selecter( $schema, $table->{comment}{name}, $table->{comment}{prefix}, @{$table->{comment}{cols}} );
 __PACKAGE__->mk_select_rows( 'sel_comments_for', "SELECT $table->{comment}{sql_sel_cols} FROM $table->{entry}{sql_fqt} $join->{e_c} WHERE e.id = ? AND c.status = ? ORDER BY c.inserted", [ 'e_id', 'c_status' ] );
@@ -133,7 +123,7 @@ sub ins_label {
     my $common_model = $self->parent()->get_model('Common');
 
     my $label = $common_model->ass_label( $hr );
-    $self->_do( $ins_entry_label, $hr->{e_id}, $label->{l_id} );
+    $self->ins_entry_label({ e_id => $hr->{e_id}, l_id => $label->{l_id} });
 }
 
 sub del_entry_label_for {

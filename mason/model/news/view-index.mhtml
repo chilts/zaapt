@@ -11,7 +11,7 @@
         die "News '$n_name' not found.";
         return;
     }
-    my $articles = $model->sel_latest_articles({ n_id => $news->{n_id}, _limit => $news->{n_show} });
+    my $articles = $model->sel_article_latest({ n_id => $news->{n_id}, _limit => $news->{n_show} });
 </%init>
 %# ----------------------------------------------------------------------------
 <div class="z_news">

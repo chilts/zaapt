@@ -43,7 +43,7 @@
         $m->abort(404);
         return;
     }
-    my $articles = $model->sel_latest_articles({ n_id => $news->{n_id}, _limit => $news->{n_show} });
+    my $articles = $model->sel_article_latest({ n_id => $news->{n_id}, _limit => $news->{n_show} });
 
     my $date = $articles->[-1]{a_inserted};
     $date =~ /(\d{4})-(\d{2})-(\d{2}) (\d{2}:\d{2}:\d{2})/;

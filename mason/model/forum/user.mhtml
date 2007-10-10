@@ -25,8 +25,6 @@
     # we can let these other pages do this, but check that $p makes sense
     $p = 1 unless $p =~ m{ \A \d+ \z }xms;
 
-    warn "id=$id";
-
     if ( $page eq 'index' ) {
         # main index page
         $m->comp('/zaapt/model/forum/user-forum.mhtml',

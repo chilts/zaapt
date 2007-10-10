@@ -2,14 +2,57 @@
 <%args>
     $forum
     $topic
+    $posts
     $p
 </%args>
 %# ----------------------------------------------------------------------------
-        <td class="left">
-            <a href="<% $topic->{tp_id} | u %>.html"><% $topic->{tp_subject} | h %></a>
-% if ( $topic->{tp_posts} > $forum->{f_show} ) {
-            <br />
-            <& /zaapt/common/paginator.mhtml, url => "$topic->{tp_id}.html?", btext => 'Page:', to => $topic->{tp_posts}, perpage => $forum->{f_show} &>
-% }
+<%init>
+    my $r = 0;
+</%init>
+%# ----------------------------------------------------------------------------
+<h1><% $forum->{f_title} | h %></h1>
+
+<p>
+    <span class="floatright">Please <& /zaapt/common/sign-in-url.mhtml, text => 'sign in' &> to post.</span>
+    <a href="../">&laquo; Back to Main Forums</a>
+    <br />
+    <a href="./">&laquo; Back to Topic List</a>
+</p>
+
+<h2><% $topic->{tp_subject} | h %></h2>
+
+<p class="center">
+<& /zaapt/common/paginator.mhtml, url => '?', btext => 'Page:', to => $topic->{tp_posts}, perpage => $forum->{f_show}, current => $p &>
+</p>
+
+% if ( @$posts ) {
+
+<table>
+    <tr>
+        <th>Poster</th>
+        <th>Message</th>
+    </tr>
+%     my $r = 0;
+%     foreach my $post ( @$posts ) {
+    <tr class="r<% $r=1-$r %>">
+        <td class="top">
+            <& /zaapt/common/icon.mhtml, name => 'script', title => 'A Post' &>
+            <& /zaapt/common/a_username.mhtml, a_username => $post->{a_username} &><br />
+            <span class="small soft nw">
+            Joined: <& /zaapt/common/datetime.mhtml, datetime => $post->{a_inserted} &><br />
+            Posts: <% $post->{i_posts} | h %><br />
+            </span>
         </td>
+
+        <& render-post.mhtml, post => $post &>
+
+    </tr>
+%     }
+</table>
+% } else {
+<p>There are currently no topics here.</p>
+% }
+
+<h2>Key</h2>
+<& /zaapt/common/icon.mhtml, name => 'script', title => 'A Post' &> A Post<br />
 %# ----------------------------------------------------------------------------

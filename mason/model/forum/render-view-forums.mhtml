@@ -1,0 +1,41 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $forums
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $r = 0;
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Forums</h1>
+
+% if ( @$forums ) {
+<table>
+    <tr>
+        <th colspan="2">Forum</th>
+        <th>Topics</th>
+        <th>Posts</th>
+        <th>Last Post</th>
+    </tr>
+%     foreach my $forum ( @$forums ) {
+    <tr class="r<% $r++%2 %>">
+        <td>
+            <& /zaapt/common/icon.mhtml, name => 'script', title => 'Forum' &>
+        </td>
+        <td>
+            <a href="<% $forum->{f_name} | u %>/"><% $forum->{f_title} | h %></a>
+            <p><% $forum->{f_description} | h %></p>
+        </td>
+        <td><% $forum->{f_topics} | h %></td>
+        <td><% $forum->{f_posts} | h %></td>
+        <td>
+            <% $forum->{f_poster_id} | h %><br />
+            <& /zaapt/common/a_username.mhtml, a_username => $forum->{a_username} &>
+        </td>
+    </tr>
+%     }
+</table>
+% } else {
+<p>There are currently no forums here.</p>
+% }
+%# ----------------------------------------------------------------------------

@@ -507,6 +507,11 @@ sub mk_deleter {
     $self->_inject_method("del_$table", $method);
 }
 
+sub _mk_select_count {
+    my ($self, $t) = @_;
+    __PACKAGE__->mk_select_row( "sel_$t->{name}_count", __PACKAGE__->_mk_count( "$t->schema.$t->{name}" ) );
+}
+
 sub _mk_selecter {
     my ($self, $schema, $t) = @_;
     __PACKAGE__->mk_selecter( $schema, $t->{name}, $t->{prefix}, @{$t->{cols}} );

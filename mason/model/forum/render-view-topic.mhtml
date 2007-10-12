@@ -50,7 +50,7 @@
 %     }
 </table>
 % } else {
-<p>There are currently no topics here.</p>
+<p>There are currently no posts here.</p>
 % }
 
 <h2>Key</h2>

@@ -5,6 +5,7 @@ use base qw( Zaapt::Store Class::Accessor );
 use strict;
 use warnings;
 use Carp;
+use Data::Dumper;
 use List::Util qw(reduce);
 
 our $VERSION = '0.1';
@@ -361,6 +362,8 @@ sub _rows {
     my ($self, $stm, @bind_values) = @_;
     my $sth = $self->get_sth( $stm );
     my $rows = [];
+    # warn $stm;
+    # warn Dumper(\@bind_values);
     $sth->execute( @bind_values );
     while ( my $row = $sth->fetchrow_hashref() ) {
         push @$rows, $row;
@@ -415,6 +418,8 @@ sub _mk_inserter {
     # create the closure
     my $method =  sub {
         my ($self, $hr) = @_;
+        # warn "sql=$sql";
+        # warn Dumper($hr);
         return $self->_do( $sql, map { $hr->{$_} } @hr_names );
     };
 
@@ -509,7 +514,7 @@ sub mk_deleter {
 
 sub _mk_select_count {
     my ($self, $t) = @_;
-    __PACKAGE__->mk_select_row( "sel_$t->{name}_count", __PACKAGE__->_mk_count( "$t->schema.$t->{name}" ) );
+    __PACKAGE__->mk_select_row( "sel_$t->{name}_count", __PACKAGE__->_mk_count( "$t->{schema}.$t->{name}" ) );
 }
 
 sub _mk_selecter {
@@ -565,6 +570,26 @@ sub mk_select_rows {
     };
 
     $self->_inject_method($method_name, $method);
+}
+
+sub _mk_select_rows_offset {
+    my ($self, $method_name, $stm, $hr_names) = @_;
+
+    $hr_names = [] unless ref $hr_names eq 'ARRAY';
+
+    # create the first closure
+    my $method1 =  sub {
+        my ($self, $hr) = @_;
+        return $self->_rows( $stm, map { $hr->{$_} } @$hr_names );
+    };
+
+    my $method2 =  sub {
+        my ($self, $hr) = @_;
+        return $self->_rows( "$stm LIMIT ? OFFSET ?", map { $hr->{$_} } @$hr_names, '_limit', '_offset' );
+    };
+
+    $self->_inject_method($method_name, $method1);
+    $self->_inject_method("${method_name}_offset", $method2);
 }
 
 # easier way of doing the thing below

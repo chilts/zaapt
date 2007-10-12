@@ -83,7 +83,7 @@
         }
     }
 
-    my $topics = $model->sel_all_topics_in({ f_id => $forum->{f_id}, _offset => ($p-1) * $forum->{f_show}, _limit => $forum->{f_show} });
+    my $topics = $model->sel_topic_all_in_offset({ f_id => $forum->{f_id}, _offset => ($p-1) * $forum->{f_show}, _limit => $forum->{f_show} });
 </%init>
 %# ----------------------------------------------------------------------------
 <& render-user-forum.mhtml,

@@ -13,7 +13,7 @@
 %# ----------------------------------------------------------------------------
 <%init>
     my $model = $zaapt->get_model('Forum');
-    my $forums = $model->sel_forums_all();
+    my $forums = $model->sel_forum_all();
 </%init>
 %# ----------------------------------------------------------------------------
 <& render-user-forums.mhtml, forums => $forums, last => $last &>

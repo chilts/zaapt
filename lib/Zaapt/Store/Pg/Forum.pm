@@ -4,117 +4,124 @@ use base qw( Zaapt::Store::Pg Zaapt::Model::Forum );
 
 use strict;
 use warnings;
+use Data::Dumper;
+
+use Zaapt::Store::Pg::Common;
+use Zaapt::Store::Pg::Account;
 
 ## ----------------------------------------------------------------------------
 # constants
 
-# table names
-my $forum_tablename = "forum.forum f";
-my $topic_tablename = "forum.topic tp";
-my $post_tablename = "forum.post p";
-my $type_tablename = "common.type t";
-my $account_tablename = "account.account a";
-my $poster_tablename = "account.account po";
-my $info_tablename = "forum.info i";
+# schema name
+my $schema = 'forum';
 
-# helper
-my $forum_cols = __PACKAGE__->_mk_cols( 'f', qw(id name title description show topics posts poster_id r:admin_id r:view_id r:moderator_id ts:inserted ts:updated) );
-my $topic_cols = __PACKAGE__->_mk_cols( 'tp', qw(id forum_id account_id subject sticky locked posts poster_id ts:inserted ts:updated) );
-my $post_cols = __PACKAGE__->_mk_cols( 'p', qw(id topic_id account_id message type_id ts:inserted ts:updated) );
-my $type_cols = __PACKAGE__->_mk_cols( 't', qw(id name) );
-my $account_cols = __PACKAGE__->_mk_cols( 'a', qw(id username ts:inserted ts:updated) );
-my $poster_cols = __PACKAGE__->_mk_cols( 'po', qw(id username ts:inserted ts:updated) );
-my $info_cols = __PACKAGE__->_mk_cols( 'i', qw(account_id posts signature ts:inserted ts:updated) );
+my $tables = {
+    forum => {
+        schema => $schema,
+        name => 'forum',
+        prefix => 'f',
+        cols => [ qw(id name title description show topics posts poster_id r:admin_id r:view_id r:moderator_id ts:inserted ts:updated) ],
+    },
+    topic => {
+        schema => $schema,
+        name => 'topic',
+        prefix => 'tp',
+        cols => [
+            'id',
+            [ 'forum_id', 'fk', 'f_id' ],
+            [ 'account_id', 'fk', 'a_id' ],
+            qw(subject sticky locked posts poster_id ts:inserted ts:updated)
+        ],
+    },
+    post => {
+        schema => $schema,
+        name => 'post',
+        prefix => 'p',
+        cols => [
+            'id',
+            [ 'topic_id', 'fk', 'tp_id' ],
+            [ 'account_id', 'fk', 'a_id' ],
+            'message',
+            [ 'type_id', 'fk', 't_id' ],
+            qw(ts:inserted ts:updated)
+        ],
+    },
+    type => Zaapt::Store::Pg::Common->_get_table( 'type' ),
+    account => Zaapt::Store::Pg::Account->_get_table( 'account' ),
+    poster => Zaapt::Store::Pg::Account->_get_table( 'account' ),
+    info => {
+        schema => $schema,
+        name => 'info',
+        prefix => 'i',
+        cols => [
+            [ 'account_id', 'fk', 'a_id' ],
+            qw(posts signature ts:inserted ts:updated)
+        ],
+    },
+};
+
+# change the poster table to have prefix 'p'
+$tables->{poster}{prefix} = 'po';
 
 # joins
-my $f_tp_join = "JOIN $topic_tablename ON (tp.forum_id = f.id)";
-my $tp_p_join = "JOIN $post_tablename ON (p.topic_id = tp.id)";
-my $p_t_join = "JOIN $type_tablename ON (p.type_id = t.id)";
-my $tp_a_join = "JOIN $account_tablename ON (tp.account_id = a.id)";
-my $tp_po_join = "LEFT JOIN $poster_tablename ON (tp.poster_id = po.id)";
-my $p_a_join = "JOIN $account_tablename ON (p.account_id = a.id)";
-my $f_po_join = "JOIN $poster_tablename ON (f.poster_id = po.id)";
-my $p_i_join = "LEFT JOIN $info_tablename ON (p.account_id = i.account_id)";
+my $join = {
+    f_tp  => "JOIN $schema.topic tp ON (tp.forum_id = f.id)",
+    tp_p  => "JOIN $schema.post p ON (p.topic_id = tp.id)",
+    p_t   => "JOIN common.type t ON (p.type_id = t.id)",
+    tp_a  => "JOIN account.account a ON (tp.account_id = a.id)",
+    tp_po => "LEFT JOIN account.account po ON (tp.poster_id = po.id)",
+    p_a   => "JOIN account.account a ON (p.account_id = a.id)",
+    f_po  => "JOIN account.account po ON (f.poster_id = po.id)",
+    p_i   => "LEFT JOIN $schema.info i ON (p.account_id = i.account_id)",
+};
+
+## ----------------------------------------------------------------------------
+
+# creates {sql_fqt} and {sql_sel_cols}
+__PACKAGE__->_mk_sql( $schema, $tables );
+
+# generate the Perl method accessors
+__PACKAGE__->_mk_db_accessors( $schema, $tables );
+
+## ----------------------------------------------------------------------------
+# simple accessors
+
+# create some reusable sql
+my $topic_cols = "$tables->{forum}{sql_sel_cols}, $tables->{topic}{sql_sel_cols}, $tables->{account}{sql_sel_cols}";
+my $topic_tables = "$tables->{forum}{sql_fqt} $join->{f_tp} $join->{tp_a}";
+my $post_cols = "$tables->{forum}{sql_sel_cols}, $tables->{topic}{sql_sel_cols}, $tables->{post}{sql_sel_cols}";
+my $post_tables = "$tables->{forum}{sql_fqt} $join->{f_tp} $join->{tp_p}";
 
 # forum
-my $ins_forum = __PACKAGE__->_mk_ins( 'forum.forum', qw(name title description show admin_id view_id moderator_id) );
-my $upd_forum = __PACKAGE__->_mk_upd( 'forum.forum', 'id', qw(name title description show admin_id view_id moderator_id) );
-my $sel_forum = "SELECT $forum_cols FROM $forum_tablename WHERE f.id = ?";
-my $del_forum = __PACKAGE__->_mk_del('forum.forum', 'id');
-my $sel_forum_using_name = "SELECT $forum_cols FROM $forum_tablename WHERE f.name = ?";
-my $sel_forums_all = "SELECT $forum_cols, $poster_cols FROM $forum_tablename LEFT $f_po_join ORDER BY f.name";
-my $sel_forum_count = __PACKAGE__->_mk_count( 'forum.forum' );
+__PACKAGE__->_mk_selecter( $schema, $tables->{forum} );
+__PACKAGE__->_mk_selecter_using( $schema, $tables->{forum}, 'name' );
+__PACKAGE__->mk_select_rows( 'sel_forum_all', "SELECT $tables->{forum}{sql_sel_cols} FROM $tables->{forum}{sql_fqt} ORDER BY f.name" );
+__PACKAGE__->_mk_select_count( $tables->{forum} );
 
 # topic
-my $ins_topic = __PACKAGE__->_mk_ins( 'forum.topic', qw(forum_id account_id subject) );
-my $upd_topic = __PACKAGE__->_mk_upd( 'forum.topic', 'id', qw(forum_id account_id subject sticky locked));
-my $del_topic = __PACKAGE__->_mk_del( 'forum.topic', 'id' );
-my $sel_topic = "SELECT $forum_cols, $topic_cols FROM $forum_tablename $f_tp_join WHERE tp.id = ?";
-my $sel_topic_if_forum = "SELECT $forum_cols, $topic_cols FROM $forum_tablename $f_tp_join $f_tp_join WHERE f.id = ? AND tp.id = ?";
-my $sel_all_topics_in = "SELECT $forum_cols, $topic_cols, $account_cols, $poster_cols FROM $forum_tablename $f_tp_join $tp_a_join $tp_po_join WHERE f.id = ? ORDER BY tp.sticky DESC, tp.updated DESC";
-my $sel_all_topics_in_offset = "SELECT $forum_cols, $topic_cols, $account_cols, $poster_cols FROM $forum_tablename $f_tp_join $tp_a_join $tp_po_join WHERE f.id = ? ORDER BY tp.sticky DESC, tp.updated DESC LIMIT ? OFFSET ?";
-my $sel_latest_topics = "SELECT $forum_cols, $topic_cols FROM $forum_tablename $f_tp_join $f_tp_join WHERE f.id = ? ORDER BY tp.inserted DESC LIMIT ?";
-my $sel_archive_topics = "SELECT $forum_cols, $topic_cols FROM $forum_tablename $f_tp_join $f_tp_join WHERE f.id = ? AND tp.inserted >= ?::DATE AND tp.inserted <= ?::DATE + ?::INTERVAL ORDER BY tp.inserted DESC";
-my $sel_topic_count = __PACKAGE__->_mk_count( 'forum.topic' );
+__PACKAGE__->mk_select_row( 'sel_topic', "SELECT $topic_cols FROM $topic_tables WHERE tp.id = ?", [ 'tp_id' ] );
+__PACKAGE__->_mk_select_count( $tables->{topic} );
+__PACKAGE__->_mk_select_rows_offset( 'sel_topic_all_in', "SELECT $topic_cols, $tables->{poster}{sql_sel_cols} FROM $topic_tables $join->{tp_po} WHERE f.id = ? ORDER BY tp.sticky DESC, tp.updated DESC", [ 'f_id' ] );
 
 # posts
-my $ins_post = __PACKAGE__->_mk_ins( 'forum.post', qw(topic_id account_id message type_id) );
-my $upd_post = __PACKAGE__->_mk_upd( 'forum.post', 'id', qw(topic_id account_id message type_id));
-my $del_post = __PACKAGE__->_mk_del( 'forum.post', 'id' );
-my $sel_post = "SELECT $forum_cols, $topic_cols, $post_cols FROM $forum_tablename $f_tp_join $tp_p_join WHERE p.id = ?";
-my $sel_all_posts_in = "SELECT $forum_cols, $topic_cols, $post_cols, CASE WHEN current_timestamp < p.inserted + '1 hour'::INTERVAL THEN 1 ELSE 0 END AS p_editable, $type_cols, $account_cols, $info_cols FROM $forum_tablename $f_tp_join $tp_p_join $p_t_join $p_a_join $p_i_join WHERE tp.id = ? ORDER BY p.inserted";
-my $sel_all_posts_in_offset = "$sel_all_posts_in LIMIT ? OFFSET ?";
-my $sel_post_all_for = "SELECT $forum_cols, $topic_cols, $post_cols, $account_cols FROM $forum_tablename $f_tp_join $tp_p_join $tp_a_join WHERE p.account_id = ? ORDER BY p.inserted DESC";
-my $sel_post_all_for_offset = "$sel_post_all_for LIMIT ? OFFSET ?";
-my $del_posts_for_topic = __PACKAGE__->_mk_del( 'forum.post', 'topic_id' );
-my $sel_post_count = __PACKAGE__->_mk_count( 'forum.post' );
+__PACKAGE__->mk_select_row( 'sel_post', "SELECT $post_cols FROM $post_tables WHERE p.id = ?", [ 'p_id' ] );
+__PACKAGE__->mk_select_rows( 'sel_post_all', "SELECT $tables->{forum}{sql_sel_cols} FROM $tables->{forum}{sql_fqt} ORDER BY f.name" );
+__PACKAGE__->_mk_select_rows_offset( 'sel_post_all_in', "SELECT $post_cols, CASE WHEN current_timestamp < p.inserted + '1 hour'::INTERVAL THEN 1 ELSE 0 END AS p_editable, $tables->{type}{sql_sel_cols}, $tables->{account}{sql_sel_cols}, $tables->{info}{sql_sel_cols} FROM $post_tables $join->{p_t} $join->{p_a} $join->{p_i} WHERE tp.id = ? ORDER BY p.inserted", [ 'tp_id' ] );
+__PACKAGE__->_mk_select_rows_offset( 'sel_post_all_for', "SELECT $post_cols, $tables->{account}{sql_sel_cols} FROM $post_tables $join->{tp_a} WHERE p.account_id = ? ORDER BY p.inserted DESC", [ 'p_id' ] );
+__PACKAGE__->_mk_select_count( $tables->{post} );
 
 # info
-my $ins_info = __PACKAGE__->_mk_ins( 'forum.info', qw(account_id posts signature) );
-my $upd_info = __PACKAGE__->_mk_upd( 'forum.info', 'account_id', qw(posts signature) );
-my $sel_info = "SELECT $info_cols FROM $info_tablename WHERE i.account_id = ?";
+__PACKAGE__->_mk_selecter( $schema, $tables->{info} );
 
 ## ----------------------------------------------------------------------------
 # methods
 
-sub ins_forum {
-    my ($self, $hr) = @_;
-    $self->_do( $ins_forum, $hr->{f_name}, $hr->{f_title}, $hr->{f_description}, $hr->{f_show}, $hr->{_admin}, $hr->{_view}, $hr->{_moderator} );
-}
-
-sub upd_forum {
-    my ($self, $hr) = @_;
-    $self->_do( $upd_forum, $hr->{f_name}, $hr->{f_title}, $hr->{f_description}, $hr->{f_show}, $hr->{_admin}, $hr->{_view}, $hr->{_moderator}, $hr->{f_id} );
-}
-
-sub del_forum {
-    my ($self, $hr) = @_;
-    $self->_do( $del_forum, $hr->{f_id} );
-}
-
-sub sel_forum {
-    my ($self, $hr) = @_;
-    return $self->_row( $sel_forum, $hr->{f_id} );
-}
-
-sub sel_forums_all {
-    my ($self) = @_;
-    return $self->_rows( $sel_forums_all );
-}
-
-sub sel_forum_count {
-    my ($self) = @_;
-    return $self->_row( $sel_forum_count );
-}
-
-sub sel_forum_using_name {
-    my ($self, $hr) = @_;
-    return $self->_row( $sel_forum_using_name, $hr->{f_name} );
-}
-
+my $ins_topic = __PACKAGE__->_mk_ins( 'forum.topic', qw(forum_id account_id subject) );
 sub ins_topic {
     my ($self, $hr) = @_;
-    $self->_do( $ins_topic, $hr->{f_id}, $hr->{a_id}, $hr->{tp_subject} );
+    warn "sql=$ins_topic";
+    warn Dumper($hr);
+    return $self->_do( $ins_topic, map { $hr->{$_} } qw(f_id a_id tp_subject) );
 }
 
 sub ins_new_topic {
@@ -126,10 +133,9 @@ sub ins_new_topic {
     $self->dbh()->commit();
 }
 
-sub upd_topic {
-    my ($self, $hr) = @_;
-    $self->_do( $upd_topic, $hr->{f_id}, $hr->{a_id}, $hr->{tp_subject}, $hr->{tp_sticky}, $hr->{tp_locked}, $hr->{tp_id} );
-}
+# ToDo: one left
+my $del_posts_for_topic = __PACKAGE__->_mk_del( 'forum.post', 'topic_id' );
+my $del_topic = __PACKAGE__->_mk_del( 'forum.topic', 'id' );
 
 sub del_topic {
     my ($self, $hr) = @_;
@@ -137,90 +143,6 @@ sub del_topic {
     $self->_do( $del_posts_for_topic, $hr->{tp_id} );
     $self->_do( $del_topic, $hr->{tp_id} );
     $self->dbh()->commit();
-}
-
-sub sel_topic {
-    my ($self, $hr) = @_;
-    return $self->_row( $sel_topic, $hr->{tp_id} );
-}
-
-sub sel_topic_if_forum {
-    my ($self, $hr) = @_;
-    return $self->_row( $sel_topic_if_forum, $hr->{f_id}, $hr->{tp_id} );
-}
-
-sub sel_all_topics_in {
-    my ($self, $hr) = @_;
-    if ( defined $hr->{_limit} and defined $hr->{_offset} ) {
-        return $self->_rows( $sel_all_topics_in_offset, $hr->{f_id}, $hr->{_limit}, $hr->{_offset} );
-    }
-    return $self->_rows( $sel_all_topics_in, $hr->{f_id} );
-}
-
-sub sel_latest_topics {
-    my ($self, $hr) = @_;
-    return $self->_rows( $sel_latest_topics, $hr->{f_id}, $hr->{_limit} );
-}
-
-sub sel_topic_count {
-    my ($self) = @_;
-    return $self->_row( $sel_topic_count );
-}
-
-sub sel_all_posts_in {
-    my ($self, $hr) = @_;
-    if ( defined $hr->{_limit} and defined $hr->{_offset} ) {
-        return $self->_rows( $sel_all_posts_in_offset, $hr->{tp_id}, $hr->{_limit}, $hr->{_offset} );
-    }
-    return $self->_rows( $sel_all_posts_in, $hr->{tp_id} );
-}
-
-sub sel_post_all_for {
-    my ($self, $hr) = @_;
-    if ( defined $hr->{_limit} and defined $hr->{_offset} ) {
-        return $self->_rows( $sel_post_all_for_offset, $hr->{a_id}, $hr->{_limit}, $hr->{_offset} );
-    }
-    return $self->_rows( $sel_post_all_for, $hr->{a_id} );
-}
-
-sub ins_post {
-    my ($self, $hr) = @_;
-    $self->_do( $ins_post, $hr->{tp_id}, $hr->{a_id}, $hr->{p_message}, $hr->{t_id} );
-}
-
-sub upd_post {
-    my ($self, $hr) = @_;
-    $self->_do( $upd_post, $hr->{tp_id}, $hr->{a_id}, $hr->{p_message}, $hr->{t_id}, $hr->{p_id} );
-}
-
-sub sel_post {
-    my ($self, $hr) = @_;
-    return $self->_row( $sel_post, $hr->{p_id} );
-}
-
-sub del_post {
-    my ($self, $hr) = @_;
-    $self->_do( $del_post, $hr->{p_id} );
-}
-
-sub sel_post_count {
-    my ($self) = @_;
-    return $self->_row( $sel_post_count );
-}
-
-sub ins_info {
-    my ($self, $hr) = @_;
-    return $self->_do( $ins_info, $hr->{a_id}, $hr->{i_posts}, $hr->{i_signature} );
-}
-
-sub upd_info {
-    my ($self, $hr) = @_;
-    $self->_do( $upd_info, $hr->{i_posts}, $hr->{i_signature}, $hr->{a_id} );
-}
-
-sub sel_info {
-    my ($self, $hr) = @_;
-    return $self->_row( $sel_info, $hr->{a_id} );
 }
 
 sub _nuke {

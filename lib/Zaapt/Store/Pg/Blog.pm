@@ -15,14 +15,16 @@ my $schema = 'blog';
 
 my $table = {
     blog => {
-        name => 'blog',
+        schema => $schema,
+        name   => 'blog',
         prefix => 'b',
-        cols => [ qw(id name title description show moderate comment trackback r:admin_id r:view_id r:edit_id r:publish_id r:comment_id r:trackback_id ts:inserted ts:updated) ],
+        cols   => [ qw(id name title description show moderate comment trackback r:admin_id r:view_id r:edit_id r:publish_id r:comment_id r:trackback_id ts:inserted ts:updated) ],
     },
     entry => {
-        name => 'entry',
+        schema => $schema,
+        name   => 'entry',
         prefix => 'e',
-        cols => [
+        cols   => [
             'id',
             [ 'blog_id', 'fk', 'b_id' ],
             [ 'account_id', 'fk', 'a_id' ],
@@ -31,9 +33,10 @@ my $table = {
         ],
     },
     entry_label => {
-        name => 'entry_label',
+        schema => $schema,
+        name   => 'entry_label',
         prefix => 'el',
-        cols => [
+        cols   => [
             'id',
             [ 'entry_id', 'fk', 'e_id' ],
             [ 'label_id', 'fk', 'l_id' ],
@@ -41,18 +44,20 @@ my $table = {
         ],
     },
     comment => {
-        name => 'comment',
+        schema => $schema,
+        name   => 'comment',
         prefix => 'c',
-        cols => [
+        cols   => [
             'id',
             [ 'entry_id', 'fk', 'e_id' ],
             qw(name email homepage comment status ts:inserted ts:updated)
         ],
     },
     trackback => {
-        name => 'trackback',
+        schema => $schema,
+        name   => 'trackback',
         prefix => 'tr',
-        cols => [
+        cols   => [
             'id',
             [ 'entry_id', 'fk', 'e_id' ],
             qw(url blogname title excerpt status ts:inserted ts:updated)

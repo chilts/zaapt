@@ -12,14 +12,16 @@ my $schema = 'dir';
 
 my $table = {
     dir => {
-        name => 'dir',
+        schema => $schema,
+        name   => 'dir',
         prefix => 'd',
-        cols => [ qw(id name title description path webdir ro:total r:admin_id r:view_id r:edit_id ts:inserted ts:updated) ],
+        cols   => [ qw(id name title description path webdir ro:total r:admin_id r:view_id r:edit_id ts:inserted ts:updated) ],
     },
     file => {
-        name => 'file',
+        schema => $schema,
+        name   => 'file',
         prefix => 'f',
-        cols => [
+        cols   => [
             'id',
             [ 'dir_id', 'fk', 'd_id' ],
             qw(name ext title description filename ts:inserted ts:updated)

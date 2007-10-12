@@ -14,15 +14,15 @@ my $schema = 'menu';
 my $tables = {
     menu => {
         schema => $schema,
-        name => 'menu',
+        name   => 'menu',
         prefix => 'm',
-        cols => [ qw(id name title description r:admin_id r:view_id r:edit_id) ],
+        cols   => [ qw(id name title description r:admin_id r:view_id r:edit_id) ],
     },
     item => {
         schema => $schema,
-        name => 'item',
+        name   => 'item',
         prefix => 'i',
-        cols => [
+        cols   => [
             'id',
             [ 'menu_id', 'fk', 'm_id' ],
             qw(display level url text ishtml)

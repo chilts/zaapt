@@ -12,28 +12,32 @@ my $schema = 'gallery';
 
 my $table = {
     gallery => {
-        name => 'gallery',
+        schema => $schema,
+        name   => 'gallery',
         prefix => 'g',
-        cols => [ qw(id name title description path original webdir show extractexif ro:total r:admin_id r:view_id r:edit_id ts:inserted ts:updated) ],
+        cols   => [ qw(id name title description path original webdir show extractexif ro:total r:admin_id r:view_id r:edit_id ts:inserted ts:updated) ],
     },
     picture => {
-        name => 'picture',
+        schema => $schema,
+        name   => 'picture',
         prefix => 'p',
-        cols => [
+        cols   => [
             'id',
             [ 'gallery_id', 'fk', 'g_id' ],
             qw(name title description filename ts:inserted ts:updated)
         ],
     },
     field => {
-        name => 'field',
+        schema => $schema,
+        name   => 'field',
         prefix => 'f',
-        cols => [ qw(id info description isexif ts:inserted ts:updated) ],
+        cols   => [ qw(id info description isexif ts:inserted ts:updated) ],
     },
     detail => {
-        name => 'detail',
+        schema => $schema,
+        name   => 'detail',
         prefix => 'd',
-        cols => [
+        cols   => [
             'id',
             [ 'picture_id', 'fk', 'p_id' ],
             [ 'field_id', 'fk', 'f_id' ],
@@ -41,18 +45,20 @@ my $table = {
         ],
     },
     size => {
-        name => 'size',
+        schema => $schema,
+        name   => 'size',
         prefix => 's',
-        cols => [
+        cols   => [
             'id',
             [ 'gallery_id', 'fk', 'g_id' ],
             qw(title size path ts:inserted ts:updated)
         ],
     },
     required => {
-        name => 'required',
+        schema => $schema,
+        name   => 'required',
         prefix => 'r',
-        cols => [
+        cols   => [
             'id',
             [ 'gallery_id', 'fk', 'g_id' ],
             [ 'field_id', 'fk', 'f_id' ],

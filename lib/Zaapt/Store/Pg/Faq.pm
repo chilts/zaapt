@@ -16,15 +16,15 @@ my $schema = 'faq';
 my $tables = {
     faq => {
         schema => $schema,
-        name => 'faq',
+        name   => 'faq',
         prefix => 'f',
-        cols => [ qw(id name title description r:admin_id r:view_id r:edit_id) ],
+        cols   => [ qw(id name title description r:admin_id r:view_id r:edit_id) ],
     },
     question => {
         schema => $schema,
-        name => 'question',
+        name   => 'question',
         prefix => 'q',
-        cols => [
+        cols   => [
             'id',
             [ 'faq_id', 'fk', 'f_id' ],
             [ 'type_id', 'fk', 't_id' ],

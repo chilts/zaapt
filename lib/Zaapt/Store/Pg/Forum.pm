@@ -18,15 +18,15 @@ my $schema = 'forum';
 my $tables = {
     forum => {
         schema => $schema,
-        name => 'forum',
+        name   => 'forum',
         prefix => 'f',
-        cols => [ qw(id name title description show topics posts poster_id r:admin_id r:view_id r:moderator_id ts:inserted ts:updated) ],
+        cols   => [ qw(id name title description show topics posts poster_id r:admin_id r:view_id r:moderator_id ts:inserted ts:updated) ],
     },
     topic => {
         schema => $schema,
-        name => 'topic',
+        name   => 'topic',
         prefix => 'tp',
-        cols => [
+        cols   => [
             'id',
             [ 'forum_id', 'fk', 'f_id' ],
             [ 'account_id', 'fk', 'a_id' ],
@@ -35,9 +35,9 @@ my $tables = {
     },
     post => {
         schema => $schema,
-        name => 'post',
+        name   => 'post',
         prefix => 'p',
-        cols => [
+        cols   => [
             'id',
             [ 'topic_id', 'fk', 'tp_id' ],
             [ 'account_id', 'fk', 'a_id' ],
@@ -51,9 +51,9 @@ my $tables = {
     poster => Zaapt::Store::Pg::Account->_get_table( 'account' ),
     info => {
         schema => $schema,
-        name => 'info',
+        name   => 'info',
         prefix => 'i',
-        cols => [
+        cols   => [
             [ 'account_id', 'fk', 'a_id' ],
             qw(posts signature ts:inserted ts:updated)
         ],

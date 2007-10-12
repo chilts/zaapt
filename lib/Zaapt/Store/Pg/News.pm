@@ -16,15 +16,15 @@ my $schema = 'news';
 my $tables = {
     news => {
         schema => $schema,
-        name => 'news',
+        name   => 'news',
         prefix => 'n',
-        cols => [ qw(id name title description show r:admin_id r:view_id r:edit_id r:publish_id) ],
+        cols   => [ qw(id name title description show r:admin_id r:view_id r:edit_id r:publish_id) ],
     },
     article => {
         schema => $schema,
-        name => 'article',
+        name   => 'article',
         prefix => 'a',
-        cols => [
+        cols   => [
             'id',
             [ 'news_id', 'fk', 'n_id' ],
             [ 'type_id', 'fk', 't_id' ],

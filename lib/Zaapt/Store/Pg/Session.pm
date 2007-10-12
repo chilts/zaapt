@@ -12,9 +12,10 @@ my $schema = 'session';
 
 my $table = {
     session => {
-        name => 'session',
+        schema => $schema,
+        name   => 'session',
         prefix => 's',
-        cols => [ qw(id a_session ts:inserted ts:updated) ],
+        cols   => [ qw(id a_session ts:inserted ts:updated) ],
     },
 };
 

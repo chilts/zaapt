@@ -14,9 +14,10 @@ my $schema = 'friend';
 
 my $table = {
     friend => {
-        name => 'friend',
+        schema => $schema,
+        name   => 'friend',
         prefix => 'f',
-        cols => [
+        cols   => [
             'id',
             [ 'account_id', 'fk', 'a_id' ],
             [ 'to_id', 'fk', 't_id' ],

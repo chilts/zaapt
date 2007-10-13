@@ -67,7 +67,7 @@ __PACKAGE__->mk_select_rows( 'sel_account_all', "SELECT $tables->{account}{sql_s
 
 # role
 __PACKAGE__->_mk_selecter( $schema, $tables->{role} );
-__PACKAGE__->mk_select_rows( 'sel_role_all', "SELECT $tables->{role}{sql_sel_cols} FROM $tables->{role}{sql_fqt} ORDER BY a.id" );
+__PACKAGE__->mk_select_rows( 'sel_role_all', "SELECT $tables->{role}{sql_sel_cols} FROM $tables->{role}{sql_fqt} ORDER BY r.name" );
 
 # privilege
 my $main_cols = "$tables->{account}{sql_sel_cols}, $tables->{privilege}{sql_sel_cols}, $tables->{role}{sql_sel_cols}";

@@ -17,181 +17,139 @@ my $tables = {
         prefix => 'a',
         cols   => [ qw(id username firstname lastname email notify salt password confirmed admin logins last ts:inserted ts:updated) ],
     },
+    role => {
+        schema => $schema,
+        name   => 'role',
+        prefix => 'r',
+        cols   => [ qw(id name description ts:inserted ts:updated) ],
+    },
+    privilege => {
+        schema => $schema,
+        name   => 'privilege',
+        prefix => 'p',
+        cols   => [
+            'id',
+            [ 'account_id', 'fk', 'a_id' ],
+            [ 'role_id', 'fk', 'r_id' ],
+            qw(ts:inserted ts:updated)
+        ],
+    },
+    confirm => {
+        schema => $schema,
+        name   => 'confirm',
+        prefix => 'c',
+        cols   => [
+            qw(account_id code ts:inserted ts:updated)
+        ],
+    },
 };
 
-# table names
-my $account_tablename = "account.account a";
-my $role_tablename = "account.role r";
-my $privilege_tablename = "account.privilege p";
-my $confirm_tablename = "account.confirm c";
+my $join = {
+    a_p  => "JOIN $schema.privilege p ON (a.id = p.account_id)",
+    p_r  => "JOIN account.role r ON (p.role_id = r.id)",
+};
 
-# helper
-my $account_cols = __PACKAGE__->_mk_cols( 'a', qw(id username firstname lastname email notify salt password confirmed admin logins last ts:inserted ts:updated) );
-my $role_cols = __PACKAGE__->_mk_cols( 'r', qw(id name description) );
-my $privilege_cols = __PACKAGE__->_mk_cols( 'p', qw(id account_id role_id) );
-my $confirm_cols = __PACKAGE__->_mk_cols( 'c', qw(account_id code) );
+sub _get_tables { return $tables; }
+
+## ----------------------------------------------------------------------------
+
+# creates {sql_fqt} and {sql_sel_cols}
+__PACKAGE__->_mk_sql( $schema, $tables );
+
+# generate the SQL ins/upd/del (no sel)
+__PACKAGE__->_mk_sql_accessors( $schema, $tables );
+
+## ----------------------------------------------------------------------------
 
 # account
-my $ins_account = "INSERT INTO account.account(username, firstname, lastname, email, notify, salt, password, admin, confirmed) VALUES(?, ?, ?, ?, ?, ?, md5(? || ?), COALESCE(?, False), COALESCE(?, False))";
-my $del_account = __PACKAGE__->_mk_del( 'account.account', qw(id) );
-my $sel_account = "SELECT $account_cols FROM $account_tablename WHERE id = ?";
-my $sel_account_using_username = "SELECT $account_cols FROM $account_tablename WHERE username = ?";
-my $upd_account = __PACKAGE__->_mk_upd( 'account.account', 'id', qw(username firstname lastname email notify confirmed admin));
-my $upd_password = "UPDATE account.account SET password = md5(salt || ?) WHERE id = ?";
-my $upd_logins = "UPDATE account.account SET logins = logins + 1 WHERE id = ?";
-my $upd_last = "UPDATE account.account SET last = CURRENT_TIMESTAMP WHERE id = ?";
-my $sel_account_all = "SELECT $account_cols FROM $account_tablename ORDER BY a.id";
+__PACKAGE__->_mk_selecter( $schema, $tables->{account} );
+__PACKAGE__->mk_select_rows( 'sel_account_all', "SELECT $tables->{account}{sql_sel_cols} FROM $tables->{account}{sql_fqt} ORDER BY a.id" );
 
 # role
-my $ins_role = __PACKAGE__->_mk_ins( 'account.role', qw(name description) );
-my $upd_role = __PACKAGE__->_mk_upd( 'account.role', 'id', qw(name description) );
-my $del_role = __PACKAGE__->_mk_del( 'account.role', qw(id) );
-my $sel_role = __PACKAGE__->_mk_sel( 'account.role', 'r', qw(name description) );
-my $sel_all_roles = "SELECT $role_cols FROM $role_tablename ORDER BY name"; # deprecated
-my $sel_role_all = "SELECT $role_cols FROM $role_tablename ORDER BY name";
+__PACKAGE__->_mk_selecter( $schema, $tables->{role} );
+__PACKAGE__->mk_select_rows( 'sel_role_all', "SELECT $tables->{role}{sql_sel_cols} FROM $tables->{role}{sql_fqt} ORDER BY a.id" );
 
 # privilege
-my $ins_privilege = __PACKAGE__->_mk_ins( 'account.privilege', qw(account_id role_id) );
-my $del_privilege = __PACKAGE__->_mk_del( 'account.privilege', qw(id) );
-my $sel_privilege = "SELECT $privilege_cols FROM $privilege_tablename WHERE p.id = ?";
-my $sel_privilege_all = "SELECT $account_cols, $privilege_cols, $role_cols FROM $account_tablename JOIN $privilege_tablename ON (a.id = p.account_id) JOIN $role_tablename ON (p.role_id = r.id) ORDER BY a.id, r.id";
-my $sel_privilege_all_by_account = "SELECT $account_cols, $privilege_cols, $role_cols FROM $account_tablename JOIN $privilege_tablename ON (a.id = p.account_id) JOIN $role_tablename ON (p.role_id = r.id) ORDER BY a.id, r.id";
-my $sel_privilege_all_by_role = "SELECT $role_cols, $privilege_cols, $account_cols FROM $role_tablename JOIN $privilege_tablename ON (r.id = p.role_id) JOIN $account_tablename ON (p.account_id = a.id) ORDER BY r.id, a.id";
+my $main_cols = "$tables->{account}{sql_sel_cols}, $tables->{privilege}{sql_sel_cols}, $tables->{role}{sql_sel_cols}";
+my $main_joins = "$tables->{account}{sql_fqt} $join->{a_p} $join->{p_r}";
+__PACKAGE__->_mk_selecter( $schema, $tables->{privilege} );
+__PACKAGE__->mk_select_rows( 'sel_privilege_all', "SELECT $main_cols FROM $main_joins ORDER BY a.id, r.id", [] );
+__PACKAGE__->mk_select_rows( 'sel_privilege_all_order_by_account', "SELECT $main_cols FROM $main_joins ORDER BY a.id, r.id", [ ] );
+__PACKAGE__->mk_select_rows( 'sel_privilege_all_order_by_role', "SELECT $main_cols FROM $main_joins ORDER BY r.id, a.id", [ ] );
 
 # confirm
-my $ins_confirm = __PACKAGE__->_mk_ins( 'account.confirm', qw(account_id code) );
-my $sel_confirm = "SELECT $confirm_cols FROM $confirm_tablename WHERE account_id = ?";
-my $del_confirm = __PACKAGE__->_mk_del( 'account.confirm', qw(account_id) );;
-
-# general select queries
-my $sel_account_for_authentication = "SELECT $account_cols FROM $account_tablename WHERE username = ? AND password = md5(salt || ?)";
-my $sel_roles_for_account = "SELECT a.username AS a_username, r.id AS r_id, r.name AS r_name FROM account.account a JOIN account.privilege p ON (a.id = p.account_id) JOIN account.role r ON (p.role_id = r.id) WHERE a.id = ?";
+__PACKAGE__->_mk_selecter( $schema, $tables->{confirm} );
 
 ## ----------------------------------------------------------------------------
 # methods
 
-sub _get_tables { return $tables; }
-
+my $ins_account = "INSERT INTO account.account(username, firstname, lastname, email, notify, salt, password, admin, confirmed) VALUES(?, ?, ?, ?, ?, ?, md5(? || ?), COALESCE(?, False), COALESCE(?, False))";
 sub ins_account {
     my ($self, $hr) = @_;
     $self->_do( $ins_account, $hr->{a_username}, $hr->{a_firstname}, $hr->{a_lastname}, $hr->{a_email}, $hr->{a_notify}, $hr->{a_salt}, $hr->{a_salt}, $hr->{a_password}, $hr->{a_admin}, $hr->{a_confirmed} );
 }
 
-sub ins_privilege {
-    my ($self, $hr) = @_;
-    $self->_do( $ins_privilege, $hr->{a_id}, $hr->{r_id} );
-}
-
-sub ins_role {
-    my ($self, $hr) = @_;
-    $self->_do( $ins_role, $hr->{r_name}, $hr->{r_description} );
-}
-
-sub upd_role {
-    my ($self, $hr) = @_;
-    $self->_do( $upd_role, $hr->{r_name}, $hr->{r_description}, $hr->{r_id} );
-}
-
-sub del_role {
-    my ($self, $hr) = @_;
-    $self->_do( $del_role, $hr->{r_id} );
-}
-
-sub sel_role {
-    my ($self, $hr) = @_;
-    return $self->_row( $sel_role, $hr->{r_id} );
-}
-
-sub sel_role_all {
-    my ($self, $hr) = @_;
-    return $self->_rows( $sel_role_all );
-}
-
+my $sel_roles_for_account = "SELECT a.username AS a_username, r.id AS r_id, r.name AS r_name FROM account.account a JOIN account.privilege p ON (a.id = p.account_id) JOIN account.role r ON (p.role_id = r.id) WHERE a.id = ?";
 sub sel_roles_for_account {
     my ($self, $hr) = @_;
     return $self->_rows( $sel_roles_for_account, $hr->{a_id} );
 }
 
-sub del_privilege {
-    my ($self, $hr) = @_;
-    $self->_do( $del_privilege, $hr->{p_id} );
-}
-
-sub sel_privilege {
-    my ($self, $hr) = @_;
-    return $self->_row( $sel_privilege, $hr->{p_id} );
-}
-
-sub sel_privilege_all {
-    my ($self, $hr) = @_;
-    return $self->_rows( $sel_privilege_all );
-}
-
-sub sel_privilege_all_by_account {
-    my ($self, $hr) = @_;
-    return $self->_rows( $sel_privilege_all_by_account );
-}
-
-sub sel_privilege_all_by_role {
-    my ($self, $hr) = @_;
-    return $self->_rows( $sel_privilege_all_by_role );
-}
-
-sub sel_account {
-    my ($self, $hr) = @_;
-    return $self->_row( $sel_account, $hr->{a_id} );
-}
-
-sub del_account {
-    my ($self, $hr) = @_;
-    $self->_do( $del_account, $hr->{a_id} );
-}
-
+my $sel_account_using_username = "SELECT $tables->{account}{sql_sel_cols} FROM $tables->{account}{sql_fqt} WHERE a.username = ?";
 sub sel_account_using_username {
     my ($self, $hr) = @_;
     return $self->_row( $sel_account_using_username, $hr->{a_username} );
 }
 
+my $sel_account_for_authentication = "SELECT $tables->{account}{sql_sel_cols} FROM $tables->{account}{sql_fqt} WHERE a.username = ? AND a.password = md5(salt || ?)";
 sub sel_account_for_authentication {
     my ($self, $hr) = @_;
     return $self->_row( $sel_account_for_authentication, $hr->{a_username}, $hr->{a_password} );
 }
 
+my $sel_account_check_password = "SELECT $tables->{account}{sql_sel_cols} FROM $tables->{account}{sql_fqt} WHERE a.id = ? AND a.password = md5(salt || ?)";
+sub sel_account_check_password {
+    my ($self, $hr) = @_;
+    return $self->_row( $sel_account_check_password, $hr->{a_id}, $hr->{a_password} );
+}
+
+my $upd_account_admin_toggle = "UPDATE account.account SET admin = not admin WHERE id = ?";
+sub upd_account_admin_toggle {
+    my ($self, $hr) = @_;
+    return $self->_do( $upd_account_admin_toggle, $hr->{a_id} );
+}
+
+my $upd_account = __PACKAGE__->_mk_upd( 'account.account', 'id', qw(username firstname lastname email notify confirmed admin));
 sub upd_account {
     my ($self, $hr) = @_;
     $self->_do( $upd_account, $hr->{a_username}, $hr->{a_firstname}, $hr->{a_lastname}, $hr->{a_email}, $hr->{a_notify}, $hr->{a_confirmed}, $hr->{a_admin}, $hr->{a_id} );
 }
 
+my $upd_password = "UPDATE account.account SET password = md5(salt || ?) WHERE id = ?";
 sub upd_password {
     my ($self, $hr) = @_;
     $self->_do( $upd_password, $hr->{a_password}, $hr->{a_id} );
 }
 
+my $upd_logins = "UPDATE account.account SET logins = logins + 1 WHERE id = ?";
 sub upd_logins {
     my ($self, $hr) = @_;
     $self->_do( $upd_logins, $hr->{a_id} );
 }
 
+my $upd_last = "UPDATE account.account SET last = CURRENT_TIMESTAMP WHERE id = ?";
 sub upd_last {
     my ($self, $hr) = @_;
     $self->_do( $upd_last, $hr->{a_id} );
 }
 
-sub sel_account_all {
-    my ($self) = @_;
-    return $self->_rows( $sel_account_all );
-}
-
+my $ins_confirm = __PACKAGE__->_mk_ins( 'account.confirm', qw(account_id code) );
 sub ins_confirm {
     my ($self, $hr) = @_;
     $self->_do( $ins_confirm, $hr->{a_id}, $hr->{c_code} );
 }
 
-sub sel_confirm {
-    my ($self, $hr) = @_;
-    $self->_row( $sel_confirm, $hr->{a_id} );
-}
-
+my $del_confirm = __PACKAGE__->_mk_del( 'account.confirm', qw(account_id) );
 sub del_confirm {
     my ($self, $hr) = @_;
     $self->_do( $del_confirm, $hr->{a_id} );

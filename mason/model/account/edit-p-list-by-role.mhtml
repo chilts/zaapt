@@ -6,7 +6,7 @@
 %# ----------------------------------------------------------------------------
 <%init>
     my $model = $zaapt->get_model('Account');
-    my $roles_raw = $model->sel_privilege_all_by_role();
+    my $roles_raw = $model->sel_privilege_all_order_by_role();
     my $roles = {};
     foreach my $row ( @$roles_raw ) {
        my $r_name = $row->{r_name};

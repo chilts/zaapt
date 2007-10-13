@@ -31,16 +31,16 @@
         push @$err, Zaapt::Utils::Valid::err();
     }
 
-    unless ( Zaapt::Utils::Valid::contains_something($a_firstname, 'Firstname') ) {
+    unless ( Zaapt::Utils::Valid::has_content($a_firstname, 'Firstname') ) {
         push @$err, Zaapt::Utils::Valid::err();
     }
 
-    unless ( Zaapt::Utils::Valid::contains_something($a_lastname, 'Lastname') ) {
+    unless ( Zaapt::Utils::Valid::has_content($a_lastname, 'Lastname') ) {
         push @$err, Zaapt::Utils::Valid::err();
     }
 
     # need to do better checking for this email address
-    unless ( Zaapt::Utils::Valid::contains_something($a_email, 'Email') ) {
+    unless ( Zaapt::Utils::Valid::has_content($a_email, 'Email') ) {
         push @$err, Zaapt::Utils::Valid::err();
     }
 

@@ -37,7 +37,7 @@
         <td>
 %    if ( exists $my_roles->{super} ) {
             * <a href="#">Reset Password (ToDo)</a><br />
-            * <a href="#">Make Admin (ToDo)</a><br />
+            * <a href="edit-a-admin-toggle.html?a_id=<% $account->{a_id} | u %>">Toggle Admin</a><br />
             * <a href="edit-a-del.html?a_id=<% $account->{a_id} | u %>">Delete</a><br />
 %    } else {
             * No Actions
@@ -47,5 +47,4 @@
 % }
 
 </&>
-
 %# ----------------------------------------------------------------------------

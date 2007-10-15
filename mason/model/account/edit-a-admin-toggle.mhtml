@@ -1,0 +1,20 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $my_roles
+    $a_id
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Account');
+    my $account = $model->sel_account({ a_id => $a_id });
+
+    $m->redirect('edit-a-list.html') unless defined $account;
+    $m->redirect('edit-a-list.html') unless exists $my_roles->{super};
+
+    $model->upd_account_admin_toggle({ a_id => $a_id });
+
+    $m->redirect("edit-a-list.html");
+    return;
+</%init>
+%# ----------------------------------------------------------------------------

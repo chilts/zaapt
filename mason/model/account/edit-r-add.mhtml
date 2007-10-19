@@ -1,11 +1,11 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_roles
+    $my_perms
 </%args>
 %# ----------------------------------------------------------------------------
 <%init>
-    $m->redirect('edit-r-list.html') unless exists $my_roles->{super};
+    $m->redirect('edit-r-list.html') unless exists $my_perms->{super};
 </%init>
 %# ----------------------------------------------------------------------------
 <h1>Add a Role</h1>

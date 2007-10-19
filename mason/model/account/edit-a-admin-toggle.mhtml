@@ -1,7 +1,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_roles
+    $my_perms
     $a_id
 </%args>
 %# ----------------------------------------------------------------------------
@@ -10,7 +10,7 @@
     my $account = $model->sel_account({ a_id => $a_id });
 
     $m->redirect('edit-a-list.html') unless defined $account;
-    $m->redirect('edit-a-list.html') unless exists $my_roles->{super};
+    $m->redirect('edit-a-list.html') unless exists $my_perms->{super};
 
     $model->upd_account_admin_toggle({ a_id => $a_id });
 

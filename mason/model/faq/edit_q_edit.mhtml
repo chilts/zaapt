@@ -1,7 +1,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_roles
+    $my_perms
     $q_id
 </%args>
 %# ----------------------------------------------------------------------------
@@ -17,7 +17,7 @@
 
     $m->redirect('edit_f_list.html') unless defined $question;
 
-    $m->redirect('edit_q_list.html?f_id=$question->{f_id}') unless exists $my_roles->{$question->{_edit}};
+    $m->redirect('edit_q_list.html?f_id=$question->{f_id}') unless exists $my_perms->{$question->{_edit}};
 
     my $page_types = $zaapt->get_model('Common')->sel_type_all();
     my @options = map { { value => $_->{t_id}, text => $_->{t_name} } } @$page_types;

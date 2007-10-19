@@ -1,7 +1,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_roles
+    $my_perms
 </%args>
 %# ----------------------------------------------------------------------------
 <%init>
@@ -12,7 +12,7 @@
 <h1>Dir List</h1>
 
 <p>
-% if ( exists $my_roles->{super} ) {
+% if ( exists $my_perms->{super} ) {
     * <a href="edit-d-add.html">Add Dir &raquo;</a><br />
 % }
 </p>
@@ -21,7 +21,7 @@
 
 % my $r = 1;
 % foreach my $dir ( @$dirs ) {
-%     next unless exists $my_roles->{$dir->{_view}};
+%     next unless exists $my_perms->{$dir->{_view}};
         <tr class="r<% $r++%2 %>">
             <td>
                 <% $dir->{d_name} | h %> (<% $dir->{d_total} | h %> files)<br />
@@ -29,10 +29,10 @@
                 webdir: <% $dir->{d_webdir} | h %>
             </td>
             <td>
-%         if ( exists $my_roles->{$dir->{_edit}} ) {
+%         if ( exists $my_perms->{$dir->{_edit}} ) {
                 * <a href="edit-f-add.html?d_id=<% $dir->{d_id} | u %>">Add File</a><br />
                 * <a href="edit-f-list.html?d_id=<% $dir->{d_id} | u %>">File List</a><br />
-%             if ( exists $my_roles->{$dir->{_admin}} ) {
+%             if ( exists $my_perms->{$dir->{_admin}} ) {
                 * <a href="edit-d-del.html?d_id=<% $dir->{d_id} | u %>">Delete</a><br />
 %             }
 %         } else {

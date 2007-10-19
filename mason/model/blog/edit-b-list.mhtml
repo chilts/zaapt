@@ -1,7 +1,7 @@
 %# --- ARGS -------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_roles
+    $my_perms
 </%args>
 %# --- INIT -------------------------------------------------------------------
 <%init>
@@ -11,7 +11,7 @@
 %# --- HTML -------------------------------------------------------------------
 <h1>Blog List</h1>
 
-% if ( exists $my_roles->{super} ) {
+% if ( exists $my_perms->{super} ) {
 <p>
     * <a href="edit-b-add.html">Add Blog &raquo;</a><br />
 </p>
@@ -27,17 +27,17 @@
     <tbody>
 % my $row = 1;
 % foreach my $blog ( @$blogs ) {
-%     next unless exists $my_roles->{$blog->{_view}};
+%     next unless exists $my_perms->{$blog->{_view}};
         <tr class="r<% $row=1-$row %>">
             <td>
                 <% $blog->{b_name} | h %>
             </td>
             <td>
-%         if ( exists $my_roles->{$blog->{_edit}} ) {
+%         if ( exists $my_perms->{$blog->{_edit}} ) {
                 * <a href="edit-e-add.html?b_id=<% $blog->{b_id} | u %>">Add Entry</a><br />
                 * <a href="edit-e-list.html?b_id=<% $blog->{b_id} | u %>">Entry List</a><br />
                 * <a href="edit-c-list.html?b_id=<% $blog->{b_id} | u %>">Audit Comments</a><br />
-%             if ( exists $my_roles->{$blog->{_admin}} ) {
+%             if ( exists $my_perms->{$blog->{_admin}} ) {
                 * <a href="edit-b-del.html?b_id=<% $blog->{b_id} | u %>">Delete</a><br />
 %             }
 %         } else {

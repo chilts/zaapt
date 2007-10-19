@@ -1,7 +1,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_roles
+    $my_perms
     $a_id
 </%args>
 %# ----------------------------------------------------------------------------
@@ -11,7 +11,7 @@
 
     $m->redirect('edit-a-list.html') unless defined $account;
 
-    $m->redirect('edit-a-list.html') unless exists $my_roles->{super};
+    $m->redirect('edit-a-list.html') unless exists $my_perms->{super};
 
     $model->del_account({ a_id => $a_id });
 

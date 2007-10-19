@@ -1,7 +1,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_roles
+    $my_perms
     $d_id
 </%args>
 %# ----------------------------------------------------------------------------
@@ -11,7 +11,7 @@
 
     $m->redirect('edit-d-list.html') unless defined $dir;
 
-    $m->redirect('edit-d-list.html') unless exists $my_roles->{$dir->{_admin}};
+    $m->redirect('edit-d-list.html') unless exists $my_perms->{$dir->{_admin}};
 
     $model->del_dir({ d_id => $d_id });
 

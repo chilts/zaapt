@@ -10,10 +10,10 @@ CREATE TABLE news.news (
     title           TEXT NOT NULL,
     description     TEXT NOT NULL,
     show            INTEGER NOT NULL,
-    admin_id        INTEGER NOT NULL REFERENCES account.role,
-    view_id         INTEGER NOT NULL REFERENCES account.role,
-    edit_id         INTEGER NOT NULL REFERENCES account.role,
-    publish_id      INTEGER NOT NULL REFERENCES account.role,
+    admin_id        INTEGER NOT NULL REFERENCES account.permission,
+    view_id         INTEGER NOT NULL REFERENCES account.permission,
+    edit_id         INTEGER NOT NULL REFERENCES account.permission,
+    publish_id      INTEGER NOT NULL REFERENCES account.permission,
 
     UNIQUE(name),
     LIKE base       INCLUDING DEFAULTS

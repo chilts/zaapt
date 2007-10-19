@@ -1,7 +1,7 @@
 %# --- ARGS -------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_roles
+    $my_perms
 </%args>
 %# --- INIT -------------------------------------------------------------------
 <%init>
@@ -11,7 +11,7 @@
 %# --- HTML -------------------------------------------------------------------
 <h1>Content List</h1>
 
-% if ( exists $my_roles->{super} ) {
+% if ( exists $my_perms->{super} ) {
 <p>
     * <a href="edit_c_add.html">Add Content Section &raquo;</a><br />
 </p>
@@ -27,13 +27,13 @@
     <tbody>
 % my $row = 1;
 % foreach my $content ( @$contents ) {
-%     next unless exists $my_roles->{$content->{_view}};
+%     next unless exists $my_perms->{$content->{_view}};
         <tr class="r<% $row=1-$row %>">
             <td>
                 <% $content->{c_name} | h %>
             </td>
             <td>
-%         if ( exists $my_roles->{$content->{_admin}} ) {
+%         if ( exists $my_perms->{$content->{_admin}} ) {
                 * <a href="edit_p_add.html?c_id=<% $content->{c_id} | u %>">Add Page</a><br />
                 * <a href="edit_p_list.html?c_id=<% $content->{c_id} | u %>">List/Edit</a><br />
                 * <a href="edit_c_del.html?c_id=<% $content->{c_id} | u %>">Delete</a><br />

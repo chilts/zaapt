@@ -1,7 +1,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_roles
+    $my_perms
     $a_username  => ''
     $a_firstname => ''
     $a_lastname  => ''
@@ -18,7 +18,7 @@
 </%once>
 %# ----------------------------------------------------------------------------
 <%init>
-    $m->redirect('edit-a-list.html') unless exists $my_roles->{super};
+    $m->redirect('edit-a-list.html') unless exists $my_perms->{super};
 
     # do some checking
     my $err = [];

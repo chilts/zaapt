@@ -1,7 +1,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_roles
+    $my_perms
     $g_id
 </%args>
 %# ----------------------------------------------------------------------------
@@ -13,7 +13,7 @@
         return;
     }
 
-    $m->redirect('edit-g-list.html') unless exists $my_roles->{$gallery->{_view}};
+    $m->redirect('edit-g-list.html') unless exists $my_perms->{$gallery->{_view}};
     my $sizes = $model->sel_size_all_in({ g_id => $g_id });
 </%init>
 %# ----------------------------------------------------------------------------
@@ -24,7 +24,7 @@
 <& edit-render-g-title.mhtml, gallery => $gallery &>
 
 <p>
-% if ( exists $my_roles->{$gallery->{_admin}} ) {
+% if ( exists $my_perms->{$gallery->{_admin}} ) {
     * <a href="edit-s-add.html?g_id=<% $gallery->{g_id} | u %>">Add Size &raquo;</a><br />
     * <a href="edit-s-regenerate.html">Regenerate All Sizes&raquo;</a></p><br />
 % } else {
@@ -42,7 +42,7 @@
                 <strong><% $size->{s_path} | h %>/</strong><br />
             </td>
             <td>
-%         if ( exists $my_roles->{$gallery->{_admin}} ) {
+%         if ( exists $my_perms->{$gallery->{_admin}} ) {
                 * <a href="edit-s-edit.html?s_id=<% $size->{s_id} | u %>">Edit Size</a><br />
                 * <a href="edit-s-del.html?s_id=<% $size->{s_id} | u %>">Delete</a><br />
 %         } else {

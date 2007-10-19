@@ -7,7 +7,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_roles
+    $my_perms
     $n_name        => ''
     $n_title       => ''
     $n_description => ''
@@ -26,7 +26,7 @@
 <%init>
     my $model = $zaapt->get_model('News');
 
-    $m->redirect('edit_n_list.html') unless exists $my_roles->{super};
+    $m->redirect('edit_n_list.html') unless exists $my_perms->{super};
 
     my $err = [];
 

@@ -13,12 +13,12 @@ CREATE TABLE blog.blog (
     moderate        BOOLEAN NOT NULL DEFAULT False,
     comment         BOOLEAN NOT NULL DEFAULT False,
     trackback       BOOLEAN NOT NULL DEFAULT False,
-    admin_id        INTEGER NOT NULL REFERENCES account.role,
-    view_id         INTEGER NOT NULL REFERENCES account.role,
-    edit_id         INTEGER NOT NULL REFERENCES account.role,
-    publish_id      INTEGER NOT NULL REFERENCES account.role,
-    comment_id      INTEGER NOT NULL REFERENCES account.role,
-    trackback_id    INTEGER NOT NULL REFERENCES account.role,
+    admin_id        INTEGER NOT NULL REFERENCES account.permission,
+    view_id         INTEGER NOT NULL REFERENCES account.permission,
+    edit_id         INTEGER NOT NULL REFERENCES account.permission,
+    publish_id      INTEGER NOT NULL REFERENCES account.permission,
+    comment_id      INTEGER NOT NULL REFERENCES account.permission,
+    trackback_id    INTEGER NOT NULL REFERENCES account.permission,
 
     UNIQUE(name),
     LIKE base       INCLUDING DEFAULTS

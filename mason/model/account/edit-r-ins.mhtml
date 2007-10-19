@@ -1,13 +1,13 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_roles
+    $my_perms
     $r_name        => ''
     $r_description => ''
 </%args>
 %# ----------------------------------------------------------------------------
 <%init>
-    $m->redirect('edit-r-list.html') unless exists $my_roles->{super};
+    $m->redirect('edit-r-list.html') unless exists $my_perms->{super};
 
     # do some checking
     my $err = [];
@@ -43,5 +43,4 @@
         { type => 'submit', field => 'Actions', value => 'Add Role', cancel => 'edit-r-list.html' },
     ]
 &>
-
 %# ----------------------------------------------------------------------------

@@ -24,6 +24,11 @@ CREATE TABLE account.account (
 CREATE TRIGGER account_updated BEFORE UPDATE ON account.account
     FOR EACH ROW EXECUTE PROCEDURE updated();
 
+-- Some information from the following links:
+-- - http://en.wikipedia.org/wiki/Role-Based_Access_Control
+-- - http://www.ecs.syr.edu/faculty/chin/cse774/readings/rbac/p34-ferraiolo.pdf
+--   (specifically, P.42, Fig.2
+
 -- table: role
 CREATE SEQUENCE account.role_id_seq;
 CREATE TABLE account.role (
@@ -37,18 +42,72 @@ CREATE TABLE account.role (
 CREATE TRIGGER role_updated BEFORE UPDATE ON account.role
     FOR EACH ROW EXECUTE PROCEDURE updated();
 
--- table: privilege
-CREATE SEQUENCE account.privilege_id_seq;
-CREATE TABLE account.privilege (
-    id              INTEGER NOT NULL DEFAULT nextval('account.privilege_id_seq'::TEXT) PRIMARY KEY,
+-- table: permission
+CREATE SEQUENCE account.permission_id_seq;
+CREATE TABLE account.permission (
+    id              INTEGER NOT NULL DEFAULT nextval('account.permission_id_seq'::TEXT) PRIMARY KEY,
+    name            TEXT NOT NULL,
+    description     TEXT NOT NULL,
+
+    UNIQUE(name),
+    LIKE base       INCLUDING DEFAULTS
+);
+CREATE TRIGGER permission_updated BEFORE UPDATE ON account.permission
+    FOR EACH ROW EXECUTE PROCEDURE updated();
+
+-- table: ra - role assignment (read: which account has which role)
+-- Note: in most RBAC articles, this is named the 'user assignment' table)
+CREATE SEQUENCE account.ra_id_seq;
+CREATE TABLE account.ra (
+    id              INTEGER NOT NULL DEFAULT nextval('account.ra_id_seq'::TEXT) PRIMARY KEY,
     account_id      INTEGER NOT NULL REFERENCES account.account,
     role_id         INTEGER NOT NULL REFERENCES account.role,
 
     UNIQUE(account_id, role_id),
     LIKE base       INCLUDING DEFAULTS
 );
-CREATE TRIGGER privilege_updated BEFORE UPDATE ON account.privilege
+CREATE TRIGGER required_updated BEFORE UPDATE ON account.ra
     FOR EACH ROW EXECUTE PROCEDURE updated();
+
+-- table: pa - permission assignment (read: which role has which permission)
+CREATE SEQUENCE account.pa_id_seq;
+CREATE TABLE account.pa (
+    id              INTEGER NOT NULL DEFAULT nextval('account.pa_id_seq'::TEXT) PRIMARY KEY,
+    role_id         INTEGER NOT NULL REFERENCES account.role,
+    permission_id   INTEGER NOT NULL REFERENCES account.permission,
+
+    UNIQUE(role_id, permission_id),
+    LIKE base       INCLUDING DEFAULTS
+);
+CREATE TRIGGER required_updated BEFORE UPDATE ON account.pa
+    FOR EACH ROW EXECUTE PROCEDURE updated();
+
+-- table: rh - role hierarchy (read: which roles encompass other roles)
+-- ToDo: for the future, to fulfil Level 2 - Hierarchical RBAC
+-- CREATE SEQUENCE account.rh_id_seq;
+-- CREATE TABLE account.rh (
+--     id              INTEGER NOT NULL DEFAULT nextval('account.rh_id_seq'::TEXT) PRIMARY KEY,
+--     role_id         INTEGER NOT NULL REFERENCES account.role,
+--     role_id         INTEGER NOT NULL REFERENCES account.role,
+-- 
+--     LIKE base       INCLUDING DEFAULTS
+-- );
+-- CREATE TRIGGER required_updated BEFORE UPDATE ON account.rh
+--     FOR EACH ROW EXECUTE PROCEDURE updated();
+
+-- table: ssd - static separation of duty
+-- if a (role, role) pair is in this list, it means they can't be assigned to the same account
+-- ToDo: for the future
+-- CREATE SEQUENCE account.ssd_id_seq;
+-- CREATE TABLE account.ssd (
+--     id              INTEGER NOT NULL DEFAULT nextval('account.ssd_id_seq'::TEXT) PRIMARY KEY,
+--     role_id         INTEGER NOT NULL REFERENCES account.role,
+--     role_id         INTEGER NOT NULL REFERENCES account.role,
+-- 
+--     LIKE base       INCLUDING DEFAULTS
+-- );
+-- CREATE TRIGGER required_updated BEFORE UPDATE ON account.ssd
+--     FOR EACH ROW EXECUTE PROCEDURE updated();
 
 -- table: confirm
 CREATE TABLE account.confirm (

@@ -1,7 +1,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_roles
+    $my_perms
     $e_id
 </%args>
 %# ----------------------------------------------------------------------------
@@ -15,7 +15,7 @@
 
     # check the error conditions first - we need to recover
     $m->redirect('edit-b-list.html') unless defined $entry;
-    $m->redirect('edit-b-list.html') unless exists $my_roles->{$entry->{_admin}};
+    $m->redirect('edit-b-list.html') unless exists $my_perms->{$entry->{_admin}};
 
     $model->del_entry({ e_id => $e_id });
 

@@ -1,7 +1,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_roles
+    $my_perms
     $g_id
 </%args>
 %# ----------------------------------------------------------------------------
@@ -17,7 +17,7 @@
         return;
     }
 
-    $m->redirect('edit-g-list.html') unless exists $my_roles->{$gallery->{_admin}};
+    $m->redirect('edit-g-list.html') unless exists $my_perms->{$gallery->{_admin}};
 </%init>
 %# ----------------------------------------------------------------------------
 <h1>Add a Size</h1>

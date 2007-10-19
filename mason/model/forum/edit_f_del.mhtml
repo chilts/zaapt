@@ -1,7 +1,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_roles
+    $my_perms
     $f_id
 </%args>
 %# ----------------------------------------------------------------------------
@@ -11,7 +11,7 @@
 
     $m->redirect('edit_f_list.html') unless defined $forum;
 
-    $m->redirect('edit_f_list.html') unless exists $my_roles->{$forum->{_admin}};
+    $m->redirect('edit_f_list.html') unless exists $my_perms->{$forum->{_admin}};
 
     $model->del_forum({ f_id => $f_id });
 

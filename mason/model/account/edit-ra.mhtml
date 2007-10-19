@@ -1,0 +1,65 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $my_perms
+    $_act => ''
+    $a_id => undef
+    @r_id => ()
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    use Data::Dumper;
+    warn Dumper(\%ARGS);
+    $m->redirect('edit-a-list.html') unless exists $my_perms->{super};
+
+    my $model = $zaapt->get_model('Account');
+    my $account = $model->sel_account({ a_id => $a_id });
+    $m->redirect('edit-a-list.html') unless defined $account;
+
+    if ( $_act eq 'save' ) {
+        # remove all the current ones and add these in
+        $model->del_ra_for({ a_id => $a_id });
+        foreach my $r_id ( @r_id ) {
+             $model->ins_ra({ a_id => $a_id, r_id => $r_id });
+        }
+    }
+
+    # get all the roles and this account's roles
+    my $roles = $model->sel_role_all();
+    my $assigned = $model->sel_role_all_for_account({ a_id => $a_id });
+    my %assigned = map { $_->{r_id} => 1 } @$assigned;
+    warn Dumper($assigned);
+    warn Dumper(\%assigned);
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Role Assigner</h1>
+
+<p>
+    * <a href="edit-a-list.html">&laquo; Back to Account List</a>
+</p>
+
+<h2>Account: <% $account->{a_name} | h %> - '<% $account->{a_firstname} | h %> <% $account->{a_lastname} | h %>'</h2>
+
+<form action="?" method="post">
+<input type="hidden" name="a_id" value="<% $a_id | h %>" />
+<&| /zaapt/common/admin/table-edit.mhtml, title => 'Role' &>
+
+% my $row = 1;
+% foreach my $role ( @$roles ) {
+    <tr class="r<% $row=1-$row %>">
+        <td>
+            (<% $role->{r_id} | h %>) <strong><% $role->{r_name} | h %></strong><br />
+            <% $role->{r_description} | h %>
+        </td>
+        <td>
+            <input type="checkbox" id="r_<% $role->{r_id} | h %>" name="r_id" value="<% $role->{r_id} | h %>"<% exists $assigned{$role->{r_id}} ? ' checked="checked"' : '' %> />
+            <label for="r_<% $role->{r_id} | h %>" > Assign</label>
+        </td>
+    </tr>
+% }
+</&>
+<input type="hidden" name="_act" value="save" />
+<input type="submit" value="Assign Roles" />
+</form>
+
+%# ----------------------------------------------------------------------------

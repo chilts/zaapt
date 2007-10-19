@@ -1,7 +1,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_roles
+    $my_perms
     $id
     $b_id
     $e_name      => ''
@@ -30,7 +30,7 @@
     $m->redirect('edit-b-list.html') unless defined $blog;
 
     # to insert an entry, '_edit' is required
-    $m->redirect('edit-b-list.html') unless exists $my_roles->{$blog->{_edit}};
+    $m->redirect('edit-b-list.html') unless exists $my_perms->{$blog->{_edit}};
 
     # check this type exists
     unless ( $zaapt->get_model('Common')->sel_type({ t_id => $t_id }) ) {

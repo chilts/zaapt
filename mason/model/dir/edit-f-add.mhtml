@@ -1,7 +1,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_roles
+    $my_perms
     $d_id
 </%args>
 %# ----------------------------------------------------------------------------
@@ -15,7 +15,7 @@
     my $dir = $model->sel_dir({ d_id => $d_id });
 
     $m->redirect('edit-d-list.html') unless defined $dir;
-    $m->redirect('edit-d-list.html') unless exists $my_roles->{$dir->{_edit}};
+    $m->redirect('edit-d-list.html') unless exists $my_perms->{$dir->{_edit}};
 </%init>
 %# ----------------------------------------------------------------------------
 <h1>Add a File</h1>

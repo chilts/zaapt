@@ -23,16 +23,31 @@ my $tables = {
         prefix => 'r',
         cols   => [ qw(id name description ts:inserted ts:updated) ],
     },
-    privilege => {
+    permission => {
         schema => $schema,
-        name   => 'privilege',
+        name   => 'permission',
         prefix => 'p',
+        cols   => [ qw(id name description ts:inserted ts:updated) ],
+    },
+    ra => {
+        schema => $schema,
+        name   => 'ra',
+        prefix => 'ra',
         cols   => [
             'id',
             [ 'account_id', 'fk', 'a_id' ],
             [ 'role_id', 'fk', 'r_id' ],
-            qw(ts:inserted ts:updated)
-        ],
+            qw(ts:inserted ts:updated) ],
+    },
+    pa => {
+        schema => $schema,
+        name   => 'pa',
+        prefix => 'pa',
+        cols   => [
+            'id',
+            [ 'role_id', 'fk', 'r_id' ],
+            [ 'permission_id', 'fk', 'p_id' ],
+            qw(ts:inserted ts:updated) ],
     },
     confirm => {
         schema => $schema,
@@ -45,8 +60,11 @@ my $tables = {
 };
 
 my $join = {
-    a_p  => "JOIN $schema.privilege p ON (a.id = p.account_id)",
-    p_r  => "JOIN account.role r ON (p.role_id = r.id)",
+    a_ra => "JOIN $schema.ra ra ON (a.id = ra.account_id)",
+    ra_r => "JOIN $schema.role r ON (ra.role_id = r.id)",
+    r_pa => "JOIN $schema.pa pa ON (r.id = pa.role_id)",
+    pa_p => "JOIN $schema.permission p ON (pa.permission_id = p.id)",
+    a_c  => "JOIN $schema.confirm c ON (a.id = c.account_id)",
 };
 
 sub _get_tables { return $tables; }
@@ -61,6 +79,10 @@ __PACKAGE__->_mk_sql_accessors( $schema, $tables );
 
 ## ----------------------------------------------------------------------------
 
+# link all the tables
+my $main_cols = "$tables->{account}{sql_sel_cols}, $tables->{role}{sql_sel_cols}, $tables->{permission}{sql_sel_cols}";
+my $main_joins = "$tables->{account}{sql_fqt} $join->{a_ra} $join->{ra_r} $join->{r_pa} $join->{pa_p}";
+
 # account
 __PACKAGE__->_mk_selecter( $schema, $tables->{account} );
 __PACKAGE__->mk_select_rows( 'sel_account_all', "SELECT $tables->{account}{sql_sel_cols} FROM $tables->{account}{sql_fqt} ORDER BY a.id" );
@@ -68,17 +90,22 @@ __PACKAGE__->mk_select_rows( 'sel_account_all', "SELECT $tables->{account}{sql_s
 # role
 __PACKAGE__->_mk_selecter( $schema, $tables->{role} );
 __PACKAGE__->mk_select_rows( 'sel_role_all', "SELECT $tables->{role}{sql_sel_cols} FROM $tables->{role}{sql_fqt} ORDER BY r.name" );
+__PACKAGE__->mk_select_rows( 'sel_role_all_for_account', "SELECT $tables->{account}{sql_sel_cols}, $tables->{role}{sql_sel_cols}  FROM $tables->{account}{sql_fqt} $join->{a_ra} $join->{ra_r} WHERE a.id = ? ORDER BY r.id", [ 'a_id' ] );
 
-# privilege
-my $main_cols = "$tables->{account}{sql_sel_cols}, $tables->{privilege}{sql_sel_cols}, $tables->{role}{sql_sel_cols}";
-my $main_joins = "$tables->{account}{sql_fqt} $join->{a_p} $join->{p_r}";
-__PACKAGE__->_mk_selecter( $schema, $tables->{privilege} );
-__PACKAGE__->mk_select_rows( 'sel_privilege_all', "SELECT $main_cols FROM $main_joins ORDER BY a.id, r.id", [] );
-__PACKAGE__->mk_select_rows( 'sel_privilege_all_order_by_account', "SELECT $main_cols FROM $main_joins ORDER BY a.id, r.id", [ ] );
-__PACKAGE__->mk_select_rows( 'sel_privilege_all_order_by_role', "SELECT $main_cols FROM $main_joins ORDER BY r.id, a.id", [ ] );
+# permission
+__PACKAGE__->_mk_selecter( $schema, $tables->{permission} );
+__PACKAGE__->mk_select_rows( 'sel_permission_all', "SELECT $tables->{permission}{sql_sel_cols} FROM $tables->{permission}{sql_fqt} ORDER BY p.id", [] );
+__PACKAGE__->mk_select_rows( 'sel_permission_all_for_role', "SELECT $tables->{role}{sql_sel_cols}, $tables->{permission}{sql_sel_cols} FROM $tables->{role}{sql_fqt} $join->{r_pa} $join->{pa_p} WHERE r.id = ? ORDER BY p.id", [ 'r_id' ] );
+__PACKAGE__->mk_select_rows( 'sel_permission_all_for_account', "SELECT $main_cols FROM $main_joins WHERE a.id = ? ORDER BY p.id", [ 'a_id' ] );
 
 # confirm
 __PACKAGE__->_mk_selecter( $schema, $tables->{confirm} );
+
+# ra
+__PACKAGE__->_mk_do( 'del_ra_for', "DELETE FROM account.ra WHERE account_id = ?", [ 'a_id' ] );
+
+# pa
+__PACKAGE__->_mk_do( 'del_pa_for', "DELETE FROM account.pa WHERE role_id = ?", [ 'r_id' ] );
 
 ## ----------------------------------------------------------------------------
 # methods
@@ -89,7 +116,7 @@ sub ins_account {
     $self->_do( $ins_account, $hr->{a_username}, $hr->{a_firstname}, $hr->{a_lastname}, $hr->{a_email}, $hr->{a_notify}, $hr->{a_salt}, $hr->{a_salt}, $hr->{a_password}, $hr->{a_admin}, $hr->{a_confirmed} );
 }
 
-my $sel_roles_for_account = "SELECT a.username AS a_username, r.id AS r_id, r.name AS r_name FROM account.account a JOIN account.privilege p ON (a.id = p.account_id) JOIN account.role r ON (p.role_id = r.id) WHERE a.id = ?";
+my $sel_roles_for_account = "SELECT a.username AS a_username, r.id AS r_id, r.name AS r_name FROM account.account a JOIN account.permission p ON (a.id = p.account_id) JOIN account.role r ON (p.role_id = r.id) WHERE a.id = ?";
 sub sel_roles_for_account {
     my ($self, $hr) = @_;
     return $self->_rows( $sel_roles_for_account, $hr->{a_id} );
@@ -187,7 +214,9 @@ sub confirm {
 sub _nuke {
     my ($self) = @_;
     $self->dbh()->begin_work();
-    $self->dbh()->do( "DELETE FROM account.privilege" );
+    $self->dbh()->do( "DELETE FROM account.pa" );
+    $self->dbh()->do( "DELETE FROM account.permission" );
+    $self->dbh()->do( "DELETE FROM account.ra" );
     $self->dbh()->do( "DELETE FROM account.role" );
     $self->dbh()->do( "DELETE FROM account.account" );
     $self->dbh()->commit();

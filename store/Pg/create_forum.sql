@@ -13,9 +13,9 @@ CREATE TABLE forum.forum (
     topics          INTEGER NOT NULL DEFAULT 0,
     posts           INTEGER NOT NULL DEFAULT 0,
     poster_id       INTEGER REFERENCES account.account,
-    admin_id        INTEGER NOT NULL REFERENCES account.role,
-    view_id         INTEGER NOT NULL REFERENCES account.role,
-    moderator_id    INTEGER NOT NULL REFERENCES account.role,
+    admin_id        INTEGER NOT NULL REFERENCES account.permission,
+    view_id         INTEGER NOT NULL REFERENCES account.permission,
+    moderator_id    INTEGER NOT NULL REFERENCES account.permission,
 
     UNIQUE(name),
     LIKE base       INCLUDING DEFAULTS

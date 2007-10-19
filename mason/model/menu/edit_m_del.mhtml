@@ -1,7 +1,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_roles
+    $my_perms
     $m_id
 </%args>
 %# ----------------------------------------------------------------------------
@@ -11,7 +11,7 @@
 
     $m->redirect('edit_m_list.html') unless defined $menu;
 
-    $m->redirect('edit_m_list.html') unless exists $my_roles->{$menu->{_admin}};
+    $m->redirect('edit_m_list.html') unless exists $my_perms->{$menu->{_admin}};
 
     $model->del_menu({ m_id => $m_id });
 

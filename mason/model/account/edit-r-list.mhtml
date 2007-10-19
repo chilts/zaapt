@@ -1,17 +1,18 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_roles
+    $my_perms
 </%args>
 %# ----------------------------------------------------------------------------
 <%init>
     my $model = $zaapt->get_model('Account');
     my $roles = $model->sel_role_all();
+    warn "in edit-r-list.mhtml\n";
 </%init>
 %# ----------------------------------------------------------------------------
 <h1>Role List</h1>
 
-% if ( exists $my_roles->{super} ) {
+% if ( exists $my_perms->{super} ) {
 <p>
     * <a href="edit-r-add.html">Add Role &raquo;</a><br />
 </p>
@@ -27,8 +28,9 @@
             <% $role->{r_description} | h %>
         </td>
         <td>
-%    if ( exists $my_roles->{super} ) {
+%    if ( exists $my_perms->{super} ) {
             * <a href="edit-r-edit.html?r_id=<% $role->{r_id} | u %>">Edit Role</a><br />
+            * <a href="edit-pa.html?r_id=<% $role->{r_id} | u %>">Permission Assigner</a><br />
             * <a href="edit-r-del.html?r_id=<% $role->{r_id} | u %>">Delete</a><br />
 %    } else {
             * No Actions

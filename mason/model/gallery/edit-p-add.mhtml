@@ -1,7 +1,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_roles
+    $my_perms
     $g_id
 </%args>
 %# ----------------------------------------------------------------------------
@@ -15,7 +15,7 @@
     my $gallery = $model->sel_gallery({ g_id => $g_id });
 
     $m->redirect('edit-g-list.html') unless defined $gallery;
-    $m->redirect('edit-g-list.html') unless exists $my_roles->{$gallery->{_edit}};
+    $m->redirect('edit-g-list.html') unless exists $my_perms->{$gallery->{_edit}};
 </%init>
 %# ----------------------------------------------------------------------------
 <h1>Add a Picture</h1>

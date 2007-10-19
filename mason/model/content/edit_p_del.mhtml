@@ -1,7 +1,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_roles
+    $my_perms
     $p_id
 </%args>
 %# ----------------------------------------------------------------------------
@@ -13,7 +13,7 @@
     $m->redirect('edit.html') unless defined $page;
 
     # this user can only delete pages if they have admin privileges
-    $m->redirect('edit.html') unless exists $my_roles->{$page->{_admin}};
+    $m->redirect('edit.html') unless exists $my_perms->{$page->{_admin}};
 
     $model->del_page({ p_id => $p_id });
     $m->redirect("edit_p_list.html?c_id=$page->{c_id}");

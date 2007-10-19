@@ -1,7 +1,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_roles
+    $my_perms
     $i_id
 </%args>
 %# ----------------------------------------------------------------------------
@@ -11,7 +11,7 @@
     my $item = $model->sel_item({ i_id => $i_id });
     $m->redirect('edit_m_list.html') unless defined $item;
 
-    $m->redirect('edit_m_list.html') unless exists $my_roles->{$item->{_edit}};
+    $m->redirect('edit_m_list.html') unless exists $my_perms->{$item->{_edit}};
 </%init>
 %# ----------------------------------------------------------------------------
 <h1>Edit an Item</h1>

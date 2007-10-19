@@ -1,33 +1,34 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_roles
+    $my_perms
 </%args>
 %# ----------------------------------------------------------------------------
 <%init>
     my $model = $zaapt->get_model('Account');
-    my $privileges = $model->sel_privilege_all();
+    my $permissions = $model->sel_permission_all();
 </%init>
 %# ----------------------------------------------------------------------------
-<h1>Privilege List</h1>
+<h1>Permission List</h1>
 
-% if ( exists $my_roles->{super} ) {
+% if ( exists $my_perms->{super} ) {
 <p>
-    * <a href="edit-p-add.html">Add Privilege &raquo;</a><br />
+    * <a href="edit-p-add.html">Add Permission &raquo;</a><br />
 </p>
 % }
 
-<&| /zaapt/common/admin/table-edit.mhtml, title => 'Privileges by Account' &>
+<&| /zaapt/common/admin/table-edit.mhtml, title => 'Permission' &>
 
 % my $row = 1;
-% foreach my $privilege ( @$privileges ) {
+% foreach my $permission ( @$permissions ) {
     <tr class="r<% $row=1-$row %>">
         <td>
-            (<% $privilege->{a_id} | h %>) <strong><% $privilege->{a_username} | h %></strong> - <% $privilege->{r_name} | h %><br />
+            (<% $permission->{p_id} | h %>) <strong><% $permission->{p_name} | h %></strong>
+            <br /><% $permission->{p_description} | h %>
         </td>
         <td>
-%         if ( exists $my_roles->{super} ) {
-            * <a href="edit-p-del.html?p_id=<% $privilege->{p_id} | u %>&amp;from=list">Delete</a><br />
+%         if ( exists $my_perms->{super} ) {
+            * <a href="edit-p-del.html?p_id=<% $permission->{p_id} | u %>">Delete</a><br />
 %         } else {
             * No Actions
 %         }

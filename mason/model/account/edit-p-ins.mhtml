@@ -1,40 +1,46 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_roles
-    $a_id => undef
-    $r_id => undef
-    $from => 'list'
+    $my_perms
+    $p_name        => ''
+    $p_description => ''
 </%args>
 %# ----------------------------------------------------------------------------
-<%once>
-    my $allowed = {
-        from => {
-            list    => 'edit-p-list.html',
-            account => 'edit-p-list-by-account.html',
-            role    => 'edit-p-list-by-role.html',
-        },
-    };
-</%once>
-%# ----------------------------------------------------------------------------
 <%init>
-    $m->redirect('edit-r-list.html') unless exists $my_roles->{super};
+    $m->redirect('edit-p-list.html') unless exists $my_perms->{super};
 
-    $from = 'list' unless exists $allowed->{from}{$from};
-    my $redirect_to = $allowed->{from}{$from};
+    # do some checking
+    my $err = [];
 
-    my $model = $zaapt->get_model('Account');
-    my $account = $model->sel_account({ a_id => $a_id });
-    my $role = $model->sel_role({ r_id => $r_id });
+    unless ( Zaapt::Utils::Valid::is_valid_name($p_name, 'Name') ) {
+        push @$err, Zaapt::Utils::Valid::err();
+    }
 
-    $m->redirect($redirect_to) unless defined $account;
-    $m->redirect($redirect_to) unless defined $role;
+    $p_description = Zaapt::Utils::Conv::remove_cr( $p_description );
 
-    $model->ins_privilege({
-        a_id  => $a_id,
-        r_id => $r_id,
-    });
-    $m->redirect($redirect_to);
-    return;
+    unless ( @$err ) {
+        my $model = $zaapt->get_model('Account');
+        $model->ins_permission({
+            p_name        => $p_name,
+            p_description => $p_description,
+        });
+        $m->redirect('edit-p-list.html');
+        return;
+    }
 </%init>
+%# ----------------------------------------------------------------------------
+<h1>Add a Permission</h1>
+
+<p><a href="edit-p-list.html">&laquo; Back to Permission List</a></p>
+
+<h2>Permission: ?</h2>
+
+<& /zaapt/common/err.mhtml, err => $err &>
+
+<& /zaapt/common/form.mhtml, action => 'edit-p-ins.html', elements => [
+        { type => 'text', field => 'Name', name => 'p_name', size => 40, value => $p_name },
+        { type => 'textarea', field => 'Description', name => 'p_description', rows => 10, cols => 40, value => $p_description },
+        { type => 'submit', field => 'Actions', value => 'Add Permission', cancel => 'edit-p-list.html' },
+    ]
+&>
 %# ----------------------------------------------------------------------------

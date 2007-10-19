@@ -1,7 +1,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_roles
+    $my_perms
     $a          => ''
     $f_name
     $page       => ''
@@ -44,7 +44,7 @@
         # the moderator is editing the post
         $m->comp('/zaapt/model/forum/moderator-edit-post.mhtml',
             zaapt      => $zaapt,
-            my_roles   => $my_roles,
+            my_perms   => $my_perms,
             a          => $a,
             f_name     => $f_name,
             p_id       => $p_id,
@@ -67,7 +67,7 @@
         # main index page
         $m->comp('/zaapt/model/forum/moderator-del-post.mhtml',
             zaapt      => $zaapt,
-            my_roles   => $my_roles,
+            my_perms   => $my_perms,
             a          => $a,
             f_name     => $f_name,
             p_id       => $p_id,
@@ -77,7 +77,7 @@
     else {
         $m->comp( '/zaapt/model/forum/user-topic.mhtml',
             zaapt     => $zaapt,
-            my_roles  => $my_roles,
+            my_perms  => $my_perms,
             a         => $a,
             f_name    => $f_name,
             tp_id     => $page,

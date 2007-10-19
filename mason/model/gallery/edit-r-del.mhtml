@@ -1,7 +1,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_roles
+    $my_perms
     $r_id
 </%args>
 %# ----------------------------------------------------------------------------
@@ -15,7 +15,7 @@
 
     # check the error conditions first - we need to recover
     $m->redirect('edit-g-list.html') unless defined $required;
-    $m->redirect('edit-g-list.html') unless exists $my_roles->{$required->{_admin}};
+    $m->redirect('edit-g-list.html') unless exists $my_perms->{$required->{_admin}};
 
     $model->del_required({ r_id => $r_id });
 

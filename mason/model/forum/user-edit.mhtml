@@ -1,6 +1,6 @@
 %# ----------------------------------------------------------------------------
 <%doc>
-    Note: $my_roles is not a required arg, so make sure the person editing this
+    Note: $my_perms is not a required arg, so make sure the person editing this
     is allowed to.
 </%doc>
 %# ----------------------------------------------------------------------------

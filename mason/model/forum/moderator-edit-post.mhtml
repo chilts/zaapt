@@ -1,7 +1,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_roles
+    $my_perms
     $a         => ''
     $f_name
     $p_id      => undef
@@ -22,7 +22,7 @@
     }
 
     # check they are allowed to moderate this post
-    unless ( exists $my_roles->{$post->{_moderator}} ) {
+    unless ( exists $my_perms->{$post->{_moderator}} ) {
         $m->clear_buffer();
         $m->abort(403);
         return;

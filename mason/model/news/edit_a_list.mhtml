@@ -1,7 +1,7 @@
 %# --- ARGS -------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_roles
+    $my_perms
     $n_id
 </%args>
 %# --- INIT -------------------------------------------------------------------
@@ -12,7 +12,7 @@
         $m->redirect('edit_n_list.html');
         return;
     }
-    $m->redirect('edit_n_list.html') unless exists $my_roles->{$news->{_view}};
+    $m->redirect('edit_n_list.html') unless exists $my_perms->{$news->{_view}};
     my $articles = $model->sel_article_all_in({ n_id => $n_id });
 </%init>
 %# --- HTML -------------------------------------------------------------------
@@ -22,7 +22,7 @@
 
 <h2>News: '<% $news->{n_title} | h %>'</h2>
 
-% if ( exists $my_roles->{$news->{_admin}} ) {
+% if ( exists $my_perms->{$news->{_admin}} ) {
 <p>
     * <a href="edit_a_add.html?n_id=<% $news->{n_id} | u %>">Add Article &raquo;</a>
 </p>
@@ -41,9 +41,9 @@
         <tr class="r<% $row=1-$row %>">
             <td><strong>(<% $article->{a_id} | h %>)</strong> <% $article->{a_title} | h %> (<% $article->{a_inserted} | h %>)</td>
             <td>
-%         if ( exists $my_roles->{$news->{_edit}} ) {
+%         if ( exists $my_perms->{$news->{_edit}} ) {
                 * <a href="edit_a_edit.html?a_id=<% $article->{a_id} | u %>">Edit Article</a><br />
-%             if ( exists $my_roles->{$news->{_admin}} ) {
+%             if ( exists $my_perms->{$news->{_admin}} ) {
                 * <a href="edit_a_del.html?a_id=<% $article->{a_id} | u %>">Delete</a><br />
 %             }
 %         } else {

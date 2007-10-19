@@ -5,7 +5,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_roles
+    $my_perms
     $p_id
     $p_name
     $p_content
@@ -22,7 +22,7 @@
     $m->redirect('edit.html') unless defined $page;
 
     # to edit this page, the user needs the '_edit' role
-    $m->redirect('edit.html') unless exists $my_roles->{$page->{_edit}};
+    $m->redirect('edit.html') unless exists $my_perms->{$page->{_edit}};
 
     # check that the page name consists only of letters
     unless ( @$err ) {

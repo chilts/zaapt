@@ -1,7 +1,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_roles
+    $my_perms
     $g_id
     $f_id
 </%args>
@@ -18,7 +18,7 @@
         return;
     }
 
-    $m->redirect('edit-g-list.html') unless exists $my_roles->{$gallery->{_admin}};
+    $m->redirect('edit-g-list.html') unless exists $my_perms->{$gallery->{_admin}};
 
     my $field = $model->sel_field({ f_id => $f_id });
     $m->redirect('edit-r-list.html?g_id=' . uri_escape($g_id)) unless defined $field;

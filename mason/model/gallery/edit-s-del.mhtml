@@ -1,7 +1,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_roles
+    $my_perms
     $s_id
 </%args>
 %# ----------------------------------------------------------------------------
@@ -15,7 +15,7 @@
 
     # check the error conditions first - we need to recover
     $m->redirect('edit-g-list.html') unless defined $size;
-    $m->redirect('edit-g-list.html') unless exists $my_roles->{$size->{_admin}};
+    $m->redirect('edit-g-list.html') unless exists $my_perms->{$size->{_admin}};
 
     $model->del_size({ s_id => $s_id });
 

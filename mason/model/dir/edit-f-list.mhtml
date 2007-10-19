@@ -1,7 +1,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_roles
+    $my_perms
     $d_id
 </%args>
 %# ----------------------------------------------------------------------------
@@ -13,7 +13,7 @@
         return;
     }
 
-    $m->redirect('edit-d-list.html') unless exists $my_roles->{$dir->{_view}};
+    $m->redirect('edit-d-list.html') unless exists $my_perms->{$dir->{_view}};
     my $files = $model->sel_file_all_in({ d_id => $d_id });
 </%init>
 %# ----------------------------------------------------------------------------
@@ -24,7 +24,7 @@
 <& edit-render-d-title.mhtml, dir => $dir &>
 
 <p>
-% if ( exists $my_roles->{$dir->{_edit}} ) {
+% if ( exists $my_perms->{$dir->{_edit}} ) {
     * <a href="edit-f-add.html?d_id=<% $dir->{d_id} | u %>">Add File &raquo;</a><br />
 % } else {
     * No Actions
@@ -43,7 +43,7 @@
             original filename: <strong><% $file->{f_filename} | h %></strong><br />
         </td>
         <td>
-%     if ( exists $my_roles->{$dir->{_edit}} ) {
+%     if ( exists $my_perms->{$dir->{_edit}} ) {
         * <a href="edit-f-del.html?f_id=<% $file->{f_id} | u %>">Delete</a><br />
 %     } else {
         -

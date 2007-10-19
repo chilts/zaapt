@@ -1,7 +1,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_roles
+    $my_perms
     $g_id
 </%args>
 %# ----------------------------------------------------------------------------
@@ -13,7 +13,7 @@
         return;
     }
 
-    $m->redirect('edit-g-list.html') unless exists $my_roles->{$gallery->{_view}};
+    $m->redirect('edit-g-list.html') unless exists $my_perms->{$gallery->{_view}};
     my $pictures = $model->sel_picture_all_in({ g_id => $g_id });
 </%init>
 %# ----------------------------------------------------------------------------
@@ -24,7 +24,7 @@
 <& edit-render-g-title.mhtml, gallery => $gallery &>
 
 <p>
-% if ( exists $my_roles->{$gallery->{_edit}} ) {
+% if ( exists $my_perms->{$gallery->{_edit}} ) {
     * <a href="edit-p-add.html?g_id=<% $gallery->{g_id} | u %>">Add Picture &raquo;</a><br />
 % } else {
     * No Actions
@@ -41,7 +41,7 @@
                 <strong><% $picture->{p_title} | h %></strong><br />
             </td>
             <td>
-%         if ( exists $my_roles->{$gallery->{_edit}} ) {
+%         if ( exists $my_perms->{$gallery->{_edit}} ) {
                 * <a href="edit-p-edit.html?p_id=<% $picture->{p_id} | u %>">Edit Picture</a><br />
                 * <a href="edit-p-del.html?p_id=<% $picture->{p_id} | u %>">Delete</a><br />
 %         } else {

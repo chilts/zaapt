@@ -5,7 +5,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_roles
+    $my_perms
     $i_id
     $i_level
     $i_url
@@ -28,7 +28,7 @@
     $m->redirect('edit.html') unless defined $item;
 
     # to edit this item, the user needs the '_edit' role
-    $m->redirect('edit.html') unless exists $my_roles->{$item->{_edit}};
+    $m->redirect('edit.html') unless exists $my_perms->{$item->{_edit}};
 
     unless ( Zaapt::Utils::Valid::is_non_negative_integer($i_level, 'Level') ) {
         push @$err, Zaapt::Utils::Valid::err();

@@ -1,7 +1,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_roles
+    $my_perms
     $f_id
     $q_question => ''
     $q_answer   => ''
@@ -22,7 +22,7 @@
     $m->redirect('edit_f_list.html') unless defined $faq;
 
     # to insert a question, '_admin' is required
-    $m->redirect('edit_f_list.html') unless exists $my_roles->{$faq->{_admin}};
+    $m->redirect('edit_f_list.html') unless exists $my_perms->{$faq->{_admin}};
 
     # check this type exists
     unless ( $zaapt->get_model('Common')->sel_type({ t_id => $t_id }) ) {

@@ -1,7 +1,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_roles
+    $my_perms
     $a_id
 </%args>
 %# ----------------------------------------------------------------------------
@@ -15,7 +15,7 @@
 
     # check the error conditions first - we need to recover
     $m->redirect('edit_n_list.html') unless defined $article;
-    $m->redirect('edit_a_list.html?n_id=' . uri_escape($article->{n_id})) unless exists $my_roles->{$article->{_edit}};
+    $m->redirect('edit_a_list.html?n_id=' . uri_escape($article->{n_id})) unless exists $my_perms->{$article->{_edit}};
 
     my $page_types = $zaapt->get_model('Common')->sel_type_all();
     my @options = map { { value => $_->{t_id}, text => $_->{t_name} } } @$page_types;

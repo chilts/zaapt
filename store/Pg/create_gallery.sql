@@ -15,9 +15,9 @@ CREATE TABLE gallery.gallery (
     show            INTEGER NOT NULL,
     extractexif     BOOLEAN NOT NULL DEFAULT False,
     total           INTEGER NOT NULL DEFAULT 0,
-    admin_id        INTEGER NOT NULL REFERENCES account.role,
-    view_id         INTEGER NOT NULL REFERENCES account.role,
-    edit_id         INTEGER NOT NULL REFERENCES account.role,
+    admin_id        INTEGER NOT NULL REFERENCES account.permission,
+    view_id         INTEGER NOT NULL REFERENCES account.permission,
+    edit_id         INTEGER NOT NULL REFERENCES account.permission,
 
     UNIQUE(name),
     LIKE base       INCLUDING DEFAULTS

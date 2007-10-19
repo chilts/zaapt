@@ -517,6 +517,20 @@ sub _mk_select_count {
     __PACKAGE__->mk_select_row( "sel_$t->{name}_count", __PACKAGE__->_mk_count( "$t->{schema}.$t->{name}" ) );
 }
 
+sub _mk_do {
+    my ($self, $method_name, $stm, $hr_names) = @_;
+
+    $hr_names = [] unless ref $hr_names eq 'ARRAY';
+
+    # create the closure
+    my $method =  sub {
+        my ($self, $hr) = @_;
+        return $self->_do( $stm, map { $hr->{$_} } @$hr_names );
+    };
+
+    $self->_inject_method($method_name, $method);
+}
+
 sub _mk_selecter {
     my ($self, $schema, $t) = @_;
     __PACKAGE__->mk_selecter( $schema, $t->{name}, $t->{prefix}, @{$t->{cols}} );

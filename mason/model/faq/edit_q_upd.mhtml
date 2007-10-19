@@ -1,7 +1,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_roles
+    $my_perms
     $q_id
     $q_question => ''
     $q_answer   => ''
@@ -18,7 +18,7 @@
 
     # program errors
     $m->redirect('edit_f_list.html') unless defined $question;
-    $m->redirect("edit_q_list.html?q_id=" . uri_escape($q_id)) unless exists $my_roles->{$question->{_edit}};
+    $m->redirect("edit_q_list.html?q_id=" . uri_escape($q_id)) unless exists $my_perms->{$question->{_edit}};
 
     # check this type exists
     unless ( $zaapt->get_model('Common')->sel_type({ t_id => $t_id }) ) {

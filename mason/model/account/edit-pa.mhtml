@@ -1,0 +1,65 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $my_perms
+    $_act => ''
+    $r_id => undef
+    @p_id => ()
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    use Data::Dumper;
+    warn Dumper(\%ARGS);
+    $m->redirect('edit-r-list.html') unless exists $my_perms->{super};
+
+    my $model = $zaapt->get_model('Account');
+    my $role = $model->sel_role({ r_id => $r_id });
+    $m->redirect('edit-r-list.html') unless defined $role;
+
+    if ( $_act eq 'save' ) {
+        # remove all the current ones and add these in
+        $model->del_pa_for({ r_id => $r_id });
+        foreach my $p_id ( @p_id ) {
+             $model->ins_pa({ r_id => $r_id, p_id => $p_id });
+        }
+    }
+
+    # get all the roles and this account's roles
+    my $permissions = $model->sel_permission_all();
+    my $assigned = $model->sel_permission_all_for_role({ r_id => $r_id });
+    my %assigned = map { $_->{p_id} => 1 } @$assigned;
+    warn Dumper($assigned);
+    warn Dumper(\%assigned);
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Permission Assigner</h1>
+
+<p>
+    * <a href="edit-r-list.html">&laquo; Back to Role List</a>
+</p>
+
+<h2>Role: '<% $role->{r_name} | h %>'</h2>
+
+<form action="?" method="post">
+<input type="hidden" name="r_id" value="<% $r_id | h %>" />
+<&| /zaapt/common/admin/table-edit.mhtml, title => 'Permission' &>
+
+% my $row = 1;
+% foreach my $permission ( @$permissions ) {
+    <tr class="r<% $row=1-$row %>">
+        <td>
+            (<% $permission->{p_id} | h %>) <strong><% $permission->{p_name} | h %></strong><br />
+            <% $permission->{p_description} | h %>
+        </td>
+        <td>
+            <input type="checkbox" id="p_<% $permission->{p_id} | h %>" name="p_id" value="<% $permission->{p_id} | h %>"<% exists $assigned{$permission->{p_id}} ? ' checked="checked"' : '' %> />
+            <label for="p_<% $permission->{p_id} | h %>" > Assign</label>
+        </td>
+    </tr>
+% }
+</&>
+<input type="hidden" name="_act" value="save" />
+<input type="submit" value="Assign Permissions" />
+</form>
+
+%# ----------------------------------------------------------------------------

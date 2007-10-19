@@ -15,13 +15,7 @@
     }
 </%init>
 %# ----------------------------------------------------------------------------
-<div class="z_profile">
-<h1>Account Info</h1>
-
-<&  /zaapt/common/table.mhtml, rows => [
-        { field => 'Username', value => $account->{a_username} },
-        { field => 'Joined', value => $account->{a_inserted} },
-    ]
+<& render-view-info.mhtml,
+    account => $account
 &>
-</div>
 %# ----------------------------------------------------------------------------

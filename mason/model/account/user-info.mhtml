@@ -15,16 +15,7 @@
     }
 </%init>
 %# ----------------------------------------------------------------------------
-<h1>Account Info</h1>
-
-<&  /zaapt/common/table.mhtml, rows => [
-        { field => 'Firstname', value => $account->{a_firstname} },
-        { field => 'Lastname', value => $account->{a_lastname} },
-        { field => 'Username', value => $account->{a_username} },
-        { field => 'Email', value => $account->{a_email} },
-        { field => 'Notifications', value => ( $account->{a_notify} ? 'Yes' : 'No' ) },
-        { field => 'Logins', value => $account->{a_logins} },
-        { field => 'Joined', value => $account->{a_inserted} },
-    ]
-&>
+<& render-user-info.mhtml,
+    account => $account
+&.
 %# ----------------------------------------------------------------------------

@@ -22,33 +22,15 @@
 </%args>
 %# ----------------------------------------------------------------------------
 <%init>
-    my $model = $zaapt->get_model('Menu');
-    my $menu = $model->sel_menu_using_name({ m_name => $m_name });
-
-    unless ( defined $menu ) {
-        die "Menu '$m_name' not found.";
-        return;
+    # figure out what we're looking at
+    if ( $page eq 'index' ) {
+        $m->comp('/zaapt/model/menu/view-index.mhtml', zaapt => $zaapt, m_name => $m_name);
     }
-
-    my $items = $model->sel_item_all_in({ m_id => $menu->{m_id} });
+    else {
+        # don't know what this page is
+        $m->clear_buffer();
+        $m->abort(404);
+    }
+    return;
 </%init>
-%# ----------------------------------------------------------------------------
-<div class="z_menu">
-% if ( @$items ) {
-    <ul>
-%     foreach my $item ( @$items ) {
-        <li>
-            <% '+' x $item->{i_level} %>
-            <a href="<% $item->{i_url} | u %>">
-%         if ( $item->{i_ishtml} ) {
-                <% $item->{i_text} %>
-%         } else {
-                <% $item->{i_text} | h %>
-%         }
-            </a>
-        </li>
-%     }
-    </ul>
-% }
-</div>
 %# ----------------------------------------------------------------------------

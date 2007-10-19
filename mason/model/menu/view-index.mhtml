@@ -1,0 +1,17 @@
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Menu');
+    my $menu = $model->sel_menu_using_name({ m_name => $m_name });
+
+    unless ( defined $menu ) {
+        die "Menu '$m_name' not found.";
+        return;
+    }
+
+    my $items = $model->sel_item_all_in({ m_id => $menu->{m_id} });
+</%init>
+%# ----------------------------------------------------------------------------
+<& render-view-index.mhtml,
+    items => $items,
+&>
+%# ----------------------------------------------------------------------------

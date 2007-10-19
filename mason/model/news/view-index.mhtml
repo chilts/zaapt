@@ -14,13 +14,7 @@
     my $articles = $model->sel_article_latest({ n_id => $news->{n_id}, _limit => $news->{n_show} });
 </%init>
 %# ----------------------------------------------------------------------------
-<div class="z_news">
-% if ( @$articles ) {
-%     foreach my $article ( @$articles ) {
-<& render-article-summary.mhtml, article => $article &>
-%     }
-% } else {
-<p>Currently, there are no articles in this news section.</p>
-% }
-</div>
+<& render-view-index.mhtml,
+    articles => $articles,
+&>
 %# ----------------------------------------------------------------------------

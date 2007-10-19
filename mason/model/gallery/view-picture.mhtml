@@ -23,5 +23,5 @@
     my $details = $model->sel_picture_detail_all({ p_id => $picture->{p_id} });
 </%init>
 %# ----------------------------------------------------------------------------
-<& render-picture.mhtml, gallery => $gallery, picture => $picture, details => $details &>
+<& render-view-picture.mhtml, gallery => $gallery, picture => $picture, details => $details &>
 %# ----------------------------------------------------------------------------

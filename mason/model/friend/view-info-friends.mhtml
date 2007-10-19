@@ -10,17 +10,7 @@
     my $friends = $model->sel_friend_for({ a_id => $id });
 </%init>
 %# ----------------------------------------------------------------------------
-
-<h2>Friends List</h2>
-
-% if ( @$friends ) {
-<ul>
-%     foreach my $friend ( @$friends ) {
-    <li><& /zaapt/common/a_username.mhtml, a_username => $friend->{t_username} &></li>
-%     }
-</ul>
-% } else {
-<p>This member hasn't added any friends yet.</p>
-% }
-
+<& render-view-info-friends.mhtml,
+    friends => $friends,
+&>
 %# ----------------------------------------------------------------------------

@@ -1,0 +1,17 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $friends
+</%args>
+%# ----------------------------------------------------------------------------
+<h2>Friends List</h2>
+
+% if ( @$friends ) {
+<ul>
+%     foreach my $friend ( @$friends ) {
+    <li><& /zaapt/common/a_username.mhtml, a_username => $friend->{t_username} &></li>
+%     }
+</ul>
+% } else {
+<p>This member hasn't added any friends yet.</p>
+% }
+%# ----------------------------------------------------------------------------

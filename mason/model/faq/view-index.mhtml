@@ -16,22 +16,8 @@
     my $questions = $model->sel_question_all_in({ f_id => $faq->{f_id} });
 </%init>
 %# ----------------------------------------------------------------------------
-<div class="z_faq">
-<h1><% $faq->{f_title} | h %></h1>
-% if ( @$questions ) {
-<ol>
-%     foreach my $q ( @$questions ) {
-    <li><a href="#<% $q->{f_name} | h %>_<% $q->{q_id} | h %>"><% $q->{q_question} | h %></a></li>
-%     }
-</ol>
-
-%     foreach my $q ( @$questions ) {
-<a name="<% $q->{f_name} | h %>_<% $q->{q_id} | h %>"></a>
-<p><strong>Q: <% $q->{q_question} | h %></strong></p>
-<& /zaapt/common/render.mhtml, t_name => $q->{t_name}, content => $q->{q_answer} &>
-%     }
-% } else {
-<p>There are currently no questions in this section.</p>
-% }
-</div>
+<& render-view-index.mhtml,
+    faq       => $faq,
+    questions => $questions,
+&>
 %# ----------------------------------------------------------------------------

@@ -1,7 +1,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_perms
+    $perms
     $i_id
 </%args>
 %# ----------------------------------------------------------------------------
@@ -13,7 +13,7 @@
     $m->redirect('edit.html') unless defined $item;
 
     # this user can only delete items if they have admin privileges
-    $m->redirect('edit.html') unless exists $my_perms->{$item->{_admin}};
+    $m->redirect('edit.html') unless exists $perms->{$item->{_admin}};
 
     $model->del_item({ i_id => $i_id });
     $m->redirect("edit_i_list.html?m_id=$item->{m_id}");

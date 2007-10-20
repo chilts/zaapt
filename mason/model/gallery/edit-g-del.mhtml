@@ -1,7 +1,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_perms
+    $perms
     $g_id
 </%args>
 %# ----------------------------------------------------------------------------
@@ -11,7 +11,7 @@
 
     $m->redirect('edit-b-list.html') unless defined $gallery;
 
-    $m->redirect('edit-b-list.html') unless exists $my_perms->{$gallery->{_admin}};
+    $m->redirect('edit-b-list.html') unless exists $perms->{$gallery->{_admin}};
 
     $model->del_gallery({ g_id => $g_id });
 

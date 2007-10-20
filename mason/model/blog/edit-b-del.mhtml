@@ -1,7 +1,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_perms
+    $perms
     $b_id
 </%args>
 %# ----------------------------------------------------------------------------
@@ -11,7 +11,7 @@
 
     $m->redirect('edit-b-list.html') unless defined $blog;
 
-    $m->redirect('edit-b-list.html') unless exists $my_perms->{$blog->{_admin}};
+    $m->redirect('edit-b-list.html') unless exists $perms->{$blog->{_admin}};
 
     $model->del_blog({ b_id => $b_id });
 

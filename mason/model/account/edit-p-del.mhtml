@@ -1,13 +1,13 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_perms
+    $perms
     $p_id
 </%args>
 %# ----------------------------------------------------------------------------
 <%init>
     # need 'super'
-    $m->redirect("edit.html") unless exists $my_perms->{super};
+    $m->redirect("edit.html") unless exists $perms->{super};
 
     my $model = $zaapt->get_model('Account');
     my $permission = $model->sel_permission({ p_id => $p_id });

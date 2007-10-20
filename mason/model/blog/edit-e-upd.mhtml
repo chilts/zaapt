@@ -1,7 +1,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_perms
+    $perms
     $e_id
     $e_name      => ''
     $e_title     => ''
@@ -25,7 +25,7 @@
 
     # check the error conditions first - we need to recover
     $m->redirect('edit-b-list.html') unless defined $entry;
-    $m->redirect('edit-e-list.html?b_id=' . uri_escape($entry->{b_id})) unless exists $my_perms->{$entry->{_edit}};
+    $m->redirect('edit-e-list.html?b_id=' . uri_escape($entry->{b_id})) unless exists $perms->{$entry->{_edit}};
 
     # check this type exists
     unless ( $zaapt->get_model('Common')->sel_type({ t_id => $t_id }) ) {

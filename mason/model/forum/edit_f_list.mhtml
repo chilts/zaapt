@@ -1,7 +1,7 @@
 %# --- ARGS -------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_perms
+    $perms
 </%args>
 %# --- INIT -------------------------------------------------------------------
 <%init>
@@ -11,7 +11,7 @@
 %# --- HTML -------------------------------------------------------------------
 <h1>Forum List</h1>
 
-% if ( exists $my_perms->{super} ) {
+% if ( exists $perms->{super} ) {
 <p>
     * <a href="edit_f_add.html">Add Forum &raquo;</a><br />
 </p>
@@ -27,19 +27,19 @@
     <tbody>
 % my $row = 1;
 % foreach my $forum ( @$forums ) {
-%     next unless exists $my_perms->{$forum->{_view}};
+%     next unless exists $perms->{$forum->{_view}};
         <tr class="r<% $row=1-$row %>">
             <td>
                 <% $forum->{f_name} | h %>
             </td>
             <td>
-%         if ( exists $my_perms->{$forum->{_admin}} ) {
+%         if ( exists $perms->{$forum->{_admin}} ) {
                 * <a href="edit_f_edit.html?f_id=<% $forum->{f_id} | u %>">Edit Details</a><br />
 %         }
-%         if ( exists $my_perms->{$forum->{_moderator}} ) {
+%         if ( exists $perms->{$forum->{_moderator}} ) {
                 * <a href="edit_t_list.html?f_id=<% $forum->{f_id} | u %>">Moderate</a><br />
 %         }
-%         if ( exists $my_perms->{$forum->{_admin}} ) {
+%         if ( exists $perms->{$forum->{_admin}} ) {
                 * <a href="edit_f_del.html?f_id=<% $forum->{f_id} | u %>">Delete</a><br />
 %         }
             </td>

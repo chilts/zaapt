@@ -1,7 +1,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_perms
+    $perms
     $_act => ''
     $r_id => undef
     @p_id => ()
@@ -10,7 +10,7 @@
 <%init>
     use Data::Dumper;
     warn Dumper(\%ARGS);
-    $m->redirect('edit-r-list.html') unless exists $my_perms->{super};
+    $m->redirect('edit-r-list.html') unless exists $perms->{super};
 
     my $model = $zaapt->get_model('Account');
     my $role = $model->sel_role({ r_id => $r_id });

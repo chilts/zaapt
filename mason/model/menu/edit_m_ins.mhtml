@@ -5,7 +5,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_perms
+    $perms
     $m_name        => undef
     $m_title       => undef
     $m_description => undef
@@ -18,7 +18,7 @@
     my $model = $zaapt->get_model('Menu');
 
     # to insert this page, the user needs the 'super' role
-    $m->redirect('edit_m_list.html') unless exists $my_perms->{super};
+    $m->redirect('edit_m_list.html') unless exists $perms->{super};
 
     my $err = [];
 

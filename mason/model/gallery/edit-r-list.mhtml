@@ -1,7 +1,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_perms
+    $perms
     $g_id
 </%args>
 %# ----------------------------------------------------------------------------
@@ -15,7 +15,7 @@
         return;
     }
 
-    $m->redirect('edit-g-list.html') unless exists $my_perms->{$gallery->{_view}};
+    $m->redirect('edit-g-list.html') unless exists $perms->{$gallery->{_view}};
     my $fields = $model->sel_field_all();
     my $requireds = $model->sel_required_all_in({ g_id => $g_id });
 
@@ -44,7 +44,7 @@
                 Status: <strong><% exists $required{$field->{f_id}} ? 'Required' : '-' %></strong><br />
             </td>
             <td>
-%         if ( exists $my_perms->{$gallery->{_admin}} ) {
+%         if ( exists $perms->{$gallery->{_admin}} ) {
 %             if ( exists $required{$field->{f_id}} ) {
                 * <a href="edit-r-del.html?r_id=<% $required{$field->{f_id}} | u %>">Remove</a><br />
 %             } else {

@@ -1,7 +1,7 @@
 %# --- ARGS -------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_perms
+    $perms
     $m_id
 </%args>
 %# --- INIT -------------------------------------------------------------------
@@ -12,7 +12,7 @@
         $m->redirect('edit_m_list.html');
         return;
     }
-    $m->redirect('edit_m_list.html') unless exists $my_perms->{$menu->{_view}};
+    $m->redirect('edit_m_list.html') unless exists $perms->{$menu->{_view}};
     my $items = $model->sel_item_all_in({ m_id => $m_id });
 </%init>
 %# --- HTML -------------------------------------------------------------------
@@ -22,7 +22,7 @@
 
 <h2>Menu: <% $menu->{m_name} | h %> - '<% $menu->{m_title} | h %>'</h2>
 
-% if ( exists $my_perms->{$menu->{_admin}} ) {
+% if ( exists $perms->{$menu->{_admin}} ) {
 <p>
     * <a href="edit_i_add.html?m_id=<% $menu->{m_id} | u %>">Add Item &raquo;</a>
 </p>
@@ -44,9 +44,9 @@
                 <% $item->{i_text} | h %>  <strong>(<% $item->{i_ishtml} ? 'html' : 'text' %>)</strong>
             </td>
             <td>
-%         if ( exists $my_perms->{$item->{_edit}} ) {
+%         if ( exists $perms->{$item->{_edit}} ) {
                 * <a href="edit_i_edit.html?i_id=<% $item->{i_id} | u %>">Edit Item</a><br />
-%             if ( exists $my_perms->{$item->{_admin}} ) {
+%             if ( exists $perms->{$item->{_admin}} ) {
                 * <a href="edit_i_del.html?i_id=<% $item->{i_id} | u %>">Delete</a><br />
                 * Move <a href="edit_i_move_up.html?i_id=<% $item->{i_id} | u %>">Up</a> / <a href="edit_i_move_dn.html?i_id=<% $item->{i_id} | u %>">Dn</a><br />
 %             }

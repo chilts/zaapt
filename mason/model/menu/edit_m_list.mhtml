@@ -1,7 +1,7 @@
 %# --- ARGS -------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_perms
+    $perms
 </%args>
 %# --- INIT -------------------------------------------------------------------
 <%init>
@@ -11,7 +11,7 @@
 %# --- HTML -------------------------------------------------------------------
 <h1>Menu List</h1>
 
-% if ( exists $my_perms->{super} ) {
+% if ( exists $perms->{super} ) {
 <p>
     * <a href="edit_m_add.html">Add Menu &raquo;</a><br />
 </p>
@@ -27,18 +27,18 @@
     <tbody>
 % my $row = 1;
 % foreach my $menu ( @$menus ) {
-%     next unless exists $my_perms->{$menu->{_view}};
+%     next unless exists $perms->{$menu->{_view}};
         <tr class="r<% $row=1-$row %>">
             <td>
                 <% $menu->{m_name} | h %>
             </td>
             <td>
-%         if ( exists $my_perms->{$menu->{_admin}} ) {
+%         if ( exists $perms->{$menu->{_admin}} ) {
                 * <a href="edit_m_edit.html?m_id=<% $menu->{m_id} | u %>">Edit Details</a><br />
                 * <a href="edit_i_add.html?m_id=<% $menu->{m_id} | u %>">Add Item</a><br />
 %         }
                 * <a href="edit_i_list.html?m_id=<% $menu->{m_id} | u %>">List/Edit</a><br />
-%         if ( exists $my_perms->{$menu->{_admin}} ) {
+%         if ( exists $perms->{$menu->{_admin}} ) {
                 * <a href="edit_m_del.html?m_id=<% $menu->{m_id} | u %>">Delete</a><br />
 %         }
             </td>

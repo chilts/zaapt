@@ -1,7 +1,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_perms
+    $perms
     $s_id
     $s_title
     $s_size
@@ -20,7 +20,7 @@
         return;
     }
 
-    $m->redirect('edit-g-list.html') unless exists $my_perms->{$size->{_admin}};
+    $m->redirect('edit-g-list.html') unless exists $perms->{$size->{_admin}};
 
     my $err = [];
 

@@ -1,13 +1,13 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_perms
+    $perms
     $p_name        => ''
     $p_description => ''
 </%args>
 %# ----------------------------------------------------------------------------
 <%init>
-    $m->redirect('edit-p-list.html') unless exists $my_perms->{super};
+    $m->redirect('edit-p-list.html') unless exists $perms->{super};
 
     # do some checking
     my $err = [];

@@ -1,7 +1,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_perms
+    $perms
     $p_id
 </%args>
 %# ----------------------------------------------------------------------------
@@ -15,7 +15,7 @@
     my $page = $model->sel_page({ p_id => $p_id });
     $m->redirect('edit_c_list.html') unless defined $page;
 
-    $m->redirect('edit_c_list.html') unless exists $my_perms->{$page->{_edit}};
+    $m->redirect('edit_c_list.html') unless exists $perms->{$page->{_edit}};
 
     my $common = $zaapt->get_model('Common');
     my $page_types = $common->sel_type_all();

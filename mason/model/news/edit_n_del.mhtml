@@ -1,7 +1,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_perms
+    $perms
     $n_id
 </%args>
 %# ----------------------------------------------------------------------------
@@ -11,7 +11,7 @@
 
     $m->redirect('edit_n_list.html') unless defined $news;
 
-    $m->redirect('edit_n_list.html') unless exists $my_perms->{$news->{_admin}};
+    $m->redirect('edit_n_list.html') unless exists $perms->{$news->{_admin}};
 
     $model->del_news({ n_id => $n_id });
 

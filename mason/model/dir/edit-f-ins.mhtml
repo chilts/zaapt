@@ -1,7 +1,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_perms
+    $perms
     $d_id
     $f_name        => undef
     $f_title       => undef
@@ -28,7 +28,7 @@
 
     # this section firstly needs to exist to be able to add a page
     $m->redirect('edit-d-list.html') unless defined $dir;
-    $m->redirect('edit-d-list.html') unless exists $my_perms->{$dir->{_edit}};
+    $m->redirect('edit-d-list.html') unless exists $perms->{$dir->{_edit}};
 
     # now we're into the normal user errors
 

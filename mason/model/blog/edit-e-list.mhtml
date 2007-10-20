@@ -1,7 +1,7 @@
 %# --- ARGS -------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_perms
+    $perms
     $b_id
 </%args>
 %# --- INIT -------------------------------------------------------------------
@@ -12,7 +12,7 @@
         $m->redirect('edit-b-list.html');
         return;
     }
-    $m->redirect('edit-b-list.html') unless exists $my_perms->{$blog->{_view}};
+    $m->redirect('edit-b-list.html') unless exists $perms->{$blog->{_view}};
     my $entries = $model->sel_entry_all_in({ b_id => $b_id });
 </%init>
 %# --- HTML -------------------------------------------------------------------
@@ -23,11 +23,11 @@
 <h2>Blog: <% $blog->{b_name} | h %> - '<% $blog->{b_title} | h %>'</h2>
 
 <p>
-% if ( exists $my_perms->{$blog->{_edit}} or exists $my_perms->{$blog->{_comment}} ) {
-%     if ( exists $my_perms->{$blog->{_edit}} ) {
+% if ( exists $perms->{$blog->{_edit}} or exists $perms->{$blog->{_comment}} ) {
+%     if ( exists $perms->{$blog->{_edit}} ) {
     * <a href="edit-e-add.html?b_id=<% $blog->{b_id} | u %>">Add Entry &raquo;</a><br />
 %     }
-%     if ( exists $my_perms->{$blog->{_comment}} ) {
+%     if ( exists $perms->{$blog->{_comment}} ) {
     * <a href="edit-c-list.html?b_id=<% $blog->{b_id} | u %>">Audit Comments &raquo;</a><br />
 %     }
 % } else {
@@ -51,10 +51,10 @@
                 <% $entry->{e_comments} || '0' | h %> comments, <% $entry->{e_trackbacks} || '0' | h %> trackbacks<br />
             </td>
             <td>
-%         if ( exists $my_perms->{$blog->{_edit}} ) {
+%         if ( exists $perms->{$blog->{_edit}} ) {
                 * <a href="edit-e-edit.html?e_id=<% $entry->{e_id} | u %>">Edit Entry</a><br />
                 * <a href="edit-l-edit.html?e_id=<% $entry->{e_id} | u %>">Edit Labels</a><br />
-%             if ( exists $my_perms->{$blog->{_admin}} ) {
+%             if ( exists $perms->{$blog->{_admin}} ) {
                 * <a href="edit-e-del.html?e_id=<% $entry->{e_id} | u %>">Delete</a><br />
 %             }
 %         } else {

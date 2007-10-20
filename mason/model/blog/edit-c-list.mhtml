@@ -1,7 +1,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_perms
+    $perms
     $b_id
 </%args>
 %# ----------------------------------------------------------------------------
@@ -12,7 +12,7 @@
         $m->redirect('edit-b-list.html');
         return;
     }
-    $m->redirect('edit-b-list.html') unless exists $my_perms->{$blog->{_view}};
+    $m->redirect('edit-b-list.html') unless exists $perms->{$blog->{_view}};
     my $comments = $model->sel_comments_for_blog({ b_id => $b_id, c_status => 'new' });
 </%init>
 %# ----------------------------------------------------------------------------
@@ -27,7 +27,7 @@
 %     return;
 % }
 
-% if ( exists $my_perms->{_comment} ) {
+% if ( exists $perms->{_comment} ) {
 <p>
     * <a href="edit-c-all.html?b_id=<% $b_id | u %>&amp;c_status=acc">Accept All &raquo;</a><br />
     * <a href="edit-c-all.html?b_id=<% $b_id | u %>&amp;c_status=rej">Reject All &raquo;</a><br />
@@ -48,7 +48,7 @@
             <% substr($comment->{c_comment}, 0, 255) . '...' | h %><br />
         </td>
         <td>
-%     if ( exists $my_perms->{$blog->{_comment}} ) {
+%     if ( exists $perms->{$blog->{_comment}} ) {
             * <a href="edit-c-status.html?b_id=<% $b_id | u %>&amp;c_id=<% $comment->{c_id} | u %>&amp;c_status=acc">Accept</a><br />
             * <a href="edit-c-status.html?b_id=<% $b_id | u %>&amp;c_id=<% $comment->{c_id} | u %>&amp;c_status=rej">Reject</a><br />
             * <a href="edit-c-status.html?b_id=<% $b_id | u %>&amp;c_id=<% $comment->{c_id} | u %>&amp;c_status=del">Delete</a><br />

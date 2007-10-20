@@ -5,7 +5,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_perms
+    $perms
     $c_name        => undef
     $c_title       => undef
     $c_description => undef
@@ -19,7 +19,7 @@
     my $model = $zaapt->get_model('Content');
 
     # to insert this page, the user needs the '_admin' role on this content section
-    $m->redirect('edit_c_list.html') unless exists $my_perms->{super};
+    $m->redirect('edit_c_list.html') unless exists $perms->{super};
 
     my $err = [];
 

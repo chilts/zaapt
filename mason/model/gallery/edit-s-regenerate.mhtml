@@ -1,7 +1,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_perms
+    $perms
     $g_id
 </%args>
 %# ----------------------------------------------------------------------------
@@ -13,7 +13,7 @@
         return;
     }
 
-    $m->redirect('edit-g-list.html') unless exists $my_perms->{$gallery->{_view}};
+    $m->redirect('edit-g-list.html') unless exists $perms->{$gallery->{_view}};
     my $sizes = $model->sel_size_all_in({ g_id => $g_id });
 
     # do the regeneration here...

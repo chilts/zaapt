@@ -1,7 +1,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_perms
+    $perms
     $q_id
 </%args>
 %# ----------------------------------------------------------------------------
@@ -15,7 +15,7 @@
 
     # check the error conditions first - we need to recover
     $m->redirect('edit_f_list.html') unless defined $question;
-    $m->redirect('edit_f_list.html') unless exists $my_perms->{$question->{_admin}};
+    $m->redirect('edit_f_list.html') unless exists $perms->{$question->{_admin}};
 
     $model->del_question({ q_id => $q_id });
 

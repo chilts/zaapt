@@ -1,11 +1,11 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_perms
+    $perms
 </%args>
 %# ----------------------------------------------------------------------------
 <%init>
-    $m->redirect('edit-c-list.html') unless exists $my_perms->{super};
+    $m->redirect('edit-c-list.html') unless exists $perms->{super};
 
     # my $model = $zaapt->get_model("Account");
 </%init>

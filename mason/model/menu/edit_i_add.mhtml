@@ -1,7 +1,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_perms
+    $perms
     $m_id
 </%args>
 %# ----------------------------------------------------------------------------
@@ -16,7 +16,7 @@
     $m->redirect('edit_m_list.html') unless defined $menu;
 
     # need admin
-    $m->redirect('edit_m_list.html') unless exists $my_perms->{$menu->{_admin}};
+    $m->redirect('edit_m_list.html') unless exists $perms->{$menu->{_admin}};
 </%init>
 %# ----------------------------------------------------------------------------
 <h1>Add a Menu Item</h1>

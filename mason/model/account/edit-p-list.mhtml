@@ -1,7 +1,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_perms
+    $perms
 </%args>
 %# ----------------------------------------------------------------------------
 <%init>
@@ -11,7 +11,7 @@
 %# ----------------------------------------------------------------------------
 <h1>Permission List</h1>
 
-% if ( exists $my_perms->{super} ) {
+% if ( exists $perms->{super} ) {
 <p>
     * <a href="edit-p-add.html">Add Permission &raquo;</a><br />
 </p>
@@ -27,7 +27,7 @@
             <br /><% $permission->{p_description} | h %>
         </td>
         <td>
-%         if ( exists $my_perms->{super} ) {
+%         if ( exists $perms->{super} ) {
             * <a href="edit-p-del.html?p_id=<% $permission->{p_id} | u %>">Delete</a><br />
 %         } else {
             * No Actions

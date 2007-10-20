@@ -1,7 +1,7 @@
 %# --- ARGS -------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_perms
+    $perms
     $c_id
 </%args>
 %# --- INIT -------------------------------------------------------------------
@@ -12,7 +12,7 @@
         $m->redirect('edit_c_list.html');
         return;
     }
-    $m->redirect('edit_c_list.html') unless exists $my_perms->{$content->{_view}};
+    $m->redirect('edit_c_list.html') unless exists $perms->{$content->{_view}};
     my $pages = $model->sel_page_all_in({ c_id => $c_id });
 </%init>
 %# --- HTML -------------------------------------------------------------------
@@ -22,7 +22,7 @@
 
 <h2>Content: <% $content->{c_name} | h %> - <% $content->{c_title} | h %></h2>
 
-% if ( exists $my_perms->{$content->{_admin}} ) {
+% if ( exists $perms->{$content->{_admin}} ) {
 <p>
     * <a href="edit_p_add.html?c_id=<% $content->{c_id} | u %>">Add Page &raquo;</a>
 </p>
@@ -41,9 +41,9 @@
         <tr class="r<% $row=1-$row %>">
             <td><% $page->{p_name} | h %> (<% $page->{t_name} %>)</td>
             <td>
-%         if ( exists $my_perms->{$page->{_edit}} ) {
+%         if ( exists $perms->{$page->{_edit}} ) {
                 * <a href="edit_p_edit.html?p_id=<% $page->{p_id} | u %>">Edit Page</a><br />
-%             if ( exists $my_perms->{$page->{_admin}} ) {
+%             if ( exists $perms->{$page->{_admin}} ) {
                 * <a href="edit_p_del.html?p_id=<% $page->{p_id} | u %>">Delete</a><br />
 %             }
 %         } else {

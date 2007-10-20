@@ -1,7 +1,7 @@
 %# --- ARGS -------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_perms
+    $perms
 </%args>
 %# --- INIT -------------------------------------------------------------------
 <%init>
@@ -11,7 +11,7 @@
 %# --- HTML -------------------------------------------------------------------
 <h1>FAQ List</h1>
 
-% if ( exists $my_perms->{super} ) {
+% if ( exists $perms->{super} ) {
 <p>
     * <a href="edit_f_add.html">Add FAQ &raquo;</a><br />
 </p>
@@ -27,20 +27,20 @@
     <tbody>
 % my $row = 1;
 % foreach my $faq ( @$faqs ) {
-%     next unless exists $my_perms->{$faq->{_view}};
+%     next unless exists $perms->{$faq->{_view}};
         <tr class="r<% $row=1-$row %>">
             <td>
                 <% $faq->{f_name} | h %>
             </td>
             <td>
-%         if ( exists $my_perms->{$faq->{_admin}} ) {
+%         if ( exists $perms->{$faq->{_admin}} ) {
                 * <a href="edit_f_edit.html?f_id=<% $faq->{f_id} | u %>">Edit Details</a><br />
 %         }
-%         if ( exists $my_perms->{$faq->{_edit}} ) {
+%         if ( exists $perms->{$faq->{_edit}} ) {
                 * <a href="edit_q_add.html?f_id=<% $faq->{f_id} | u %>">Add Question</a><br />
                 * <a href="edit_q_list.html?f_id=<% $faq->{f_id} | u %>">Question List</a><br />
 %         }
-%         if ( exists $my_perms->{$faq->{_admin}} ) {
+%         if ( exists $perms->{$faq->{_admin}} ) {
                 * <a href="edit_f_del.html?f_id=<% $faq->{f_id} | u %>">Delete</a><br />
 %         }
             </td>

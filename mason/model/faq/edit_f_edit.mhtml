@@ -5,7 +5,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_perms
+    $perms
     $f_id => undef
 </%args>
 %# ----------------------------------------------------------------------------
@@ -15,7 +15,7 @@
 
     # check the error conditions first - we need to recover
     $m->redirect('edit_f_list.html') unless defined $faq;
-    $m->redirect('edit_f_list.html?f_id=$faq->{f_id}') unless exists $my_perms->{$faq->{_admin}};
+    $m->redirect('edit_f_list.html?f_id=$faq->{f_id}') unless exists $perms->{$faq->{_admin}};
 
     my $roles = $zaapt->get_model('Account')->sel_role_all();
     my @options = map { { value => $_->{r_id}, text => $_->{r_name} } } @$roles;

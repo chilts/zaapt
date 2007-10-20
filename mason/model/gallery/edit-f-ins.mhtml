@@ -1,7 +1,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_perms
+    $perms
     $f_info        => ''
     $f_description => ''
 </%args>
@@ -12,7 +12,7 @@
 %# ----------------------------------------------------------------------------
 <%init>
     my $model = $zaapt->get_model('Gallery');
-    $m->redirect('edit-g-list.html') unless exists $my_perms->{super};
+    $m->redirect('edit-g-list.html') unless exists $perms->{super};
 
     my $err = [];
 

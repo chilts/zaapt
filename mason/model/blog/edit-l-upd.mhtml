@@ -1,7 +1,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_perms
+    $perms
     $e_id
     $e_labels
 </%args>
@@ -23,7 +23,7 @@
     }
 
     # check we can edit labels
-    $m->redirect('edit-b-list.html') unless exists $my_perms->{$entry->{_edit}};
+    $m->redirect('edit-b-list.html') unless exists $perms->{$entry->{_edit}};
     my $labels = $model->sel_label_all_for({ e_id => $entry->{e_id} });
 
     # now we're into the normal user errors

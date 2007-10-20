@@ -1,7 +1,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_perms
+    $perms
     $i_id
 </%args>
 %# ----------------------------------------------------------------------------
@@ -13,7 +13,7 @@
     $m->redirect('edit.html') unless defined $item;
 
     # to edit this item, the user needs the '_edit' role
-    $m->redirect('edit.html') unless exists $my_perms->{$item->{_edit}};
+    $m->redirect('edit.html') unless exists $perms->{$item->{_edit}};
 
     $model->upd_item_move_up({ m_id => $item->{m_id}, i_id => $i_id });
     $m->redirect("edit_i_list.html?m_id=$item->{m_id}");

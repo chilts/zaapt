@@ -1,7 +1,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_perms
+    $perms
     $m_id
     $i_level
     $i_url
@@ -22,7 +22,7 @@
     $m->redirect('edit.html') unless defined $menu;
 
     # to insert this item, the user needs the '_admin' role on this menu section
-    $m->redirect('edit.html') unless exists $my_perms->{$menu->{_admin}};
+    $m->redirect('edit.html') unless exists $perms->{$menu->{_admin}};
 
     my $err = [];
 

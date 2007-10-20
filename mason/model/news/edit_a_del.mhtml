@@ -1,7 +1,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_perms
+    $perms
     $a_id
 </%args>
 %# ----------------------------------------------------------------------------
@@ -15,7 +15,7 @@
 
     # check the error conditions first - we need to recover
     $m->redirect('edit_n_list.html') unless defined $article;
-    $m->redirect('edit_n_list.html') unless exists $my_perms->{$article->{_admin}};
+    $m->redirect('edit_n_list.html') unless exists $perms->{$article->{_admin}};
 
     $model->del_article({ a_id => $a_id });
 

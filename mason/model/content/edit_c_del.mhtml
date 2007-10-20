@@ -1,7 +1,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_perms
+    $perms
     $c_id
 </%args>
 %# ----------------------------------------------------------------------------
@@ -11,7 +11,7 @@
 
     $m->redirect('edit_c_list.html') unless defined $content;
 
-    $m->redirect('edit_c_list.html') unless exists $my_perms->{$content->{_admin}};
+    $m->redirect('edit_c_list.html') unless exists $perms->{$content->{_admin}};
 
     $model->del_content({ c_id => $c_id });
 

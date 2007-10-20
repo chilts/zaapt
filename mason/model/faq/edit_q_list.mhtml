@@ -1,7 +1,7 @@
 %# --- ARGS -------------------------------------------------------------------
 <%args>
     $zaapt
-    $my_perms
+    $perms
     $f_id
 </%args>
 %# --- INIT -------------------------------------------------------------------
@@ -12,7 +12,7 @@
         $m->redirect('edit_f_list.html');
         return;
     }
-    $m->redirect('edit_f_list.html') unless exists $my_perms->{$faq->{_view}};
+    $m->redirect('edit_f_list.html') unless exists $perms->{$faq->{_view}};
     my $questions = $model->sel_question_all_in({ f_id => $f_id });
 </%init>
 %# --- HTML -------------------------------------------------------------------
@@ -22,7 +22,7 @@
 
 <h2>FAQ: <% $faq->{f_name} | h %> - <% $faq->{f_title} | h %></h2>
 
-% if ( exists $my_perms->{$faq->{_admin}} ) {
+% if ( exists $perms->{$faq->{_admin}} ) {
 <p>
     * <a href="edit_q_add.html?f_id=<% $faq->{f_id} | u %>">Add Question &raquo;</a>
 </p>
@@ -41,10 +41,10 @@
         <tr class="r<% $row=1-$row %>">
             <td><% $question->{q_question} | h %></td>
             <td>
-%         if ( exists $my_perms->{$faq->{_edit}} ) {
+%         if ( exists $perms->{$faq->{_edit}} ) {
                 * <a href="edit_q_edit.html?q_id=<% $question->{q_id} | u %>">Edit Question</a><br />
                 * Move <a href="/todo.html">Up</a> / <a href="/todo.html">Down</a><br />
-%             if ( exists $my_perms->{$faq->{_admin}} ) {
+%             if ( exists $perms->{$faq->{_admin}} ) {
                 * <a href="edit_q_del.html?q_id=<% $question->{q_id} | u %>">Delete</a><br />
 %             }
 %         } else {

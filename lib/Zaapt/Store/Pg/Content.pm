@@ -61,7 +61,7 @@ __PACKAGE__->mk_select_rows( 'sel_content_all', "SELECT $tables->{content}{sql_s
 
 # page
 __PACKAGE__->mk_select_row( 'sel_page', "SELECT $main_cols FROM $main_tables WHERE p.id = ?", [ 'p_id' ] );
-__PACKAGE__->mk_select_row( 'sel_page_using_name', "SELECT $main_cols FROM $main_tables WHERE p.name = ?", [ 'p_name' ] );
+__PACKAGE__->mk_select_row( 'sel_page_using_name', "SELECT $main_cols FROM $main_tables WHERE c.id = ? AND p.name = ?", [ 'c_id', 'p_name' ] );
 __PACKAGE__->mk_select_rows( 'sel_page_all_in', "SELECT $main_cols FROM $main_tables WHERE c.id = ? ORDER BY p.name", [ 'c_id' ] );
 
 ## ----------------------------------------------------------------------------

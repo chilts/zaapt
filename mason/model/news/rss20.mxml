@@ -34,7 +34,7 @@
 %# ----------------------------------------------------------------------------
 <%init>
     my $base_url = "$scheme$domain";
-    $base_url .= $path if defined $path;
+    $base_url .= "/$path" if defined $path;
 
     my $model = $zaapt->get_model('News');
     my $news = $model->sel_news_using_name({ n_name => $n_name });

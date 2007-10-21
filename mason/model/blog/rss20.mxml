@@ -27,7 +27,7 @@
 %# ----------------------------------------------------------------------------
 <%init>
     my $base_url = "$scheme$domain";
-    $base_url .= $path if defined $path;
+    $base_url .= "/$path" if defined $path;
 
     my $model = $zaapt->get_model('Blog');
     my $blog = $model->sel_blog_using_name({ b_name => $b_name });

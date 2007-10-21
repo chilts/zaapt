@@ -53,8 +53,7 @@
         return;
     }
 
-    my $roles = $zaapt->get_model('Account')->sel_role_all();
-    my @options = map { { value => $_->{r_id}, text => $_->{r_name} } } @$roles;
+    my $options = $m->comp('/zaapt/common/permission_options.mhtml', zaapt => $zaapt);
 </%init>
 %# ----------------------------------------------------------------------------
 <h1>Add a Forum</h1>
@@ -70,9 +69,9 @@
         { type => 'text', field => 'Title', name => 'f_title', size => 40, value => $f_title },
         { type => 'textarea', field => 'Description', name => 'f_description', rows => 10, cols => 40, value => $f_description },
         { type => 'text', field => 'Show', name => 'f_show', size => 3, value => $f_show },
-        { type => 'select', field => 'Admin Role', name => '_admin', options => \@options, selected => $_admin },
-        { type => 'select', field => 'View Role', name => '_view', options => \@options, selected => $_view },
-        { type => 'select', field => 'Moderator Role', name => '_moderator', options => \@options, selected => $_moderator },
+        { type => 'select', field => 'Admin Perm', name => '_admin', options => $options, selected => $_admin },
+        { type => 'select', field => 'View Perm', name => '_view', options => $options, selected => $_view },
+        { type => 'select', field => 'Moderator Perm', name => '_moderator', options => $options, selected => $_moderator },
         { type => 'submit', field => 'Actions', value => 'Add Forum', cancel => 'edit_f_list.html' },
     ]
 &>

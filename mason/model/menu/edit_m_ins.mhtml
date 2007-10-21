@@ -47,8 +47,7 @@
         return;
     }
 
-    my $roles = $zaapt->get_model('Account')->sel_role_all();
-    my @options = map { { value => $_->{r_id}, text => $_->{r_name} } } @$roles;
+    my $options = $m->comp('/zaapt/common/permission_options.mhtml', zaapt => $zaapt);
 </%init>
 %# ----------------------------------------------------------------------------
 <h1>Add a Menu</h1>
@@ -63,9 +62,9 @@
         { type => 'text', field => 'Name', name => 'm_name', size => 40, value => $m_name },
         { type => 'text', field => 'Title', name => 'm_title', size => 40, value => $m_title },
         { type => 'textarea', field => 'Description', name => 'm_description', rows => 10, cols => 40, value => $m_description },
-        { type => 'select', field => 'Admin Role', name => '_admin', options => \@options, selected => $_admin },
-        { type => 'select', field => 'View Role', name => '_view', options => \@options, selected => $_view },
-        { type => 'select', field => 'Edit Role', name => '_edit', options => \@options, selected => $_edit },
+        { type => 'select', field => 'Admin Perm', name => '_admin', options => $options, selected => $_admin },
+        { type => 'select', field => 'View Perm', name => '_view', options => $options, selected => $_view },
+        { type => 'select', field => 'Edit Perm', name => '_edit', options => $options, selected => $_edit },
         { type => 'submit', field => 'Actions', value => 'Add Menu', cancel => 'edit_m_list.html' },
     ]
 &>

@@ -74,8 +74,7 @@
         return;
     }
 
-    my $roles = $zaapt->get_model('Account')->sel_role_all();
-    my @options = map { { value => $_->{r_id}, text => $_->{r_name} } } @$roles;
+    my $options = $m->comp('/zaapt/common/permission_options.mhtml', zaapt => $zaapt);
 </%init>
 %# ----------------------------------------------------------------------------
 <h1>Add a Blog</h1>
@@ -94,17 +93,17 @@
         { type => 'check', field => 'Moderate', name => 'b_moderate', checked => $b_moderate },
         { type => 'check', field => 'Comment', name => 'b_comment', checked => $b_comment },
         { type => 'check', field => 'Trackback', name => 'b_trackback', checked => $b_trackback },
-        { type => 'select', field => 'Admin Role', name => '_admin', options => \@options, selected => $_admin },
+        { type => 'select', field => 'Admin Perm', name => '_admin', options => $options, selected => $_admin },
         { type => 'note', value => "Note: Allows this user to delete this entire blog." },
-        { type => 'select', field => 'View Role', name => '_view', options => \@options, selected => $_view },
+        { type => 'select', field => 'View Perm', name => '_view', options => $options, selected => $_view },
         { type => 'note', value => "Note: Allows this user to view all blog entries." },
-        { type => 'select', field => 'Edit Role', name => '_edit', options => \@options, selected => $_edit },
+        { type => 'select', field => 'Edit Perm', name => '_edit', options => $options, selected => $_edit },
         { type => 'note', value => "Note: Allows this user to add, edit and delete blog entries and labels." },
-        { type => 'select', field => 'Publish Role', name => '_publish', options => \@options, selected => $_publish },
+        { type => 'select', field => 'Publish Perm', name => '_publish', options => $options, selected => $_publish },
         { type => 'note', value => "Note: Allows this user to publish blog entries (not yet implemented)." },
-        { type => 'select', field => 'Comment Role', name => '_comment', options => \@options, selected => $_comment },
+        { type => 'select', field => 'Comment Perm', name => '_comment', options => $options, selected => $_comment },
         { type => 'note', value => "Note: Allows this user to moderate comments." },
-        { type => 'select', field => 'Trackback Role', name => '_trackback', options => \@options, selected => $_trackback },
+        { type => 'select', field => 'Trackback Perm', name => '_trackback', options => $options, selected => $_trackback },
         { type => 'note', value => "Note: Allows this user to moderate trackbacks." },
         { type => 'submit', field => 'Actions', value => 'Add Blog', cancel => 'edit-b-list.html' },
     ]

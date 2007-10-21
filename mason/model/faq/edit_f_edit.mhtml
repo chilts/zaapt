@@ -17,8 +17,7 @@
     $m->redirect('edit_f_list.html') unless defined $faq;
     $m->redirect('edit_f_list.html?f_id=$faq->{f_id}') unless exists $perms->{$faq->{_admin}};
 
-    my $roles = $zaapt->get_model('Account')->sel_role_all();
-    my @options = map { { value => $_->{r_id}, text => $_->{r_name} } } @$roles;
+    my $options = $m->comp('/zaapt/common/permission_options.mhtml', zaapt => $zaapt);
 </%init>
 %# ----------------------------------------------------------------------------
 <h1>Edit a Faq</h1>
@@ -32,9 +31,9 @@
         { type => 'text', field => 'Name', name => 'f_name', size => 40, value => $faq->{f_name} },
         { type => 'text', field => 'Title', name => 'f_title', size => 40, value => $faq->{f_title} },
         { type => 'textarea', field => 'Description', name => 'f_description', rows => 10, cols => 40, value => $faq->{f_description} },
-        { type => 'select', field => 'Admin Role', name => '_admin', options => \@options, selected => $faq->{_admin} },
-        { type => 'select', field => 'View Role', name => '_view', options => \@options, selected => $faq->{_view} },
-        { type => 'select', field => 'Edit Role', name => '_edit', options => \@options, selected => $faq->{_moderator} },
+        { type => 'select', field => 'Admin Perm', name => '_admin', options => $options, selected => $faq->{_admin} },
+        { type => 'select', field => 'View Perm', name => '_view', options => $options, selected => $faq->{_view} },
+        { type => 'select', field => 'Edit Perm', name => '_edit', options => $options, selected => $faq->{_moderator} },
         { type => 'submit', field => 'Actions', value => 'Save', cancel => 'edit_f_list.html' },
     ]
 &>

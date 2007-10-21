@@ -10,8 +10,7 @@
 %# ----------------------------------------------------------------------------
 <%init>
     my $model = $zaapt->get_model('Gallery');
-    my $roles = $zaapt->get_model('Account')->sel_role_all();
-    my @options = map { { value => $_->{r_id}, text => $_->{r_name} } } @$roles;
+    my $options = $m->comp('/zaapt/common/permission_options.mhtml', zaapt => $zaapt);
 </%init>
 %# ----------------------------------------------------------------------------
 <h1>Add a Gallery</h1>
@@ -36,11 +35,11 @@
         { type => 'note', value => "Note: Show is used just for the main index." },
         { type => 'check', field => 'Extract Exif?', name => 'g_extractexif', checked => 1 },
 
-        { type => 'select', field => 'Admin Role', name => '_admin', options => \@options },
+        { type => 'select', field => 'Admin Perm', name => '_admin', options => $options },
         { type => 'note', value => "Note: Allows this user to delete this entire gallery." },
-        { type => 'select', field => 'View Role', name => '_view', options => \@options },
+        { type => 'select', field => 'View Perm', name => '_view', options => $options },
         { type => 'note', value => "Note: Allows this user to view all gallery pictures." },
-        { type => 'select', field => 'Edit Role', name => '_edit', options => \@options },
+        { type => 'select', field => 'Edit Perm', name => '_edit', options => $options },
         { type => 'note', value => "Note: Allows this user to add, edit and delete blog entries and labels." },
 
         { type => 'submit', field => 'Actions', value => 'Add Gallery', cancel => 'edit-g-list.html' },

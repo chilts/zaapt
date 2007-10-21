@@ -10,8 +10,7 @@
 %# ----------------------------------------------------------------------------
 <%init>
     my $model = $zaapt->get_model('Content');
-    my $roles = $zaapt->get_model('Account')->sel_role_all();
-    my @options = map { { value => $_->{r_id}, text => $_->{r_name} } } @$roles;
+    my $options = $m->comp('/zaapt/common/permission_options.mhtml', zaapt => $zaapt);
 </%init>
 %# ----------------------------------------------------------------------------
 <h1>Add a Content Section</h1>
@@ -24,10 +23,10 @@
         { type => 'text', field => 'Name', name => 'c_name', size => 40, value => '' },
         { type => 'text', field => 'Title', name => 'c_title', size => 40, value => '' },
         { type => 'textarea', field => 'Description', name => 'c_description', rows => 10, cols => 40, value => '' },
-        { type => 'select', field => 'Admin Role', name => '_admin', options => \@options },
-        { type => 'select', field => 'View Role', name => '_view', options => \@options },
-        { type => 'select', field => 'Edit Role', name => '_edit', options => \@options },
-        { type => 'select', field => 'Publish Role', name => '_publish', options => \@options },
+        { type => 'select', field => 'Admin Perm', name => '_admin', options => $options },
+        { type => 'select', field => 'View Perm', name => '_view', options => $options },
+        { type => 'select', field => 'Edit Perm', name => '_edit', options => $options },
+        { type => 'select', field => 'Publish Perm', name => '_publish', options => $options },
         { type => 'submit', field => 'Actions', value => 'Add Content Section', cancel => 'edit_c_list.html' },
     ]
 &>

@@ -61,8 +61,7 @@
         return;
     }
 
-    my $roles = $zaapt->get_model('Account')->sel_role_all();
-    my @options = map { { value => $_->{r_id}, text => $_->{r_name} } } @$roles;
+    my $options = $m->comp('/zaapt/common/permission_options.mhtml', zaapt => $zaapt);
 </%init>
 %# ----------------------------------------------------------------------------
 <h1>Add a News</h1>
@@ -78,10 +77,10 @@
         { type => 'text', field => 'Title', name => 'n_title', size => 40, value => $n_title },
         { type => 'textarea', field => 'Description', name => 'n_description', rows => 10, cols => 40, value => $n_description },
         { type => 'text', field => 'Show', name => 'n_show', size => 3, value => $n_show },
-        { type => 'select', field => 'Admin Role', name => '_admin', options => \@options, selected => $_admin },
-        { type => 'select', field => 'View Role', name => '_view', options => \@options, selected => $_view },
-        { type => 'select', field => 'Edit Role', name => '_edit', options => \@options, selected => $_edit },
-        { type => 'select', field => 'Publish Role', name => '_publish', options => \@options, selected => $_publish },
+        { type => 'select', field => 'Admin Perm', name => '_admin', options => $options, selected => $_admin },
+        { type => 'select', field => 'View Perm', name => '_view', options => $options, selected => $_view },
+        { type => 'select', field => 'Edit Perm', name => '_edit', options => $options, selected => $_edit },
+        { type => 'select', field => 'Publish Perm', name => '_publish', options => $options, selected => $_publish },
         { type => 'submit', field => 'Actions', value => 'Add News', cancel => 'edit_n_list.html' },
     ]
 &>

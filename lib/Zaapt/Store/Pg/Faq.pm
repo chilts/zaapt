@@ -57,7 +57,7 @@ my $main_tables = "$tables->{faq}{sql_fqt} $join->{f_q} $join->{q_t}";
 # faq
 __PACKAGE__->_mk_selecter( $schema, $tables->{faq} );
 __PACKAGE__->_mk_selecter_using( $schema, $tables->{faq}, 'name' );
-__PACKAGE__->mk_select_rows( 'sel_question_all', "SELECT $tables->{faq}{sql_sel_cols} FROM $tables->{faq}{sql_fqt} ORDER BY f.name" );
+__PACKAGE__->mk_select_rows( 'sel_faq_all', "SELECT $tables->{faq}{sql_sel_cols} FROM $tables->{faq}{sql_fqt} ORDER BY f.name" );
 
 # question
 __PACKAGE__->mk_select_row( 'sel_question', "SELECT $main_cols FROM $main_tables WHERE q.id = ?", [ 'q_id' ] );

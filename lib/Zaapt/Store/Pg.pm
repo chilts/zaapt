@@ -613,10 +613,10 @@ sub _mk_selecter_using {
 }
 
 sub mk_selecter_using {
-    my ($self, $schema, $table, $prefix, $col, @cols) = @_;
+    my ($self, $schema, $tablename, $prefix, $col, @cols) = @_;
 
     my $cols = __PACKAGE__->_mk_sel_cols( $prefix, @cols );
-    my $sql = "SELECT $cols FROM $schema.$table $prefix WHERE $prefix.$col = ?";
+    my $sql = "SELECT $cols FROM $schema.$tablename $prefix WHERE $prefix.$col = ?";
 
     my $class = ref $self || $self;
 
@@ -626,7 +626,7 @@ sub mk_selecter_using {
         return $self->_row( $sql, $hr->{"${prefix}_${col}"} );
     };
 
-    $self->_inject_method("sel_${table}_using_${col}", $method);
+    $self->_inject_method("sel_${tablename}_using_${col}", $method);
 }
 
 sub _mk_sel_fqt {

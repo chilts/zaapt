@@ -449,6 +449,9 @@ sub _mk_updater {
     # create the closure
     my $method =  sub {
         my ($self, $hr) = @_;
+        # warn "sql=$sql";
+        # warn Dumper($hr);
+        # warn Dumper(\@hr_names);
         return $self->_do( $sql, map { $hr->{$_} } @hr_names );
     };
 

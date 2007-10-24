@@ -1,0 +1,267 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $perms
+    $_act          => 'add'
+    $c_id          => undef
+    $e_id          => undef
+    $e_name        => ''
+    $e_title       => ''
+    $e_description => ''
+    $e_startts     => ''
+    $e_endts       => ''
+    $e_allday      => 0
+    $e_location    => ''
+    $e_link        => ''
+    $e_lat         => ''
+    $e_lng         => ''
+    $e_zoom        => ''
+</%args>
+%# ----------------------------------------------------------------------------
+<%once>
+    use URI::Escape;
+    use Data::Dumper;
+
+    my $title = {
+        add => 'Add',
+        ins => 'Add',
+        edit => 'Edit',
+        upd  => 'Edit',
+        del  => 'Delete',
+    };
+</%once>
+%# ----------------------------------------------------------------------------
+<%init>
+    warn Data::Dumper->Dump([\%ARGS], ['args']);
+
+    my $model = $zaapt->get_model('Calendar');
+
+    my ($calendar, $event);
+
+    # some data manipulation
+    $e_description = Zaapt::Utils::Conv::remove_cr( $e_description );
+    $e_allday = Zaapt::Utils::Conv::to_bool( $e_allday );
+    $e_location = undef unless Zaapt::Utils::Valid::has_content( $e_location );
+    $e_link     = undef unless Zaapt::Utils::Valid::has_content( $e_link     );
+    $e_lat      = undef unless Zaapt::Utils::Valid::has_content( $e_lat      );
+    $e_lng      = undef unless Zaapt::Utils::Valid::has_content( $e_lng      );
+    $e_zoom     = undef unless Zaapt::Utils::Valid::has_content( $e_zoom     );
+
+    # see if we are working with a Calendar or a pre-existing Event
+    if ( $_act eq 'ins' or $_act eq 'add' ) {
+        $calendar = $model->sel_calendar({ c_id => $c_id });
+
+        $m->redirect('edit-c-list.html')
+            unless defined $calendar;
+
+        $m->redirect('edit-e-list.html?c_id=' . uri_escape($c_id))
+            unless exists $perms->{$calendar->{_edit}};
+    }
+    else {
+        $event = $model->sel_event({ e_id => $e_id });
+
+        warn Data::Dumper->Dump([$event], ['event']);
+
+        $m->redirect('edit-c-list.html')
+            unless defined $event;
+
+        $m->redirect('edit-e-list.html?c_id=' . uri_escape($event->{c_id}))
+            unless exists $perms->{$event->{_edit}};
+
+        $c_id = $event->{c_id};
+    }
+
+    my $err = [];
+    my $values = {};
+
+    warn Data::Dumper->Dump([$calendar, $event], ['calendar', 'event']);
+
+    # let's do some of the actions
+    if ( $_act eq 'add' ) {
+        $values->{_act} = 'ins';
+        $values->{submit} = 'Add Event';
+    }
+    elsif ( $_act eq 'ins' ) {
+        # check that these values are valid
+        unless ( Zaapt::Utils::Valid::is_valid_name($e_name, 'Name') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+        unless ( Zaapt::Utils::Valid::has_content($e_title, 'Title') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+        unless ( Zaapt::Utils::Valid::is_datetime($e_startts, 'Start Time') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+        unless ( Zaapt::Utils::Valid::is_datetime($e_endts, 'Start End') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+        if ( defined $e_lat ) {
+            unless ( Zaapt::Utils::Valid::is_lat($e_lat, 'Latitude') ) {
+                push @$err, Zaapt::Utils::Valid::err();
+            }
+        }
+        if ( defined $e_lng ) {
+            unless ( Zaapt::Utils::Valid::is_lng($e_lng, 'Longitude') ) {
+                push @$err, Zaapt::Utils::Valid::err();
+            }
+        }
+        if ( defined $e_zoom ) {
+            unless ( Zaapt::Utils::Valid::is_zoom($e_zoom, 'Zoom') ) {
+                push @$err, Zaapt::Utils::Valid::err();
+            }
+        }
+        if ( defined $e_lat or defined $e_lng or defined $e_zoom ) {
+            unless ( defined $e_lat and defined $e_lng and defined $e_zoom ) {
+                push @$err, "if specifying one of Latitude, Longitude and Zoom, you must specify all three";
+            }
+        }
+
+        # no Event of this name should already exist in this Calendar
+        unless ( @$err ) {
+            if ( $model->sel_event_in({ c_id => $c_id, e_name => $e_name }) ) {
+                push @$err, "Event '$e_name' already exists in '$calendar->{c_name}'."
+            }
+        }
+
+        # do the insert
+        unless ( @$err ) {
+            $model->ins_event({
+                c_id          => $c_id,
+                e_name        => $e_name,
+                e_title       => $e_title,
+                e_description => $e_description,
+                e_startts     => $e_startts,
+                e_endts       => $e_endts,
+                e_allday      => $e_allday,
+                e_location    => $e_location,
+                e_link        => $e_link,
+                e_lat         => $e_lat,
+                e_lng         => $e_lng,
+                e_zoom        => $e_zoom,
+            });
+            $m->redirect("edit-e-list.html?c_id=" . uri_escape($c_id));
+            return;
+        }
+
+        $values = { %ARGS };
+        $values->{submit} = 'Add Event';
+    }
+    elsif ( $_act eq 'edit' ) {
+        # already checked permissions
+        $values = $event;
+        $values->{_act} = 'upd';
+        $values->{submit} = 'Save Event';
+    }
+    elsif ( $_act eq 'upd' ) {
+        # check that these values are valid
+        unless ( Zaapt::Utils::Valid::is_valid_name($e_name, 'Name') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+        unless ( Zaapt::Utils::Valid::has_content($e_title, 'Title') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+        unless ( Zaapt::Utils::Valid::is_datetime($e_startts, 'Start Time') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+        unless ( Zaapt::Utils::Valid::is_datetime($e_endts, 'Start End') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+        if ( defined $e_lat ) {
+            unless ( Zaapt::Utils::Valid::is_lat($e_lat, 'Latitude') ) {
+                push @$err, Zaapt::Utils::Valid::err();
+            }
+        }
+        if ( defined $e_lng ) {
+            unless ( Zaapt::Utils::Valid::is_lng($e_lng, 'Longitude') ) {
+                push @$err, Zaapt::Utils::Valid::err();
+            }
+        }
+        if ( defined $e_zoom ) {
+            unless ( Zaapt::Utils::Valid::is_zoom($e_zoom, 'Zoom') ) {
+                push @$err, Zaapt::Utils::Valid::err();
+            }
+        }
+        if ( defined $e_lat or defined $e_lng or defined $e_zoom ) {
+            unless ( defined $e_lat and defined $e_lng and defined $e_zoom ) {
+                push @$err, "if specifying one of Latitude, Longitude and Zoom, you must specify all three";
+            }
+        }
+
+        # do the update
+        unless ( @$err ) {
+            $model->upd_event({
+                c_id          => $event->{c_id},
+                e_name        => $e_name,
+                e_title       => $e_title,
+                e_description => $e_description,
+                e_startts     => $e_startts,
+                e_endts       => $e_endts,
+                e_allday      => $e_allday,
+                e_location    => $e_location,
+                e_link        => $e_link,
+                e_lat         => $e_lat,
+                e_lng         => $e_lng,
+                e_zoom        => $e_zoom,
+            });
+            $m->redirect("edit-e-list.html?c_id=" . uri_escape($c_id));
+            return;
+        }
+
+        $values = { %ARGS };
+        $values->{submit} = 'Save Event';
+    }
+    elsif ( $_act eq 'rem' ) {
+        # already checked permissions
+        $values = $event;
+        $values->{_act} = 'del';
+        $values->{submit} = 'Delete Event';
+    }
+    elsif ( $_act eq 'del' ) {
+        # delete
+        $model->del_event({ e_id => $e_id });
+        $m->redirect("edit-e-list.html?c_id=" . uri_escape( $event->{c_id} ));
+        return;
+    }
+
+    warn Data::Dumper->Dump([$values], ['values']);
+</%init>
+%# ----------------------------------------------------------------------------
+<h1><% $title->{$_act} %> a Event</h1>
+
+<p><a href="edit-e-list.html?c_id=<% $c_id | u %>">&laquo; Back to Event List</a></p>
+
+% if ( defined $event ) {
+<h2>Event: <% $event->{e_name} | h %> - '<% $event->{e_title} | h %>'</h2>
+% } else {
+<h2>Event: ?</h2>
+% }
+
+<& /zaapt/common/err.mhtml, err => $err &>
+
+<& /zaapt/common/form/edit.mhtml,
+    action => '?',
+    values => $values,
+    elements => [
+        { type => 'hidden', name => '_act' },
+        { type => 'hidden', name => 'c_id', def => $c_id },
+        { type => 'hidden', name => 'e_id', def => $e_id },
+        { type => 'text', field => 'Name', name => 'e_name', size => 40, def => '' },
+        { type => 'text', field => 'Title', name => 'e_title', size => 40, def => '' },
+        { type => 'textarea', field => 'Description', name => 'e_description', rows => 10, cols => 40, def => '' },
+
+        { type => 'text', field => 'Start Time', name => 'e_startts', size => 40, def => '' },
+        { type => 'text', field => 'End Time', name => 'e_endts', size => 40, def => '' },
+
+        { type => 'checkbox', field => 'All Day?', name => 'e_allday', checked => $e_allday },
+
+        { type => 'text', field => 'Location', name => 'e_location', size => 40, def => '' },
+        { type => 'text', field => 'Link', name => 'e_link', size => 40, def => '' },
+
+        { type => 'text', field => 'Lat', id => 'e_lat', name => 'e_lat', size => 15, def => '' },
+        { type => 'text', field => 'Lng', id => 'e_lng', name => 'e_lng', size => 15, def => '' },
+        { type => 'text', field => 'Zoom', id => 'e_zoom', name => 'e_zoom', size => 3, def => '' },
+
+        { type => 'submit', name => 'submit', field => 'Actions', cancel => 1, location => 'edit-e-list.html?c_id=' . uri_escape($c_id) },
+    ]
+&>
+%# ----------------------------------------------------------------------------

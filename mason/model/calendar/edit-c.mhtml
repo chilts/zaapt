@@ -1,0 +1,185 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $perms
+    $_act          => 'add'
+    $c_id          => undef
+    $c_name        => ''
+    $c_title       => ''
+    $c_description => ''
+    $_admin        => ''
+    $_view         => ''
+    $_edit         => ''
+</%args>
+%# ----------------------------------------------------------------------------
+<%once>
+    use URI::Escape;
+    use Data::Dumper;
+
+    my $title = {
+        add => 'Add',
+        ins => 'Add',
+        edit => 'Edit',
+        upd  => 'Edit',
+        del  => 'Delete',
+    };
+</%once>
+%# ----------------------------------------------------------------------------
+<%init>
+    # warn Data::Dumper->Dump([\%ARGS], ['args']);
+
+    my $model = $zaapt->get_model('Calendar');
+
+    $m->redirect('edit-c-list.html') unless exists $perms->{super};
+
+    my $err = [];
+    my $values = {};
+    my $calendar;
+
+    # let's do some of the actions
+    if ( $_act eq 'add' ) {
+        $values->{_act} = 'ins';
+        $values->{submit} = 'Add Calendar';
+    }
+    elsif ( $_act eq 'ins' ) {
+        # check that these values are valid
+        unless ( Zaapt::Utils::Valid::is_valid_name($c_name, 'Name') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+        unless ( Zaapt::Utils::Valid::has_content($c_title, 'Title') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+
+        # no Calendar of this name should already exist
+        unless ( @$err ) {
+            if ( $model->sel_calendar_using_name({ c_name => $c_name }) ) {
+                push @$err, "Calendar name '$c_name' already exists."
+            }
+        }
+
+        # do the insert
+        unless ( @$err ) {
+            # manipulate some values
+            $c_description = Zaapt::Utils::Conv::remove_cr( $c_description );
+
+            $model->ins_calendar({
+                c_name        => $c_name,
+                c_title       => $c_title,
+                c_description => $c_description,
+                _admin        => $_admin,
+                _view         => $_view,
+                _edit         => $_edit,
+            });
+            $m->redirect("edit-c-list.html");
+            return;
+        }
+
+        $values = { %ARGS };
+        $values->{submit} = 'Add Calendar';
+    }
+    elsif ( $_act eq 'edit' ) {
+        # get 'calendar', check permissions
+        $calendar = $model->sel_calendar({ c_id => $c_id });
+        $m->redirect('edit-c-list.html') unless defined $calendar;
+        $m->redirect('edit-c-list.html?c_id=$calendar->{c_id}') unless exists $perms->{$calendar->{_admin}};
+
+        $values = $calendar;
+        $values->{_act} = 'upd';
+        $values->{submit} = 'Save Calendar';
+    }
+    elsif ( $_act eq 'upd' ) {
+        # get 'calendar', check permissions
+        $calendar = $model->sel_calendar({ c_id => $c_id });
+        $m->redirect('edit-c-list.html') unless defined $calendar;
+        $m->redirect('edit-c-list.html?c_id=$calendar->{c_id}') unless exists $perms->{$calendar->{_admin}};
+
+        # check that these values are valid
+        unless ( Zaapt::Utils::Valid::is_valid_name($c_name, 'Name') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+        unless ( Zaapt::Utils::Valid::has_content($c_title, 'Title') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+
+        # do the update
+        unless ( @$err ) {
+            # manipulate some values
+            $c_description = Zaapt::Utils::Conv::remove_cr( $c_description );
+
+            $model->upd_calendar({
+                c_name        => $c_name,
+                c_title       => $c_title,
+                c_description => $c_description,
+                _admin        => $_admin,
+                _view         => $_view,
+                _edit         => $_edit,
+                c_id          => $c_id,
+            });
+            $m->redirect("edit-c-list.html");
+            return;
+        }
+
+        $values = { %ARGS };
+        $values->{submit} = 'Add Calendar';
+    }
+    elsif ( $_act eq 'rem' ) {
+        # get 'calendar', check permissions
+        $calendar = $model->sel_calendar({ c_id => $c_id });
+        $m->redirect('edit-c-list.html') unless defined $calendar;
+        $m->redirect('edit-c-list.html?c_id=$calendar->{c_id}') unless exists $perms->{$calendar->{_admin}};
+
+        $values = $calendar;
+        $values->{_act} = 'del';
+        $values->{submit} = 'Delete Calendar';
+    }
+    elsif ( $_act eq 'del' ) {
+        # get 'calendar', check permissions
+        $calendar = $model->sel_calendar({ c_id => $c_id });
+        $m->redirect('edit-c-list.html') unless defined $calendar;
+        $m->redirect('edit-c-list.html?c_id=$calendar->{c_id}') unless exists $perms->{$calendar->{_admin}};
+
+        # delete
+        $model->del_calendar({ c_id => $c_id });
+        $m->redirect("edit-c-list.html");
+        return;
+    }
+
+    # warn Data::Dumper->Dump([$values], ['values']);
+
+    # create the dropdown options for each role
+    my $options = $m->comp('/zaapt/common/permission_options.mhtml', zaapt => $zaapt);
+</%init>
+%# ----------------------------------------------------------------------------
+<h1><% $title->{$_act} %> a Calendar</h1>
+
+<p><a href="edit-c-list.html">&laquo; Back to Calendar List</a></p>
+
+% if ( defined $calendar ) {
+<h2>Calendar: <% $calendar->{c_name} | h %> - '<% $calendar->{c_title} | h %>'</h2>
+% } else {
+<h2>Calendar: ?</h2>
+% }
+
+<& /zaapt/common/err.mhtml, err => $err &>
+
+<& /zaapt/common/form/edit.mhtml,
+    action => '?',
+    values => $values,
+    elements => [
+        { type => 'hidden', name => '_act' },
+        { type => 'hidden', name => 'c_id', def => '' },
+        { type => 'text', field => 'Name', name => 'c_name', size => 40, def => '' },
+        { type => 'text', field => 'Title', name => 'c_title', size => 40, def => '' },
+        { type => 'textarea', field => 'Description', name => 'c_description', rows => 10, cols => 40, def => '' },
+
+        { type => 'select', field => 'Admin Role', name => '_admin', options => $options },
+        { type => 'note', def => "Note: Allows this user to delete this entire calendar." },
+        { type => 'select', field => 'View Role', name => '_view', options => $options },
+        { type => 'note', def => "Note: Allows this user to view all events." },
+        { type => 'select', field => 'Edit Role', name => '_edit', options => $options },
+        { type => 'note', def => "Note: Allows this user to add, edit and delete events." },
+
+        { type => 'submit', name => 'submit', field => 'Actions', cancel => 1, location => 'edit-c-list.html' },
+    ]
+&>
+%# ----------------------------------------------------------------------------

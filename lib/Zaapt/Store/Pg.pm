@@ -420,6 +420,7 @@ sub _mk_inserter {
         my ($self, $hr) = @_;
         # warn "sql=$sql";
         # warn Dumper($hr);
+        # warn Dumper(\@hr_names);
         return $self->_do( $sql, map { $hr->{$_} } @hr_names );
     };
 
@@ -552,6 +553,8 @@ sub mk_selecter {
     # create the closure
     my $method =  sub {
         my ($self, $hr) = @_;
+        # warn "sql=$sql";
+        # warn Dumper($hr);
         return $self->_row( $sql, $hr->{"${prefix}_${id}"} );
     };
 

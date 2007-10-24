@@ -180,7 +180,7 @@ sub is_datetime {
         return;
     }
 
-    warn "dt=$1-$2-$3 $4:$5:$6";
+    # warn "dt=$1-$2-$3 $4:$5:$6";
 
     my $datetime;
     eval {
@@ -195,6 +195,97 @@ sub is_datetime {
     };
     if ( $@ ) {
         $err = "'$name' doesn't look like a valid date";
+        return;
+    }
+
+    return 1;
+}
+
+sub is_lat {
+    my ($lat, $name) = @_;
+
+    $err = undef;
+    $name ||= 'lat';
+
+    unless ( defined $lat ) {
+        $err = "'$name' is undefined";
+        return;
+    }
+
+    if ( $lat eq '' ) {
+        $err = "no '$name' given";
+        return;
+    }
+
+    unless ( $lat =~ m{ \A [+-]? (\d+(\.\d+)?) \z }xms ) {
+        $err = "'$name' ($lat) must be of the form [+-]?[0-90](.\\d+)?";
+        return;
+    }
+
+    my $abs = $1;
+
+    unless ( $abs >= -90 and $abs <= 90 ) {
+        $err = "'$name' ($lat) must be between -90 and +90";
+        return;
+    }
+
+    return 1;
+}
+
+sub is_lng {
+    my ($lng, $name) = @_;
+
+    $err = undef;
+    $name ||= 'lng';
+
+    unless ( defined $lng ) {
+        $err = "'$name' is undefined";
+        return;
+    }
+
+    if ( $lng eq '' ) {
+        $err = "no '$name' given";
+        return;
+    }
+
+    unless ( $lng =~ m{ \A [+-]? (\d+(\.\d+)?) \z }xms ) {
+        $err = "'$name' ($lng) must be of the form [+-]?[0-180](.\\d+)?";
+        return;
+    }
+
+    my $abs = $1;
+
+    unless ( $abs >= -180 and $abs <= 180 ) {
+        $err = "'$name' ($lng) must be between -180 and +180";
+        return;
+    }
+
+    return 1;
+}
+
+sub is_zoom {
+    my ($zoom, $name) = @_;
+
+    $err = undef;
+    $name ||= 'zoom';
+
+    unless ( defined $zoom ) {
+        $err = "'$name' is undefined";
+        return;
+    }
+
+    if ( $zoom eq '' ) {
+        $err = "no '$name' given";
+        return;
+    }
+
+    unless ( $zoom =~ m{ \A \d+ \z }xms ) {
+        $err = "'$name' ($zoom) must be an integer between 1 and 19 inclusive";
+        return;
+    }
+
+    unless ( $zoom >= 1 and $zoom <= 19 ) {
+        $err = "'$name' ($zoom) must be between 1 and 19 inclusive";
         return;
     }
 

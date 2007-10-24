@@ -1,0 +1,65 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $perms
+    $c_id
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Calendar');
+    my $calendar = $model->sel_calendar({ c_id => $c_id });
+
+    $m->redirect('edit-c-list.html')
+        unless defined $calendar;
+    $m->redirect('edit-c-list.html')
+        unless exists $perms->{$calendar->{_view}};
+
+    my $events = $model->sel_event_all_in({ c_id => $c_id });
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Event List</h1>
+
+<p><a href="edit-c-list.html">&laquo; Back to Calendar List</a></p>
+
+<h2>Calendar: <% $calendar->{c_name} | h %> - <% $calendar->{c_title} | h %></h2>
+
+% if ( exists $perms->{$calendar->{_admin}} ) {
+<p>
+    * <a href="edit-e.html?_act=add&amp;c_id=<% $calendar->{c_id} | u %>">Add Event &raquo;</a>
+</p>
+% }
+
+<&| /zaapt/common/admin/table-list.mhtml, title => 'Event' &>
+
+% my $r = 1;
+% foreach my $event ( @$events ) {
+%     next unless exists $perms->{$event->{_view}};
+        <tr class="r<% $r++%2 %>">
+            <td>
+                (<% $event->{e_id} | h %>) <strong><% $event->{e_name} | h %></strong><br />
+                <% $event->{e_title} | h %><br />
+                <% $event->{e_link} | h %><br />
+                <strong>(<% $event->{e_lat} | h %>, <% $event->{e_lng} | h %>)</strong> @ <% $event->{e_zoom} | h %><br />
+            </td>
+            <td>
+%         if ( exists $perms->{$event->{_edit}} ) {
+                * <a href="edit-e.html?_act=edit&amp;e_id=<% $event->{e_id} | u %>">Edit</a><br />
+                * <a href="edit-e.html?_act=rem&amp;e_id=<% $event->{e_id} | u %>">Delete</a><br />
+%         } else {
+                No Actions
+%         }
+            </td>
+        </tr>
+% }
+% unless ( @$events ) {
+        <tr class="r0">
+            <td>no events found</td>
+            <td>
+                * <a href="edit-e.html?_act=add&amp;c_id=<% $calendar->{c_id} | u %>">Add Event</a>
+            </td>
+        </tr>
+% }
+
+</&>
+
+%# ----------------------------------------------------------------------------

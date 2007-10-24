@@ -1,0 +1,54 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $perms
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Calendar');
+    my $calendars = $model->sel_calendar_all();
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Calendar List</h1>
+
+<p>
+% if ( exists $perms->{super} ) {
+    * <a href="edit-c.html?_act=add">Add Calendar &raquo;</a><br />
+% }
+</p>
+
+<&| /zaapt/common/admin/table-list.mhtml, title => 'Calendar' &>
+
+% my $r = 1;
+% foreach my $calendar ( @$calendars ) {
+%     next unless ( exists $perms->{$calendar->{_view}} or exists $perms->{$calendar->{_admin}} );
+        <tr class="r<% $r++%2 %>">
+            <td>
+                (<% $calendar->{c_id} | h %>) <strong><% $calendar->{c_name} | h %></strong><br />
+                <% $calendar->{c_title} | h %><br />
+                <strong><% $calendar->{c_total} | h %></strong> events<br />
+            </td>
+            <td>
+%         if ( exists $perms->{$calendar->{_edit}} ) {
+                * <a href="edit-e.html?_act=add&amp;c_id=<% $calendar->{c_id} | u %>">Add Event</a><br />
+                * <a href="edit-e-list.html?c_id=<% $calendar->{c_id} | u %>">List Events</a><br />
+%         }
+%         if ( exists $perms->{$calendar->{_admin}} ) {
+                * <a href="edit-c.html?_act=edit&amp;c_id=<% $calendar->{c_id} | u %>">Edit Calendar</a><br />
+                * <a href="edit-c.html?_act=rem&amp;c_id=<% $calendar->{c_id} | u %>">Delete</a><br />
+%         }
+            </td>
+        </tr>
+% }
+% unless ( @$calendars ) {
+        <tr class="r0">
+            <td>no calendars found</td>
+            <td>
+                * <a href="edit-c.html?_act=add">Add Calendar</a>
+            </td>
+        </tr>
+% }
+
+</&>
+
+%# ----------------------------------------------------------------------------

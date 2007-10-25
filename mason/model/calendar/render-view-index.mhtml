@@ -1,0 +1,31 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $calendar
+    $events
+</%args>
+%# ----------------------------------------------------------------------------
+<h1>Events for <% $calendar->{c_title} | h %></h1>
+
+<& /zaapt/common/render.mhtml, t_name => 'text', content => $calendar->{c_description} &>
+
+% foreach my $event ( @$events ) {
+
+<h2><% $event->{e_title} | h %></h2>
+
+% if ( defined $event->{e_link} ) {
+<p><a href="<% $event->{e_link} | h %>"><% $event->{e_link} | h %></a></p>
+% }
+
+<p><% $event->{e_intro} | h %></p>
+
+<p>
+    From <strong><% $event->{e_startts} | h %></strong> until <strong><% $event->{e_endts} | h %></strong>.
+</p>
+
+<p><a href="<% $event->{e_name} | h %>.html">Read More...</a></p>
+
+% }
+% unless ( @$events ) {
+<p>Currently, there are no events in this calendar.</p>
+% }
+%# ----------------------------------------------------------------------------

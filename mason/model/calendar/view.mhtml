@@ -1,0 +1,31 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $c_name
+    $page => ''
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    if ( $page eq '' ) {
+        $m->clear_buffer();
+        $m->abort(404);
+        return;
+    }
+
+    if ( $page eq 'index' ) {
+        # main index page
+        $m->comp('/zaapt/model/calendar/view-index.mhtml',
+            zaapt  => $zaapt,
+            c_name => $c_name,
+        );
+    }
+    else {
+        $m->comp( '/zaapt/model/calendar/view-event.mhtml',
+            zaapt  => $zaapt,
+            c_name => $c_name,
+            e_name => $page,
+        );
+    }
+    return;
+</%init>
+%# ----------------------------------------------------------------------------

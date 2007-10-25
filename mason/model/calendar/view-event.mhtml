@@ -1,0 +1,27 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $c_name
+    $e_name
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Calendar');
+    my $calendar = $model->sel_calendar_using_name({ c_name => $c_name });
+    unless ( defined $calendar ) {
+        die "Calendar '$c_name' not found.";
+        return;
+    }
+    my $event = $model->sel_event_using_name({ c_id => $calendar->{c_id}, e_name => $e_name });
+    unless ( defined $event ) {
+        $m->clear_buffer();
+        $m->abort(404);
+        return;
+    }
+</%init>
+%# ----------------------------------------------------------------------------
+<& render-view-event.mhtml,
+    calendar => $calendar,
+    event    => $event,
+&>
+%# ----------------------------------------------------------------------------

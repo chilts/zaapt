@@ -1,0 +1,24 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $calendars
+</%args>
+%# ----------------------------------------------------------------------------
+<h1>All Calendars</h1>
+
+% unless ( @$calendars ) {
+<p>No calendars found.</p>
+% }
+
+% foreach my $calendar ( @$calendars ) {
+
+<h2><% $calendar->{c_title} | h %></h2>
+
+<p>This calendar has <% $calendar->{c_total} | h %> events.</p>
+
+<& /zaapt/common/render.mhtml, t_name => 'text', content => $calendar->{c_description} &>
+
+<p><a href="<% $calendar->{c_name} | h %>/">View Events...</a></p>
+
+% }
+
+%# ----------------------------------------------------------------------------

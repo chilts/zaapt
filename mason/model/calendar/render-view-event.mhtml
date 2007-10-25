@@ -1,0 +1,41 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $calendar
+    $event
+</%args>
+%# ----------------------------------------------------------------------------
+<p><a href="./">&laquo;&laquo; Back to All <% $calendar->{c_title} | h %> Listings</a></p>
+
+<h1><% $event->{e_title} | h %></h1>
+
+<p>
+    <strong><% $event->{e_intro} | h %></strong>
+</p>
+
+<h2>Description</h2>
+
+<& /zaapt/common/render.mhtml, t_name => 'text', content => $event->{e_description} &>
+
+<h2>Details</h2>
+
+<p>
+% if ( $event->{e_allday} ) {
+%#  ToDo: needs formatting correctly for the date
+    All Day On: <strong><% $event->{e_startts} | h %></strong><br />
+% } else {
+    Time: <strong><% $event->{e_startts} | h %></strong> until <strong><% $event->{e_endts} | h %></strong><br />
+% }
+% if ( defined $event->{e_location} ) {
+    Location: <strong><% $event->{e_location} | h %></strong><br />
+% }
+% if ( defined $event->{e_link} ) {
+    Link: <a href="<% $event->{e_link} | h %>"><% $event->{e_link} | h %></a><br />
+% }
+</p>
+
+% if ( defined $event->{e_zoom} ) {
+<h2>Map</h2>
+
+<p>(<% $event->{e_lat} | h %>, <% $event->{e_lng} | h %>) at Zoom <% $event->{e_zoom} | h %></p>
+% }
+%# ----------------------------------------------------------------------------

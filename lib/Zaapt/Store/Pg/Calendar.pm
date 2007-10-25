@@ -25,7 +25,7 @@ my $tables = {
         cols => [
             'id',
             [ 'calendar_id', 'fk', 'c_id' ],
-            qw(name title description ts:startts ts:endts allday location link lat lng zoom ts:inserted ts:updated) ],
+            qw(name title intro description dt:startts dt:endts allday location link lat lng zoom ts:inserted ts:updated) ],
     },
 };
 

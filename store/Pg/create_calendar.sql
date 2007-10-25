@@ -33,6 +33,7 @@ CREATE TABLE calendar.event (
     calendar_id     INTEGER NOT NULL REFERENCES calendar.calendar,
     name            TEXT NOT NULL,
     title           TEXT NOT NULL,
+    intro           TEXT NOT NULL,
     description     TEXT NOT NULL,
     startts         TIMESTAMP WITH TIME ZONE NOT NULL,
     endts           TIMESTAMP WITH TIME ZONE NOT NULL,

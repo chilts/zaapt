@@ -7,6 +7,7 @@
     $e_id          => undef
     $e_name        => ''
     $e_title       => ''
+    $e_intro       => ''
     $e_description => ''
     $e_startts     => ''
     $e_endts       => ''
@@ -37,6 +38,7 @@
     my ($calendar, $event);
 
     # some data manipulation
+    $e_intro = Zaapt::Utils::Conv::remove_cr( $e_intro );
     $e_description = Zaapt::Utils::Conv::remove_cr( $e_description );
     $e_allday = Zaapt::Utils::Conv::to_bool( $e_allday );
     $e_location = undef unless Zaapt::Utils::Valid::has_content( $e_location );
@@ -123,6 +125,7 @@
                 c_id          => $c_id,
                 e_name        => $e_name,
                 e_title       => $e_title,
+                e_intro       => $e_intro,
                 e_description => $e_description,
                 e_startts     => $e_startts,
                 e_endts       => $e_endts,
@@ -187,6 +190,7 @@
                 c_id          => $event->{c_id},
                 e_name        => $e_name,
                 e_title       => $e_title,
+                e_intro       => $e_intro,
                 e_description => $e_description,
                 e_startts     => $e_startts,
                 e_endts       => $e_endts,
@@ -240,6 +244,7 @@
         { type => 'hidden', name => 'e_id', def => $e_id },
         { type => 'text', field => 'Name', name => 'e_name', size => 40, def => '' },
         { type => 'text', field => 'Title', name => 'e_title', size => 40, def => '' },
+        { type => 'textarea', field => 'Intro', name => 'e_intro', rows => 3, cols => 40, def => '' },
         { type => 'textarea', field => 'Description', name => 'e_description', rows => 10, cols => 40, def => '' },
 
         { type => 'text', field => 'Start Time', name => 'e_startts', size => 40, def => '' },

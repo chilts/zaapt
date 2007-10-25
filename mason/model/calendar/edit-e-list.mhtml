@@ -21,7 +21,7 @@
 
 <p><a href="edit-c-list.html">&laquo; Back to Calendar List</a></p>
 
-<h2>Calendar: <% $calendar->{c_name} | h %> - <% $calendar->{c_title} | h %></h2>
+<h2>Calendar: <% $calendar->{c_name} | h %> - '<% $calendar->{c_title} | h %>'</h2>
 
 % if ( exists $perms->{$calendar->{_admin}} ) {
 <p>

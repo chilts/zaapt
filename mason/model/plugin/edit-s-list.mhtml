@@ -1,0 +1,56 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $perms
+    $p_id
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Plugin');
+    my $plugin = $model->sel_plugin({ p_id => $p_id });
+
+    my $settings = $model->sel_setting_all_in({ p_id => $p_id });
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Setting List</h1>
+
+<p><a href="edit-p-list.html">&laquo; Back to Plugin List</a></p>
+
+<h2>Plugin: <% $plugin->{p_name} | h %> - '<% $plugin->{p_title} | h %>'</h2>
+
+% if ( exists $perms->{$plugin->{_admin}} ) {
+<p>
+    * <a href="edit-s.html?_act=add&amp;p_id=<% $plugin->{p_id} | u %>">Add Setting &raquo;</a>
+</p>
+% }
+
+<&| /zaapt/common/admin/table-list.mhtml, title => 'Setting' &>
+
+% my $r = 1;
+% foreach my $setting ( @$settings ) {
+    <tr class="r<% $r++%2 %>">
+        <td>
+            (<% $setting->{s_id} | h %>) <% $setting->{s_name} | h %><br />
+            Value: <strong><% $setting->{s_value} | h %></strong><br />
+        </td>
+        <td>
+%     if ( exists $perms->{super} ) {
+            * <a href="edit-s.html?_act=edit&amp;s_id=<% $setting->{s_id} | u %>">Edit</a><br />
+%     } else {
+            No Actions
+%     }
+        </td>
+    </tr>
+% }
+% unless ( @$settings ) {
+    <tr class="r0">
+        <td>no settings found</td>
+        <td>
+            * <a href="edit-s.html?_act=add&amp;p_id=<% $plugin->{p_id} | u %>">Add Setting</a>
+        </td>
+    </tr>
+% }
+
+</&>
+
+%# ----------------------------------------------------------------------------

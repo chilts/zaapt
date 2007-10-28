@@ -1,0 +1,91 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $perms
+    $_act          => 'add'
+    $p_id          => undef
+    $s_id          => undef
+    $s_value       => ''
+</%args>
+%# ----------------------------------------------------------------------------
+<%once>
+    use URI::Escape;
+    use Data::Dumper;
+
+    my $title = {
+        edit => 'Edit',
+        upd  => 'Edit',
+    };
+</%once>
+%# ----------------------------------------------------------------------------
+<%init>
+    # check these permissions for the whole page
+    $m->redirect('edit-p-list.html') unless exists $perms->{super};
+
+    my $model = $zaapt->get_model('Plugin');
+    my $setting = $model->sel_setting({ s_id => $s_id });
+
+    $m->redirect('edit-p-list.html')
+        unless defined $setting;
+
+    $p_id = $setting->{p_id};
+
+    my $err = [];
+    my $values = {};
+
+    # let's do some of the actions
+    if ( $_act eq 'edit' ) {
+        # already checked permissions
+        $values = $setting;
+        $values->{_act} = 'upd';
+        $values->{submit} = 'Save Setting';
+    }
+    elsif ( $_act eq 'upd' ) {
+        # only need to check something was given
+        unless ( Zaapt::Utils::Valid::has_content($s_value, 'Value') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+
+        # do the update
+        unless ( @$err ) {
+            $model->upd_setting({
+                s_value       => $s_value,
+                s_id          => $s_id,
+            });
+            $m->redirect("edit-s-list.html?p_id=" . uri_escape($p_id));
+            return;
+        }
+
+        $values = { %ARGS };
+        $values->{submit} = 'Save Setting';
+    }
+</%init>
+%# ----------------------------------------------------------------------------
+<h1><% $title->{$_act} %> a Setting</h1>
+
+<p><a href="edit-s-list.html?p_id=<% $p_id | u %>">&laquo; Back to Setting List</a></p>
+
+% if ( defined $setting ) {
+<h2>Setting: <% $setting->{s_name} | h %> - '<% $setting->{s_title} | h %>'</h2>
+% } else {
+<h2>Setting: ?</h2>
+% }
+
+<& /zaapt/common/err.mhtml, err => $err &>
+
+<& /zaapt/common/form/edit.mhtml,
+    action => '?',
+    values => $values,
+    elements => [
+        { type => 'hidden', name => '_act' },
+        { type => 'hidden', name => 'p_id', def => $p_id },
+        { type => 'hidden', name => 's_id', def => $s_id },
+        { type => 'note', field => 'Name', name => 's_name', size => 40, def => '' },
+        { type => 'note', field => 'Title', name => 's_title', size => 40, def => '' },
+        { type => 'note', field => 'Description', name => 's_description', rows => 5, cols => 40, value => '' },
+        { type => 'text', field => 'Value', name => 's_value', size => 40, def => '' },
+
+        { type => 'submit', name => 'submit', field => 'Actions', cancel => 1, location => 'edit-s-list.html?p_id=' . uri_escape($p_id) },
+    ]
+&>
+%# ----------------------------------------------------------------------------

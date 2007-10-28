@@ -1,0 +1,55 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $perms
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Plugin');
+    my $plugins = $model->sel_plugin_all();
+    use Data::Dumper;
+    warn Dumper($plugins);
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Plugin List</h1>
+
+<p>
+% if ( exists $perms->{super} ) {
+    * <a href="edit-p.html?_act=add">Add Plugin &raquo;</a><br />
+% }
+</p>
+
+<&| /zaapt/common/admin/table-list.mhtml, title => 'Plugin' &>
+
+% my $r = 1;
+% foreach my $plugin ( @$plugins ) {
+    <tr class="r<% $r++%2 %>">
+        <td>
+            (<% $plugin->{p_id} | h %>) <% $plugin->{p_name} | h %> - '<% $plugin->{p_title} | h %>'<br />
+%     if ( defined $plugin->{p_module} ) {
+            <strong><% $plugin->{p_module} | h %></strong>
+%     } else {
+            no module defined
+%     }
+        </td>
+        <td>
+            * <a href="edit-s-list.html?p_id=<% $plugin->{p_id} | u %>">List Settings</a><br />
+%     if ( exists $perms->{super} ) {
+            * <a href="edit-p.html?_act=edit&amp;p_id=<% $plugin->{p_id} | u %>">Edit Plugin</a><br />
+            * <a href="edit-p.html?_act=rem&amp;p_id=<% $plugin->{p_id} | u %>">Delete</a><br />
+%     }
+        </td>
+    </tr>
+% }
+% unless ( @$plugins ) {
+    <tr class="r0">
+        <td>no plugins found</td>
+        <td>
+            * <a href="edit-p.html?_act=add">Add Plugin</a>
+        </td>
+    </tr>
+% }
+
+</&>
+
+%# ----------------------------------------------------------------------------

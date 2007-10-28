@@ -1,0 +1,149 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $perms
+    $_act          => 'add'
+    $p_id          => undef
+    $p_name        => ''
+    $p_title       => ''
+    $p_module      => ''
+</%args>
+%# ----------------------------------------------------------------------------
+<%once>
+    use URI::Escape;
+    use Data::Dumper;
+
+    my $title = {
+        add => 'Add',
+        ins => 'Add',
+        edit => 'Edit',
+        upd  => 'Edit',
+        del  => 'Delete',
+    };
+</%once>
+%# ----------------------------------------------------------------------------
+<%init>
+    # check these permissions for the whole page
+    $m->redirect('edit-p-list.html') unless exists $perms->{super};
+
+    my $model = $zaapt->get_model('Plugin');
+
+    my $err = [];
+    my $values = {};
+    my $plugin;
+
+    # let's do some of the actions
+    if ( $_act eq 'add' ) {
+        $values->{_act} = 'ins';
+        $values->{submit} = 'Add Plugin';
+    }
+    elsif ( $_act eq 'ins' ) {
+        # check that these values are valid
+        unless ( Zaapt::Utils::Valid::is_valid_name($p_name, 'Name') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+        unless ( Zaapt::Utils::Valid::has_content($p_title, 'Title') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+
+        # no Plugin of this name should already exist
+        unless ( @$err ) {
+            if ( $model->sel_plugin_using_name({ p_name => $p_name }) ) {
+                push @$err, "Plugin name '$p_name' already exists."
+            }
+        }
+
+        # do the insert
+        unless ( @$err ) {
+            # we're inserting, but we're not actually doing it here...
+            # instead, we need to run the create_<plugin>.sql script
+            # ToDo: run the create_<plugin>.sql script
+
+            $m->redirect("edit-p-list.html");
+            return;
+        }
+
+        $values = { %ARGS };
+        $values->{submit} = 'Add Plugin';
+    }
+    elsif ( $_act eq 'edit' ) {
+        # get 'plugin', permissions are already checked as okay
+        $plugin = $model->sel_plugin({ p_id => $p_id });
+
+        $values = $plugin;
+        $values->{_act} = 'upd';
+        $values->{submit} = 'Save Plugin';
+    }
+    elsif ( $_act eq 'upd' ) {
+        # get 'plugin', permissions are already checked as okay
+        $plugin = $model->sel_plugin({ p_id => $p_id });
+
+        # check that these values are valid
+        unless ( Zaapt::Utils::Valid::is_valid_name($p_name, 'Name') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+        unless ( Zaapt::Utils::Valid::has_content($p_title, 'Title') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+
+        # do the update
+        unless ( @$err ) {
+            $model->upd_plugin({
+                p_name        => $p_name,
+                p_title       => $p_title,
+                p_module      => $p_module,
+                p_id          => $p_id,
+            });
+            $m->redirect("edit-p-list.html");
+            return;
+        }
+
+        $values = { %ARGS };
+        $values->{submit} = 'Add Plugin';
+    }
+    elsif ( $_act eq 'rem' ) {
+        # get 'plugin', check permissions
+        $plugin = $model->sel_plugin({ p_id => $p_id });
+
+        $values = $plugin;
+        $values->{_act} = 'del';
+        $values->{submit} = 'Delete Plugin';
+    }
+    elsif ( $_act eq 'del' ) {
+        # get 'plugin', check permissions
+        $plugin = $model->sel_plugin({ p_id => $p_id });
+
+        # delete
+        # ToDo: run the drop_<plugin>.sql script
+
+        $m->redirect("edit-p-list.html");
+        return;
+    }
+</%init>
+%# ----------------------------------------------------------------------------
+<h1><% $title->{$_act} %> a Plugin</h1>
+
+<p><a href="edit-p-list.html">&laquo; Back to Plugin List</a></p>
+
+% if ( defined $plugin ) {
+<h2>Plugin: <% $plugin->{p_name} | h %> - '<% $plugin->{p_title} | h %>'</h2>
+% } else {
+<h2>Plugin: ?</h2>
+% }
+
+<& /zaapt/common/err.mhtml, err => $err &>
+
+<& /zaapt/common/form/edit.mhtml,
+    action => '?',
+    values => $values,
+    elements => [
+        { type => 'hidden', name => '_act' },
+        { type => 'hidden', name => 'p_id', def => '' },
+        { type => 'text', field => 'Name', name => 'p_name', size => 40, def => '' },
+        { type => 'text', field => 'Title', name => 'p_title', size => 40, def => '' },
+        { type => 'text', field => 'Module', name => 'p_module', size => 40, def => '' },
+
+        { type => 'submit', name => 'submit', field => 'Actions', cancel => 1, location => 'edit-p-list.html' },
+    ]
+&>
+%# ----------------------------------------------------------------------------

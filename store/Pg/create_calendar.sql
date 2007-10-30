@@ -2,7 +2,7 @@
 
 CREATE SCHEMA calendar;
 
--- table: gallery
+-- table: calendar
 CREATE SEQUENCE calendar.calendar_id_seq;
 CREATE TABLE calendar.calendar (
     id              INTEGER NOT NULL DEFAULT nextval('calendar.calendar_id_seq'::TEXT) PRIMARY KEY,

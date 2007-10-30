@@ -1,0 +1,17 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $p_name
+    $s_name
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Plugin');
+    my $plugin = $model->sel_plugin_using_name({ p_name => $p_name });
+
+    return unless defined $plugin;
+
+    $m->comp( 'widget-setting.mhtml', zaapt => $zaapt, p_id => $plugin->{p_id}, s_name => $s_name );
+    return;
+</%init>
+%# ----------------------------------------------------------------------------

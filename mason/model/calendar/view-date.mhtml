@@ -1,0 +1,27 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $c_name
+    $date
+    $for
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Calendar');
+    my $calendar = $model->sel_calendar_using_name({ c_name => $c_name });
+    unless ( defined $calendar ) {
+        die "Calendar '$c_name' not found.";
+        return;
+    }
+    my $events = $model->sel_event_all_in_archive({
+        c_id => $calendar->{c_id},
+        _from => $date,
+        _for => $for
+    });
+</%init>
+%# ----------------------------------------------------------------------------
+<& render-view-all-date.mhtml,
+    events => $events,
+    date   => $date,
+&>
+%# ----------------------------------------------------------------------------

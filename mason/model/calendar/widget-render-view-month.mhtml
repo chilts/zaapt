@@ -1,0 +1,61 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $today
+    $the_first
+    $dates
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $this_date = Date::Simple->new( $the_first );
+    my $this_month = $this_date->month();
+</%init>
+%# ----------------------------------------------------------------------------
+<table id="wp-calendar" summary="Calendar">
+    <caption><% $the_first->format('%b %Y') | n %></caption>
+    <thead>
+        <tr>
+            <th abbr="Monday" scope="col" title="Monday">M</th>
+            <th abbr="Tuesday" scope="col" title="Tuesday">T</th>
+            <th abbr="Wednesday" scope="col" title="Wednesday">W</th>
+            <th abbr="Thursday" scope="col" title="Thursday">T</th>
+            <th abbr="Friday" scope="col" title="Friday">F</th>
+            <th abbr="Saturday" scope="col" title="Saturday">S</th>
+            <th abbr="Sunday" scope="col" title="Sunday">S</th>
+        </tr>
+    </thead>
+% if ( 0 ) {
+    <tfoot>
+        <tr>
+            <td abbr="July" colspan="3" id="prev"><a href="#">&laquo; Jul</a></td>
+            <td class="pad">&nbsp;</td>
+            <td abbr="September" colspan="3" id="next" class="pad"><a href="#">Sep &raquo;</a></td>
+        </tr>
+    </tfoot>
+% }
+    <tbody>
+        <tr>
+%# the first line, so make a span first
+% if ( $this_date->day_of_week() != 1 ) {
+            <td colspan="<% ($this_date->day_of_week()+6)%7 %>" class="pad">&nbsp;</td>
+% }
+% while ( $this_date->month() == $this_month ) {
+            <td<% $this_date eq $today ? ' id="today"' : '' | n %>>
+%     if ( exists $dates->{$this_date} ) {
+                <a href="./date:<% $this_date | u %>.html"><% $this_date->day() | n %></a>
+%     } else {
+                <% $this_date->day() | n %>
+%     }
+            </td>
+%     if ( $this_date->day_of_week == 0 ) {
+        </tr>
+        <tr>
+%     }
+%     $this_date++;
+% }
+
+%# okay, now we're done for the month, fill in the rest
+            <td colspan="<% 7-(($this_date->day_of_week()+6)%7) %>" class="pad">&nbsp;</td>
+        </tr>
+    </tbody>
+</table>
+%# ----------------------------------------------------------------------------

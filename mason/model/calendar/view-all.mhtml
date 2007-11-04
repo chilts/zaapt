@@ -8,7 +8,43 @@
     if ( $page eq 'index' ) {
         # main index page
         $m->comp('/zaapt/model/calendar/view-all-index.mhtml',
-            zaapt  => $zaapt,
+            zaapt => $zaapt,
+        );
+    }
+    elsif ( $page eq 'latest' ) {
+        # main index page
+        $m->comp('/zaapt/model/calendar/view-all-latest.mhtml',
+            zaapt => $zaapt,
+        );
+    }
+    elsif ( $page =~ m{ \A date: (\d{4}) \z }xms ) {
+        # main index page
+        $m->comp('/zaapt/model/calendar/view-all-date.mhtml',
+            zaapt => $zaapt,
+            date  => "$1-01-01",
+            for   => '1 year',
+        );
+    }
+    elsif ( $page =~ m{ \A date: (\d{4}-\d{2}) \z }xms ) {
+        # main index page
+        $m->comp('/zaapt/model/calendar/view-all-date.mhtml',
+            zaapt => $zaapt,
+            date  => "$1-01",
+            for   => '1 month',
+        );
+    }
+    elsif ( $page =~ m{ \A date: (\d{4}-\d{2}-\d{2}) \z }xms ) {
+        # main index page
+        $m->comp('/zaapt/model/calendar/view-all-date.mhtml',
+            zaapt => $zaapt,
+            date  => $1,
+            for   => '1 day',
+        );
+    }
+    elsif ( $page eq 'calendars' ) {
+        # main index page
+        $m->comp('/zaapt/model/calendar/view-all-calendars.mhtml',
+            zaapt => $zaapt,
         );
     }
     else {

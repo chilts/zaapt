@@ -1,0 +1,28 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $events
+</%args>
+%# ----------------------------------------------------------------------------
+<h1>Latest Events Added</h1>
+
+% foreach my $event ( @$events ) {
+
+<h2><% $event->{e_title} | h %></h2>
+
+% if ( defined $event->{e_link} ) {
+<p><a href="<% $event->{e_link} | h %>"><% $event->{e_link} | h %></a></p>
+% }
+
+<p><% $event->{e_intro} | h %></p>
+
+<p>
+    From <strong><% $event->{e_startts} | h %></strong> until <strong><% $event->{e_endts} | h %></strong>.
+</p>
+
+<p><a href="<% $event->{c_name} | h %>/<% $event->{e_name} | h %>.html">Read More...</a></p>
+
+% }
+% unless ( @$events ) {
+<p>No events found.</p>
+% }
+%# ----------------------------------------------------------------------------

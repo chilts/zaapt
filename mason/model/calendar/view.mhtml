@@ -19,6 +19,40 @@
             c_name => $c_name,
         );
     }
+    elsif ( $page eq 'latest' ) {
+        # main index page
+        $m->comp('/zaapt/model/calendar/view-all-latest.mhtml',
+            zaapt => $zaapt,
+            c_name => $c_name,
+        );
+    }
+    elsif ( $page =~ m{ \A date: (\d{4}) \z }xms ) {
+        # main index page
+        $m->comp('/zaapt/model/calendar/view-all-date.mhtml',
+            zaapt => $zaapt,
+            c_name => $c_name,
+            date  => "$1-01-01",
+            for   => '1 year',
+        );
+    }
+    elsif ( $page =~ m{ \A date: (\d{4}-\d{2}) \z }xms ) {
+        # main index page
+        $m->comp('/zaapt/model/calendar/view-all-date.mhtml',
+            zaapt => $zaapt,
+            c_name => $c_name,
+            date  => "$1-01",
+            for   => '1 month',
+        );
+    }
+    elsif ( $page =~ m{ \A date: (\d{4}-\d{2}-\d{2}) \z }xms ) {
+        # main index page
+        $m->comp('/zaapt/model/calendar/view-all-date.mhtml',
+            zaapt => $zaapt,
+            c_name => $c_name,
+            date  => $1,
+            for   => '1 day',
+        );
+    }
     else {
         $m->comp( '/zaapt/model/calendar/view-event.mhtml',
             zaapt  => $zaapt,

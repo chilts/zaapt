@@ -58,6 +58,9 @@ __PACKAGE__->mk_select_row( 'sel_event', "SELECT $main_cols FROM $main_tables WH
 __PACKAGE__->mk_select_row( 'sel_event_using_name', "SELECT $main_cols FROM $main_tables WHERE c.id = ? AND e.name = ?", [ 'c_id', 'e_name' ] );
 __PACKAGE__->mk_select_row( 'sel_event_in', "SELECT $main_cols FROM $main_tables WHERE c.id = ? AND e.name = ?", [ 'c_id', 'e_name' ] );
 __PACKAGE__->mk_select_rows( 'sel_event_all_in', "SELECT $main_cols FROM $main_tables WHERE c.id = ? ORDER BY e.startts", [ 'c_id' ] );
+__PACKAGE__->mk_select_rows( 'sel_event_all_archive', "SELECT $main_cols FROM $main_tables WHERE e.startts >= ?::DATE AND e.startts <= ?::DATE + ?::INTERVAL ORDER BY e.startts", [ '_from', '_from', '_for' ] );
+__PACKAGE__->mk_select_rows( 'sel_event_all_in_archive', "SELECT $main_cols FROM $main_tables WHERE c.id = ? AND e.startts >= ?::DATE AND e.startts <= ?::DATE + ?::INTERVAL ORDER BY e.startts", [ 'c_id', '_from', '_from', '_for' ] );
+__PACKAGE__->_mk_select_rows_offset( 'sel_event_latest', "SELECT $main_cols FROM $main_tables ORDER BY e.inserted DESC LIMIT ?", [ '_limit' ] );
 
 ## ----------------------------------------------------------------------------
 # other calendar accessors

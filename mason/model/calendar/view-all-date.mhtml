@@ -1,0 +1,18 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $date
+    $for
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Calendar');
+    # ToDo: add 'show' field to Calendar (instead of hardcoding 3)
+    my $events = $model->sel_event_all_archive({ _from => $date, _for => $for });
+</%init>
+%# ----------------------------------------------------------------------------
+<& render-view-all-date.mhtml,
+    events => $events,
+    date   => $date,
+&>
+%# ----------------------------------------------------------------------------

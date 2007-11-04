@@ -1,0 +1,51 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $c_name
+    $date => undef
+    $today => undef
+</%args>
+%# ----------------------------------------------------------------------------
+<%once>
+    use Date::Simple;
+</%once>
+%# ----------------------------------------------------------------------------
+<%init>
+    # manipulate the incoming parameters
+    if ( defined $date ) {
+        $date = Date::Simple->new($date);
+    }
+    else {
+        $date = Date::Simple->new();
+    }
+    $today = Date::Simple->new() unless defined $today;
+
+    my $the_first = Date::Simple->new($date - $date->day + 1);
+
+    my $model = $zaapt->get_model('Calendar');
+    my $calendar = $model->sel_calendar_using_name({ c_name => $c_name });
+    unless ( defined $calendar ) {
+        die "Calendar '$c_name' not found.";
+        return;
+    }
+
+    my $events = $model->sel_event_all_in_archive({
+        c_id  => $calendar->{c_id},
+        _from => $the_first,
+        _for  => '1 month',
+    });
+
+    my $dates = {};
+    foreach my $event ( @$events ) {
+        my $ymd = $event->{e_startts};
+        $ymd =~ s{ \s \d\d:\d\d:\d\d \z }{}gxms;
+        $dates->{$ymd} = $event;
+    }
+</%init>
+%# ----------------------------------------------------------------------------
+<& widget-render-view-all-month.mhtml,
+    today     => $today,
+    the_first => $the_first,
+    dates     => $dates,
+&>
+%# ----------------------------------------------------------------------------

@@ -14,7 +14,7 @@
 
 <h2>Description</h2>
 
-<& /zaapt/common/render.mhtml, t_name => 'text', content => $event->{e_description} &>
+<& /zaapt/common/render.mhtml, t_name => 'html', content => $event->{e_description} &>
 
 <h2>Details</h2>
 

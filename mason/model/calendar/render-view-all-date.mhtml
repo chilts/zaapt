@@ -10,7 +10,7 @@
 
 <p><% scalar @$events %> events found</p>
 
-<h2><% $event->{e_title} | h %></h2>
+<h2><% $event->{c_title} | h %>, <% $event->{e_title} | h %></h2>
 
 % if ( defined $event->{e_link} ) {
 <p><a href="<% $event->{e_link} | h %>"><% $event->{e_link} | h %></a></p>

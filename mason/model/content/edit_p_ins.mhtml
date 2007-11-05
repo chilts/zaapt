@@ -19,8 +19,8 @@
     # this content section firstly needs to exist to be able to add a page
     $m->redirect('edit.html') unless defined $content;
 
-    # to insert this page, the user needs the '_admin' role on this content section
-    $m->redirect('edit.html') unless exists $perms->{$content->{_admin}};
+    # to insert this page, the user needs the '_edit' role on this content section
+    $m->redirect('edit.html') unless exists $perms->{$content->{_edit}};
 
     my $err = [];
 

@@ -4,7 +4,7 @@
     $event
 </%args>
 %# ----------------------------------------------------------------------------
-<p><a href="./">&laquo;&laquo; Back to All <% $calendar->{c_title} | h %> Listings</a></p>
+<p><a href="./">&laquo;&laquo; Back to all <% $calendar->{c_title} | h %> listings</a></p>
 
 <h1><% $event->{e_title} | h %></h1>
 

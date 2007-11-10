@@ -23,7 +23,7 @@
 
 <h2>Calendar: <% $calendar->{c_name} | h %> - '<% $calendar->{c_title} | h %>'</h2>
 
-% if ( exists $perms->{$calendar->{_admin}} ) {
+% if ( exists $perms->{$calendar->{_edit}} ) {
 <p>
     * <a href="edit-e.html?_act=add&amp;c_id=<% $calendar->{c_id} | u %>">Add Event &raquo;</a>
 </p>

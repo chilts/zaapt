@@ -5,6 +5,8 @@ use base qw( Zaapt::Store::Pg Zaapt::Model::Calendar );
 use strict;
 use warnings;
 
+use Zaapt::Store::Pg::Common;
+
 ## ----------------------------------------------------------------------------
 # constants
 
@@ -25,12 +27,15 @@ my $tables = {
         cols => [
             'id',
             [ 'calendar_id', 'fk', 'c_id' ],
+            [ 'type_id', 'fk', 't_id' ],
             qw(name title intro description dt:startts dt:endts allday location link lat lng zoom ts:inserted ts:updated) ],
     },
+    type => Zaapt::Store::Pg::Common->_get_table( 'type' ),
 };
 
 my $join = {
     c_e => "JOIN $schema.event e ON (c.id = e.calendar_id)",
+    e_t => "JOIN common.type t ON (e.type_id = t.id)",
 };
 
 ## ----------------------------------------------------------------------------
@@ -45,8 +50,8 @@ __PACKAGE__->_mk_db_accessors( $schema, $tables );
 # simple accessors
 
 # create some reusable sql
-my $main_cols = "$tables->{calendar}{sql_sel_cols}, $tables->{event}{sql_sel_cols}";
-my $main_tables = "$tables->{calendar}{sql_fqt} $join->{c_e}";
+my $main_cols = "$tables->{calendar}{sql_sel_cols}, $tables->{event}{sql_sel_cols}, $tables->{type}{sql_sel_cols}";
+my $main_tables = "$tables->{calendar}{sql_fqt} $join->{c_e} $join->{e_t}";
 
 # calendar
 __PACKAGE__->_mk_selecter( $schema, $tables->{calendar} );

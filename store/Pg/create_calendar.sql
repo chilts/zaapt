@@ -35,6 +35,7 @@ CREATE TABLE calendar.event (
     title           TEXT NOT NULL,
     intro           TEXT NOT NULL,
     description     TEXT NOT NULL,
+    type_id         INTEGER NOT NULL REFERENCES common.type,
     startts         TIMESTAMP WITH TIME ZONE NOT NULL,
     endts           TIMESTAMP WITH TIME ZONE NOT NULL,
     allday          BOOLEAN NOT NULL,

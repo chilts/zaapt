@@ -9,6 +9,7 @@
     $e_title       => ''
     $e_intro       => ''
     $e_description => ''
+    $t_id          => undef
     $e_startts     => ''
     $e_endts       => ''
     $e_allday      => 0
@@ -127,6 +128,7 @@
                 e_title       => $e_title,
                 e_intro       => $e_intro,
                 e_description => $e_description,
+                t_id          => $t_id,
                 e_startts     => $e_startts,
                 e_endts       => $e_endts,
                 e_allday      => $e_allday,
@@ -192,6 +194,7 @@
                 e_title       => $e_title,
                 e_intro       => $e_intro,
                 e_description => $e_description,
+                t_id          => $t_id,
                 e_startts     => $e_startts,
                 e_endts       => $e_endts,
                 e_allday      => $e_allday,
@@ -221,6 +224,9 @@
         $m->redirect("edit-e-list.html?c_id=" . uri_escape( $event->{c_id} ));
         return;
     }
+
+    my $page_types = $zaapt->get_model('Common')->sel_type_all();
+    my @options = map { { value => $_->{t_id}, text => $_->{t_name} } } @$page_types;
 </%init>
 %# ----------------------------------------------------------------------------
 <h1><% $title->{$_act} %> a Event</h1>
@@ -246,6 +252,7 @@
         { type => 'text', field => 'Title', name => 'e_title', size => 40, def => '' },
         { type => 'textarea', field => 'Intro', name => 'e_intro', rows => 3, cols => 40, def => '' },
         { type => 'textarea', field => 'Description', name => 'e_description', rows => 10, cols => 40, def => '' },
+        { type => 'select', field => 'Type', name => 't_id', options => \@options, selected => $t_id },
 
         { type => 'text', field => 'Start Time', name => 'e_startts', size => 40, def => '' },
         { type => 'text', field => 'End Time', name => 'e_endts', size => 40, def => '' },

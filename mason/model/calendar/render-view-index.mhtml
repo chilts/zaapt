@@ -4,9 +4,11 @@
     $events
 </%args>
 %# ----------------------------------------------------------------------------
-<h1>Events for <% $calendar->{c_title} | h %></h1>
+<h1><% $calendar->{c_title} | h %></h1>
 
 <& /zaapt/common/render.mhtml, t_name => 'text', content => $calendar->{c_description} &>
+
+<h1>Events</h1>
 
 % foreach my $event ( @$events ) {
 

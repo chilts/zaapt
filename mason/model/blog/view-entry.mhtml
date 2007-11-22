@@ -38,7 +38,7 @@
     my $err = [];
 
     # see if we have a comment to add
-    if ( $blog->{b_comment} ) {
+    if ( $blog->{b_comment} and $entry->{e_comment} ) {
         if ( defined $e_id and $e_id eq $entry->{e_id} ) {
 
             unless ( Zaapt::Utils::Valid::has_content($c_name) ) {
@@ -71,7 +71,7 @@
             }
         }
     }
-    # else, shouldn't really have a comment if the blog doesn't allow it - just ignore
+    # else, shouldn't really have a comment if the blog and/or entry doesn't allow it - just ignore
 
     my $labels;
     if ( $blog->{b_comment} ) {

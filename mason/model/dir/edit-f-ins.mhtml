@@ -14,6 +14,8 @@
     use Zaapt::Utils::Conv;
     use File::Copy;
     use List::Util qw(max);
+    use Apache2::Upload;
+    use Apache2::Request;
 </%once>
 %# ----------------------------------------------------------------------------
 <%init>
@@ -56,7 +58,8 @@
     # check we actually have a file
     my $f_filename;
 
-    my $upload = $r->upload();
+    my $req = Apache2::Request->new($r);
+    my $upload = $req->upload('file');
     unless ( defined $upload ) {
         push @$err, "please specify a file to upload";
     }
@@ -110,7 +113,7 @@
 
 <& /zaapt/common/form.mhtml, action => 'edit-f-ins.html', enctype => 'multipart/form-data', elements => [
         { type => 'hidden', name => 'd_id', value => $d_id },
-        { type => 'file', field => 'File', name => 'image' },
+        { type => 'file', field => 'File', name => 'file' },
         { type => 'text', field => 'Name', name => 'f_name', size => 40, value => $f_name },
         { type => 'text', field => 'Title', name => 'f_title', size => 40, value => $f_title },
         { type => 'textarea', field => 'Description', name => 'f_description', rows => 10, cols => 40, value => $f_description },

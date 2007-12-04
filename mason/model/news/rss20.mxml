@@ -51,7 +51,7 @@
 
     my $rss = new XML::RSS (version => '2.0');
     $rss->channel(
-        title        => $news->{n_description},
+        title        => $news->{n_title},
         link         => "http://$domain/",
         language     => 'en',
         description  => $news->{n_description},

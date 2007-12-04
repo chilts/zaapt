@@ -43,7 +43,7 @@
 
     my $rss = new XML::RSS (version => '2.0');
     $rss->channel(
-        title        => $blog->{b_description},
+        title        => $blog->{b_title},
         link         => "http://$domain/",
         language     => 'en',
         description  => $blog->{b_description},

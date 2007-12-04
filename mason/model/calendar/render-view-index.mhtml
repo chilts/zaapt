@@ -15,7 +15,7 @@
 <h2><% $event->{e_title} | h %></h2>
 
 % if ( defined $event->{e_link} ) {
-<p><a href="<% $event->{e_link} | h %>"><% $event->{e_link} | h %></a></p>
+<p><a href="<% $event->{e_link} | h %>">Link</a></p>
 % }
 
 <p><% $event->{e_intro} | h %></p>

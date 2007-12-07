@@ -96,5 +96,6 @@
         tied(%$sess_rh)->delete();
     }
     warn "session-begin.mas: exit" if $DEBUG;
+    return;
 </%init>
 %# ----------------------------------------------------------------------------

@@ -49,5 +49,6 @@
     $cookie->bake( $r );
 
     warn "session-sign-in.mas: exit" if $DEBUG;
+    return;
 </%init>
 %# ----------------------------------------------------------------------------

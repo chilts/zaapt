@@ -1,0 +1,180 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $perms
+    $_act          => 'add'
+    $m_id          => undef
+    $m_name        => ''
+    $m_title       => ''
+    $m_description => ''
+    $_admin        => ''
+    $_view         => ''
+    $_edit         => ''
+</%args>
+%# ----------------------------------------------------------------------------
+<%once>
+    use URI::Escape;
+
+    my $heading = {
+        add => 'Add',
+        ins => 'Add',
+        edit => 'Edit',
+        upd  => 'Edit',
+        del  => 'Delete',
+    };
+</%once>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Menu');
+
+    $m->redirect('edit-m-list.html') unless exists $perms->{super};
+
+    my $err = [];
+    my $values = {};
+    my $menu;
+
+    # let's do some of the actions
+    if ( $_act eq 'add' ) {
+        $values->{_act} = 'ins';
+        $values->{submit} = 'Add Menu';
+    }
+    elsif ( $_act eq 'ins' ) {
+        # check that these values are valid
+        unless ( Zaapt::Utils::Valid::is_valid_name($m_name, 'Name') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+        unless ( Zaapt::Utils::Valid::has_content($m_title, 'Title') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+
+        # no Menu of this name should already exist
+        unless ( @$err ) {
+            if ( $model->sel_menu_using_name({ m_name => $m_name }) ) {
+                push @$err, "Menu name '$m_name' already exists."
+            }
+        }
+
+        # do the insert
+        unless ( @$err ) {
+            # manipulate some values
+            $m_description = Zaapt::Utils::Conv::remove_cr( $m_description );
+
+            $model->ins_menu({
+                m_name        => $m_name,
+                m_title       => $m_title,
+                m_description => $m_description,
+                _admin        => $_admin,
+                _view         => $_view,
+                _edit         => $_edit,
+            });
+            $m->redirect("edit-m-list.html");
+            return;
+        }
+
+        $values = { %ARGS };
+        $values->{submit} = 'Add Menu';
+    }
+    elsif ( $_act eq 'edit' ) {
+        # get 'menu', check permissions
+        $menu = $model->sel_menu({ m_id => $m_id });
+        $m->redirect('edit-m-list.html') unless defined $menu;
+        $m->redirect('edit-m-list.html?m_id=$menu->{m_id}') unless exists $perms->{$menu->{_admin}};
+
+        $values = $menu;
+        $values->{_act} = 'upd';
+        $values->{submit} = 'Save Menu';
+    }
+    elsif ( $_act eq 'upd' ) {
+        # get 'menu', check permissions
+        $menu = $model->sel_menu({ m_id => $m_id });
+        $m->redirect('edit-m-list.html') unless defined $menu;
+        $m->redirect('edit-m-list.html?m_id=$menu->{m_id}') unless exists $perms->{$menu->{_admin}};
+
+        # check that these values are valid
+        unless ( Zaapt::Utils::Valid::is_valid_name($m_name, 'Name') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+        unless ( Zaapt::Utils::Valid::has_content($m_title, 'Title') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+
+        # do the update
+        unless ( @$err ) {
+            # manipulate some values
+            $m_description = Zaapt::Utils::Conv::remove_cr( $m_description );
+
+            $model->upd_menu({
+                m_name        => $m_name,
+                m_title       => $m_title,
+                m_description => $m_description,
+                _admin        => $_admin,
+                _view         => $_view,
+                _edit         => $_edit,
+                m_id          => $m_id,
+            });
+            $m->redirect("edit-m-list.html");
+            return;
+        }
+
+        $values = { %ARGS };
+        $values->{submit} = 'Add Menu';
+    }
+    elsif ( $_act eq 'rem' ) {
+        # get 'menu', check permissions
+        $menu = $model->sel_menu({ m_id => $m_id });
+        $m->redirect('edit-m-list.html') unless defined $menu;
+        $m->redirect('edit-m-list.html?m_id=$menu->{m_id}') unless exists $perms->{$menu->{_admin}};
+
+        $values = $menu;
+        $values->{_act} = 'del';
+        $values->{submit} = 'Delete Menu';
+    }
+    elsif ( $_act eq 'del' ) {
+        # get 'menu', check permissions
+        $menu = $model->sel_menu({ m_id => $m_id });
+        $m->redirect('edit-m-list.html') unless defined $menu;
+        $m->redirect('edit-m-list.html?m_id=$menu->{m_id}') unless exists $perms->{$menu->{_admin}};
+
+        # delete
+        $model->del_menu({ m_id => $m_id });
+        $m->redirect("edit-m-list.html");
+        return;
+    }
+
+    # create the dropdown options for each role
+    my $options = $m->comp('/zaapt/common/permission_options.mhtml', zaapt => $zaapt);
+</%init>
+%# ----------------------------------------------------------------------------
+<h1><% $heading->{$_act} %> a Menu</h1>
+
+<p><a href="edit-m-list.html">&laquo; Back to Menu List</a></p>
+
+% if ( defined $menu ) {
+<h2>Menu: <% $menu->{m_name} | h %> - '<% $menu->{m_title} | h %>'</h2>
+% } else {
+<h2>Menu: ?</h2>
+% }
+
+<& /zaapt/common/err.mhtml, err => $err &>
+
+<& /zaapt/common/form/edit.mhtml,
+    action => '?',
+    values => $values,
+    elements => [
+        { type => 'hidden', name => '_act' },
+        { type => 'hidden', name => 'm_id', def => '' },
+        { type => 'text', field => 'Name', name => 'm_name', size => 40, def => '' },
+        { type => 'text', field => 'Title', name => 'm_title', size => 40, def => '' },
+        { type => 'textarea', field => 'Description', name => 'm_description', rows => 10, cols => 40, def => '' },
+
+        { type => 'select', field => 'Admin Perm', name => '_admin', options => $options },
+        { type => 'note', def => "Note: Allows this user to delete this entire menu." },
+        { type => 'select', field => 'View Perm', name => '_view', options => $options },
+        { type => 'note', def => "Note: Allows this user to view all items." },
+        { type => 'select', field => 'Edit Perm', name => '_edit', options => $options },
+        { type => 'note', def => "Note: Allows this user to add, edit and delete items." },
+
+        { type => 'submit', name => 'submit', field => 'Actions', cancel => 1, location => 'edit-m-list.html' },
+    ]
+&>
+%# ----------------------------------------------------------------------------

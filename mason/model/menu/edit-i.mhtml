@@ -1,0 +1,188 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $perms
+    $_act     => 'add'
+    $m_id     => undef
+    $i_id     => undef
+    $i_level  => ''
+    $i_url    => ''
+    $i_text   => ''
+    $i_ishtml => 0
+</%args>
+%# ----------------------------------------------------------------------------
+<%once>
+    use Zaapt::Utils::Valid;
+    use Zaapt::Utils::Conv;
+    use URI::Escape;
+
+    my $title = {
+        add => 'Add',
+        ins => 'Add',
+        edit => 'Edit',
+        upd  => 'Edit',
+        del  => 'Delete',
+    };
+</%once>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Menu');
+
+    my ($menu, $item);
+
+    # some data manipulation
+    $i_level  = undef unless Zaapt::Utils::Valid::has_content( $i_level );
+    $i_url    = undef unless Zaapt::Utils::Valid::has_content( $i_url   );
+    $i_text   = undef unless Zaapt::Utils::Valid::has_content( $i_text  );
+    $i_text = Zaapt::Utils::Conv::remove_cr( $i_text );
+    $i_ishtml = Zaapt::Utils::Conv::to_bool( $i_ishtml );
+
+    # see if we are working with a Menu or a pre-existing Item
+    if ( $_act eq 'ins' or $_act eq 'add' ) {
+        $menu = $model->sel_menu({ m_id => $m_id });
+
+        $m->redirect('edit-m-list.html')
+            unless defined $menu;
+
+        $m->redirect('edit-m-list.html?m_id=' . uri_escape($m_id))
+            unless exists $perms->{$menu->{_edit}};
+    }
+    else {
+        $item = $model->sel_item({ i_id => $i_id });
+
+        $m->redirect('edit-m-list.html')
+            unless defined $item;
+
+        $m->redirect('edit-i-list.html?m_id=' . uri_escape($item->{m_id}))
+            unless exists $perms->{$item->{_edit}};
+
+        $m_id = $item->{m_id};
+    }
+
+    my $err = [];
+    my $values = {};
+
+    # let's do some of the actions
+    if ( $_act eq 'add' ) {
+        $values->{_act} = 'ins';
+        $values->{submit} = 'Add Item';
+    }
+    elsif ( $_act eq 'ins' ) {
+        # check that these values are valid
+        unless ( Zaapt::Utils::Valid::is_non_negative_integer($i_level, 'Level') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+
+        unless ( Zaapt::Utils::Valid::has_content($i_url, 'URL') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+
+        unless ( Zaapt::Utils::Valid::has_content($i_text, 'Text') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+
+        # do the insert
+        unless ( @$err ) {
+            $model->ins_item({
+                m_id     => $m_id,
+                i_level  => $i_level,
+                i_url    => $i_url,
+                i_text   => $i_text,
+                i_ishtml => $i_ishtml,
+            });
+            $m->redirect("edit-i-list.html?m_id=" . uri_escape( $m_id ));
+            return;
+        }
+
+        $values = { %ARGS };
+        $values->{submit} = 'Add Item';
+    }
+    elsif ( $_act eq 'edit' ) {
+        # already checked permissions
+        $values = $item;
+        $values->{_act} = 'upd';
+        $values->{submit} = 'Save Item';
+    }
+    elsif ( $_act eq 'upd' ) {
+        # check that these values are valid
+        unless ( Zaapt::Utils::Valid::is_non_negative_integer($i_level, 'Level') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+
+        unless ( Zaapt::Utils::Valid::has_content($i_url, 'URL') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+
+        unless ( Zaapt::Utils::Valid::has_content($i_text, 'Text') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+
+        # do the update
+        unless ( @$err ) {
+            $model->upd_item({
+                m_id     => $m_id,
+                i_level  => $i_level,
+                i_url    => $i_url,
+                i_text   => $i_text,
+                i_ishtml => $i_ishtml,
+                i_id     => $i_id,
+            });
+            $m->redirect("edit-i-list.html?m_id=" . uri_escape( $m_id ));
+            return;
+        }
+
+        $values = { %ARGS };
+        $values->{submit} = 'Save Item';
+    }
+    elsif ( $_act eq 'rem' ) {
+        # already checked permissions
+        $values = $item;
+        $values->{_act} = 'del';
+        $values->{submit} = 'Delete Item';
+    }
+    elsif ( $_act eq 'del' ) {
+        # delete
+        $model->del_item({ i_id => $i_id });
+        $m->redirect("edit-i-list.html?m_id=" . uri_escape( $m_id ));
+        return;
+    }
+    elsif ( $_act eq 'move-up') {
+        $model->upd_item_move_up({ m_id => $item->{m_id}, i_id => $i_id });
+        $m->redirect("edit-i-list.html?m_id=" . uri_escape( $m_id ));
+        return;
+    }
+    elsif ( $_act eq 'move-dn') {
+        $model->upd_item_move_dn({ m_id => $item->{m_id}, i_id => $i_id });
+        $m->redirect("edit-i-list.html?m_id=" . uri_escape( $m_id ));
+        return;
+    }
+</%init>
+%# ----------------------------------------------------------------------------
+<h1><% $title->{$_act} %> an Item</h1>
+
+<p><a href="edit-i-list.html?m_id=<% $m_id | u %>">&laquo; Back to Item List</a></p>
+
+% if ( defined $item ) {
+<h2>Item: <% $item->{i_name} | h %> - '<% $item->{i_title} | h %>'</h2>
+% } else {
+<h2>Item: ?</h2>
+% }
+
+<& /zaapt/common/err.mhtml, err => $err &>
+
+<& /zaapt/common/form/edit.mhtml,
+    action => '?',
+    values => $values,
+    elements => [
+        { type => 'hidden', name => '_act' },
+        { type => 'hidden', name => 'm_id', def => $m_id },
+        { type => 'hidden', name => 'i_id', def => $i_id },
+        { type => 'text', field => 'Level', name => 'i_level', size => 2, def => 0 },
+        { type => 'text', field => 'URL', name => 'i_url', size => 40, def => '' },
+        { type => 'textarea', field => 'Text', name => 'i_text', rows => 3, cols => 40, def => '' },
+        { type => 'checkbox', field => 'Is HTML?', name => 'i_ishtml', checked => $i_ishtml },
+
+        { type => 'submit', name => 'submit', field => 'Actions', cancel => 1, location => 'edit-i-list.html?m_id=' . uri_escape($m_id) },
+    ]
+&>
+%# ----------------------------------------------------------------------------

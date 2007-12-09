@@ -1,0 +1,66 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $perms
+    $m_id
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Menu');
+    my $menu = $model->sel_menu({ m_id => $m_id });
+    unless ( defined $menu ) {
+        $m->redirect('edit-m-list.html');
+        return;
+    }
+    $m->redirect('edit-m-list.html') unless exists $perms->{$menu->{_view}};
+    my $items = $model->sel_item_all_in({ m_id => $m_id });
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Item List</h1>
+
+<p><a href="edit-m-list.html">&laquo; Back to Menu List</a></p>
+
+<h2>Menu: <% $menu->{m_name} | h %> - '<% $menu->{m_title} | h %>'</h2>
+
+% if ( exists $perms->{$menu->{_admin}} ) {
+<p>
+    * <a href="edit-i.html?_act=add&amp;m_id=<% $menu->{m_id} | u %>">Add Item &raquo;</a>
+</p>
+% }
+
+<&| /zaapt/common/admin/table-list.mhtml, title => 'Item' &>
+
+% my $row = 1;
+% foreach my $item ( @$items ) {
+%     next unless exists $perms->{$item->{_view}};
+        <tr class="r<% $row=1-$row %>">
+            <td>
+                (<% $item->{i_id} | h %>) [<% $item->{i_level} ? '+' x $item->{i_level} : 'off' | h %>] <strong><% $item->{i_url} | h %></strong><br />
+                <strong><% $item->{i_text} | h %></strong> (<% $item->{i_ishtml} ? 'html' : 'text' %>)
+            </td>
+            <td>
+%         if ( exists $perms->{$item->{_edit}} ) {
+                * <a href="edit-i.html?_act=edit&amp;i_id=<% $item->{i_id} | u %>">Edit Item</a><br />
+%             if ( exists $perms->{$item->{_admin}} ) {
+                * <a href="edit-i.html?_act=rem&amp;i_id=<% $item->{i_id} | u %>">Delete</a><br />
+                * Move <a href="edit-i.html?_act=move-up&amp;i_id=<% $item->{i_id} | u %>">Up</a> / <a href="edit-i.html?_act=move-dn&amp;i_id=<% $item->{i_id} | u %>">Dn</a><br />
+%             }
+%         } else {
+                -
+%         }
+            </td>
+        </tr>
+% }
+% unless ( @$items ) {
+        <tr class="r0">
+            <td>No items here!</td>
+            <td>
+                * <a href="edit-i.html?_act=add&amp;m_id=<% $menu->{m_id} | u %>">Add Item</a>
+            </td>
+        </tr>
+% }
+    </tbody>
+</table>
+
+</&>
+%# ----------------------------------------------------------------------------

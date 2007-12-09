@@ -1,0 +1,55 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $perms
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Menu');
+    my $menus = $model->sel_menu_all();
+    use Data::Dumper;
+    warn Dumper($perms);
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Menu List</h1>
+
+% if ( exists $perms->{super} ) {
+<p>
+    * <a href="edit-m.html?_act=add">Add Menu &raquo;</a><br />
+</p>
+% }
+
+<&| /zaapt/common/admin/table-list.mhtml, title => 'Menu' &>
+
+% my $r = 1;
+% foreach my $menu ( @$menus ) {
+%     next unless exists $perms->{$menu->{_view}};
+        <tr class="r<% $r++%2 %>">
+            <td>
+                (<% $menu->{m_id} | h %>) <strong><% $menu->{m_name} | h %></strong><br />
+                <% $menu->{m_title} | h %><br />
+            </td>
+            <td>
+%         if ( exists $perms->{$menu->{_admin}} ) {
+                * <a href="edit-m.html?_act=edit&amp;m_id=<% $menu->{m_id} | u %>">Edit Details</a><br />
+                * <a href="edit-i.html?_act=add&amp;m_id=<% $menu->{m_id} | u %>">Add Item</a><br />
+%         }
+                * <a href="edit-i-list.html?m_id=<% $menu->{m_id} | u %>">List/Edit</a><br />
+%         if ( exists $perms->{$menu->{_admin}} ) {
+                * <a href="edit-m.html?_act=rem&amp;m_id=<% $menu->{m_id} | u %>">Delete</a><br />
+%         }
+            </td>
+        </tr>
+% }
+% unless ( @$menus ) {
+        <tr class="r0">
+            <td>no menus found</td>
+            <td>
+                * <a href="edit-m.html?_act=add">Add Menu</a>
+            </td>
+        </tr>
+% }
+
+</&>
+
+%# ----------------------------------------------------------------------------

@@ -87,6 +87,8 @@ __PACKAGE__->_mk_db_accessors( $schema, $tables );
 # simple accessors
 
 # create some reusable sql
+my $forum_cols = "$tables->{forum}{sql_sel_cols}, $tables->{poster}{sql_sel_cols}";
+my $forum_tables = "$tables->{forum}{sql_fqt} $join->{f_po}";
 my $topic_cols = "$tables->{forum}{sql_sel_cols}, $tables->{topic}{sql_sel_cols}, $tables->{account}{sql_sel_cols}";
 my $topic_tables = "$tables->{forum}{sql_fqt} $join->{f_tp} $join->{tp_a}";
 my $post_cols = "$tables->{forum}{sql_sel_cols}, $tables->{topic}{sql_sel_cols}, $tables->{post}{sql_sel_cols}";
@@ -95,7 +97,7 @@ my $post_tables = "$tables->{forum}{sql_fqt} $join->{f_tp} $join->{tp_p}";
 # forum
 __PACKAGE__->_mk_selecter( $schema, $tables->{forum} );
 __PACKAGE__->_mk_selecter_using( $schema, $tables->{forum}, 'name' );
-__PACKAGE__->mk_select_rows( 'sel_forum_all', "SELECT $tables->{forum}{sql_sel_cols} FROM $tables->{forum}{sql_fqt} ORDER BY f.name" );
+__PACKAGE__->mk_select_rows( 'sel_forum_all', "SELECT $forum_cols FROM $forum_tables ORDER BY f.name" );
 __PACKAGE__->_mk_select_count( $tables->{forum} );
 
 # topic

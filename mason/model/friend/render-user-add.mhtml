@@ -1,11 +1,12 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $t_username
+    $err
 </%args>
 %# ----------------------------------------------------------------------------
 <h1>Add a Friend</h1>
 
-<& /zaapt/common/err.mhtml, err => \@err &>
+<& /zaapt/common/err.mhtml, err => $err &>
 
 <& /zaapt/common/form.mhtml, action => 'add.html', elements => [
         { type => 'text', field => 'Add who?', name => 't_username', value => $t_username },

@@ -23,11 +23,16 @@ my $table = {
             [ 'to_id', 'fk', 't_id' ],
             qw(subject message read ts:inserted ts:updated) ],
     },
+    account => Zaapt::Store::Pg::Account->_get_table( 'account' ),
+    to => Zaapt::Store::Pg::Account->_get_table( 'account' ),
 };
 
+# change the prefix of the imported tables
+$table->{to}{prefix} = 't';
+
 my $join = {
-    f_a   => "JOIN account.account a ON (m.account_id = a.id)",
-    f_t  => "JOIN account.account t ON (m.to_id = t.id)",
+    m_a   => "JOIN account.account a ON (m.account_id = a.id)",
+    m_t  => "JOIN account.account t ON (m.to_id = t.id)",
 };
 
 ## ----------------------------------------------------------------------------
@@ -35,26 +40,15 @@ my $join = {
 # creates {sql_fqt} and {sql_sel_cols}
 __PACKAGE__->_mk_sql( $schema, $table );
 
-# generate the SQL ins/upd/del (no sel)
-__PACKAGE__->_mk_sql_accessors( $schema, $table );
-
-# add the 'foreign' tables
-$table->{account} = Zaapt::Store::Pg::Account->get_table_details('account');
-__PACKAGE__->_mk_sql_for( $table->{account}{schema}, $table->{account} );
-
-# 'to' is also an account, but copy the fields so we don't change the original
-
-foreach ( qw (schema name prefix cols) ) {
-    $table->{to}{$_} = $table->{account}{$_};
-}
-$table->{to}{prefix} = 't'; # change the prefix
-__PACKAGE__->_mk_sql_for( $table->{to}{schema}, $table->{to} );
+# generate the Perl method accessors
+__PACKAGE__->_mk_db_accessors( $schema, $table );
 
 ## ----------------------------------------------------------------------------
+# simple accessors
 
 # set up some useful strings
 my $message_cols = "$table->{message}{sql_sel_cols}, $table->{account}{sql_sel_cols}, $table->{to}{sql_sel_cols}";
-my $message_joins = "$table->{message}{sql_fqt} $join->{f_a} $join->{f_t}";
+my $message_joins = "$table->{message}{sql_fqt} $join->{m_a} $join->{m_t}";
 
 # get this message (and other important info)
 __PACKAGE__->mk_select_row( 'sel_message', "SELECT $message_cols FROM $message_joins WHERE m.id = ?", [ 'm_id' ] );

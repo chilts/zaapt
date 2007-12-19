@@ -38,7 +38,7 @@ sub get_model {
     if ( exists $self->{map}{$model} ) {
         eval "use $self->{map}{$model}";
         if ( $@ ) {
-            die "Couldn't load Model '$self->{map}{$model}' module";
+            die "Couldn't load Model '$self->{map}{$model}' module: $@";
         }
         $self->{models}{$model} = "$self->{map}{$model}"->new({ dbh => $self->{dbh} });
         $self->{models}{$model}->parent( $self );
@@ -48,7 +48,7 @@ sub get_model {
     elsif ( $model =~ m{ \A \w+ \z }xms ) {
         eval "use Zaapt::Store::$self->{store}::$model";
         if ( $@ ) {
-            die "Couldn't load Model 'Zaapt::Store::$self->{store}::$model' module";
+            die "Couldn't load Model 'Zaapt::Store::$self->{store}::$model' module: $@";
         }
         $self->{models}{$model} = "Zaapt::Store::$self->{store}::$model"->new({ dbh => $self->{dbh} });
         $self->{models}{$model}->parent( $self );
@@ -58,7 +58,7 @@ sub get_model {
     elsif ( $model =~ m{ \A \w+(::\w+)* \z }xms ) {
         eval "use $model";
         if ( $@ ) {
-            die "Couldn't load Model '$model' module";
+            die "Couldn't load Model '$model' module: $@";
         }
         $self->{models}{$model} = $model->new({ dbh => $self->{dbh} });
         $self->{models}{$model}->parent( $self );

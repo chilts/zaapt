@@ -1,0 +1,55 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $perms
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Faq');
+    my $faqs = $model->sel_faq_all();
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Faq List</h1>
+
+% if ( exists $perms->{super} ) {
+<p>
+    * <a href="edit-f.html?_act=add">Add Faq &raquo;</a><br />
+</p>
+% }
+
+<&| /zaapt/common/admin/table-list.mhtml, title => 'Faq' &>
+
+% my $r = 1;
+% foreach my $faq ( @$faqs ) {
+%     next unless exists $perms->{$faq->{_view}};
+        <tr class="r<% $r=1-$r %>">
+            <td>
+                (<% $faq->{f_id} | h %>) <strong><% $faq->{f_name} | h %></strong><br />
+                <% $faq->{f_title} | h %><br />
+            </td>
+            <td>
+%         if ( exists $perms->{$faq->{_admin}} ) {
+                * <a href="edit-f.html?_act=edit&amp;f_id=<% $faq->{f_id} | u %>">Edit Details</a><br />
+%         }
+%         if ( exists $perms->{$faq->{_edit}} ) {
+                * <a href="edit-q.html?_act=add&amp;f_id=<% $faq->{f_id} | u %>">Add Question</a><br />
+%         }
+                * <a href="edit-q-list.html?f_id=<% $faq->{f_id} | u %>">Question List</a><br />
+%         if ( exists $perms->{$faq->{_admin}} ) {
+                * <a href="edit-f.html?_act=rem&amp;f_id=<% $faq->{f_id} | u %>">Delete</a><br />
+%         }
+            </td>
+        </tr>
+% }
+% unless ( @$faqs ) {
+        <tr class="r0">
+            <td>no faqs found</td>
+            <td>
+                * <a href="edit-f.html?_act=add">Add Faq</a>
+            </td>
+        </tr>
+% }
+
+</&>
+
+%# ----------------------------------------------------------------------------

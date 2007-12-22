@@ -1,0 +1,168 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $perms
+    $_act       => 'add'
+    $f_id       => undef
+    $q_id       => undef
+    $q_question => ''
+    $q_answer   => ''
+    $t_id       => undef
+</%args>
+%# ----------------------------------------------------------------------------
+<%once>
+    use Zaapt::Utils::Valid;
+    use Zaapt::Utils::Conv;
+    use URI::Escape;
+
+    my $title = {
+        add => 'Add',
+        ins => 'Add',
+        edit => 'Edit',
+        upd  => 'Edit',
+        del  => 'Delete',
+    };
+</%once>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Faq');
+
+    my ($faq, $question);
+
+    # some data manipulation
+    $q_question = undef unless Zaapt::Utils::Valid::has_content( $q_question );
+    $q_answer   = Zaapt::Utils::Conv::remove_cr( $q_answer );
+
+    # see if we are working with a Faq or a pre-existing Question
+    if ( $_act eq 'ins' or $_act eq 'add' ) {
+        $faq = $model->sel_faq({ f_id => $f_id });
+
+        $m->redirect('edit-f-list.html')
+            unless defined $faq;
+
+        $m->redirect('edit-f-list.html?f_id=' . uri_escape($f_id))
+            unless exists $perms->{$faq->{_edit}};
+    }
+    else {
+        $question = $model->sel_question({ q_id => $q_id });
+
+        $m->redirect('edit-f-list.html')
+            unless defined $question;
+
+        $m->redirect('edit-q-list.html?f_id=' . uri_escape($question->{f_id}))
+            unless exists $perms->{$question->{_edit}};
+
+        $f_id = $question->{f_id};
+    }
+
+    my $err = [];
+    my $values = {};
+
+    # let's do some of the actions
+    if ( $_act eq 'add' ) {
+        $values->{_act} = 'ins';
+        $values->{submit} = 'Add Question';
+    }
+    elsif ( $_act eq 'ins' ) {
+        # check that these values are valid
+        unless ( Zaapt::Utils::Valid::has_content($q_question, 'Question') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+
+        # do the insert
+        unless ( @$err ) {
+            $model->ins_question({
+                f_id       => $f_id,
+                q_question => $q_question,
+                q_answer   => $q_answer,
+                t_id       => $t_id,
+            });
+            $m->redirect("edit-q-list.html?f_id=" . uri_escape( $f_id ));
+            return;
+        }
+
+        $values = { %ARGS };
+        $values->{submit} = 'Add Question';
+    }
+    elsif ( $_act eq 'edit' ) {
+        # already checked permissions
+        $values = $question;
+        $values->{_act} = 'upd';
+        $values->{submit} = 'Save Question';
+    }
+    elsif ( $_act eq 'upd' ) {
+        # check that these values are valid
+        unless ( Zaapt::Utils::Valid::has_content($q_question, 'Question') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+
+        # do the insert
+        unless ( @$err ) {
+            $model->upd_question({
+                f_id       => $f_id,
+                q_question => $q_question,
+                q_answer   => $q_answer,
+                t_id       => $t_id,
+                q_id       => $q_id,
+            });
+            $m->redirect("edit-q-list.html?f_id=" . uri_escape( $f_id ));
+            return;
+        }
+
+        $values = { %ARGS };
+        $values->{submit} = 'Save Question';
+    }
+    elsif ( $_act eq 'rem' ) {
+        # already checked permissions
+        $values = $question;
+        $values->{_act} = 'del';
+        $values->{submit} = 'Delete Question';
+    }
+    elsif ( $_act eq 'del' ) {
+        # delete
+        $model->del_question({ q_id => $q_id });
+        $m->redirect("edit-q-list.html?f_id=" . uri_escape( $f_id ));
+        return;
+    }
+    elsif ( $_act eq 'move-up') {
+        $model->upd_question_move_up({ f_id => $f_id, q_id => $q_id });
+        $m->redirect("edit-q-list.html?f_id=" . uri_escape( $f_id ));
+        return;
+    }
+    elsif ( $_act eq 'move-dn') {
+        $model->upd_question_move_dn({ f_id => $f_id, q_id => $q_id });
+        $m->redirect("edit-q-list.html?f_id=" . uri_escape( $f_id ));
+        return;
+    }
+
+    my $page_types = $zaapt->get_model('Common')->sel_type_all();
+    my @options = map { { value => $_->{t_id}, text => $_->{t_name} } } @$page_types;
+</%init>
+%# ----------------------------------------------------------------------------
+<h1><% $title->{$_act} | n %> an Question</h1>
+
+<p><a href="edit-q-list.html?f_id=<% $f_id | u %>">&laquo; Back to Question List</a></p>
+
+% if ( defined $question ) {
+<h2>Question: <% $question->{q_name} | h %> - '<% $question->{q_title} | h %>'</h2>
+% } else {
+<h2>Question: ?</h2>
+% }
+
+<& /zaapt/common/err.mhtml, err => $err &>
+
+<& /zaapt/common/form/edit.mhtml,
+    action => '?',
+    values => $values,
+    elements => [
+        { type => 'hidden', name => '_act' },
+        { type => 'hidden', name => 'f_id', def => $f_id },
+        { type => 'hidden', name => 'q_id', def => $q_id },
+        { type => 'text', field => 'Question', name => 'q_question', size => 40, value => '' },
+        { type => 'textarea', field => 'Answer', name => 'q_answer', rows => 10, cols => 40, value => '' },
+        { type => 'select', field => 'Type', name => 't_id', options => \@options },
+
+        { type => 'submit', name => 'submit', field => 'Actions', cancel => 1, location => 'edit-q-list.html?f_id=' . uri_escape($f_id) },
+    ]
+&>
+%# ----------------------------------------------------------------------------

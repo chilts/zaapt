@@ -1,0 +1,69 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $perms
+    $f_id => undef
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Faq');
+    my $faq = $model->sel_faq({ f_id => $f_id });
+    unless ( defined $faq ) {
+        $m->redirect('edit-f-list.html');
+        return;
+    }
+    $m->redirect('edit-f-list.html') unless exists $perms->{$faq->{_view}};
+    my $questions = $model->sel_question_all_in({ f_id => $f_id });
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Question List</h1>
+
+<p><a href="edit-f-list.html">&laquo; Back to Faq List</a></p>
+
+<h2>Faq: <% $faq->{f_name} | h %> - '<% $faq->{f_title} | h %>'</h2>
+
+% if ( exists $perms->{$faq->{_edit}} ) {
+<p>
+    * <a href="edit-q.html?_act=add&amp;f_id=<% $faq->{f_id} | u %>">Add Question &raquo;</a>
+</p>
+% }
+
+<&| /zaapt/common/admin/table-list.mhtml, title => 'Question' &>
+
+% my $row = 1;
+% foreach my $question ( @$questions ) {
+%     next unless exists $perms->{$question->{_view}};
+        <tr class="r<% $row=1-$row %>">
+            <td>
+                (<% $question->{q_id} | h %>) <strong><% $question->{q_question} | h %></strong><br />
+                Order: <strong><% $question->{q_display} | h %></strong>
+            </td>
+            <td>
+%         if ( exists $perms->{$faq->{_edit}} ) {
+                * <a href="edit-q.html?_act=edit&amp;q_id=<% $question->{q_id} | u %>">Edit Question</a><br />
+                * Move
+                <a href="edit-q.html?_act=move-up&amp;q_id=<% $question->{q_id} | u %>">Up</a>
+                /
+                <a href="edit-q.html?_act=move-dn&amp;q_id=<% $question->{q_id} | u %>">Dn</a><br />
+                * <a href="edit-q.html?_act=rem&amp;q_id=<% $question->{q_id} | u %>">Delete</a><br />
+%         } else {
+                -
+%         }
+            </td>
+        </tr>
+% }
+% unless ( @$questions ) {
+        <tr class="r0">
+            <td>No questions found</td>
+            <td>
+%         if ( exists $perms->{$faq->{_edit}} ) {
+                * <a href="edit-q.html?_act=add&amp;f_id=<% $faq->{f_id} | u %>">Add Question</a>
+%         }
+            </td>
+        </tr>
+% }
+    </tbody>
+</table>
+
+</&>
+%# ----------------------------------------------------------------------------

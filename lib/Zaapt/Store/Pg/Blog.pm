@@ -83,13 +83,13 @@ my $join = {
 __PACKAGE__->_mk_sql( $schema, $table );
 
 # generate the SQL ins/upd/del (no sel)
-__PACKAGE__->_mk_sql_accessors( $schema, $table );
+__PACKAGE__->_mk_store_accessors( $schema, $table );
 
 ## ----------------------------------------------------------------------------
 
 # blog
 __PACKAGE__->mk_selecter( $schema, $table->{blog}{name}, $table->{blog}{prefix}, @{$table->{blog}{cols}} );
-__PACKAGE__->mk_selecter_using( $schema, $table->{blog}{name}, $table->{blog}{prefix}, 'name', @{$table->{blog}{cols}} );
+__PACKAGE__->mk_selecter_using_from( $schema, $table->{blog}, 'name' );
 __PACKAGE__->mk_select_rows( 'sel_blog_all', "SELECT $table->{blog}{sql_sel_cols} FROM $table->{blog}{sql_fqt} ORDER BY b.id", [] );
 
 # entry

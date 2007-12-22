@@ -20,7 +20,7 @@ my $tables = {
         schema => $schema,
         name   => 'forum',
         prefix => 'f',
-        cols   => [ qw(id name title description show topics posts poster_id r:admin_id r:view_id r:moderator_id ts:inserted ts:updated) ],
+        cols   => [ qw(id name title description show ro:topics ro:posts poster_id r:admin_id r:view_id r:moderator_id ts:inserted ts:updated) ],
     },
     topic => {
         schema => $schema,
@@ -71,7 +71,7 @@ my $join = {
     tp_a  => "JOIN account.account a ON (tp.account_id = a.id)",
     tp_po => "LEFT JOIN account.account po ON (tp.poster_id = po.id)",
     p_a   => "JOIN account.account a ON (p.account_id = a.id)",
-    f_po  => "JOIN account.account po ON (f.poster_id = po.id)",
+    f_po  => "LEFT JOIN account.account po ON (f.poster_id = po.id)",
     p_i   => "LEFT JOIN $schema.info i ON (p.account_id = i.account_id)",
 };
 
@@ -81,7 +81,7 @@ my $join = {
 __PACKAGE__->_mk_sql( $schema, $tables );
 
 # generate the Perl method accessors
-__PACKAGE__->_mk_db_accessors( $schema, $tables );
+__PACKAGE__->_mk_store_accessors( $schema, $tables );
 
 ## ----------------------------------------------------------------------------
 # simple accessors
@@ -96,7 +96,7 @@ my $post_tables = "$tables->{forum}{sql_fqt} $join->{f_tp} $join->{tp_p}";
 
 # forum
 __PACKAGE__->_mk_selecter( $schema, $tables->{forum} );
-__PACKAGE__->_mk_selecter_using( $schema, $tables->{forum}, 'name' );
+__PACKAGE__->mk_selecter_using_from( $schema, $tables->{forum}, 'name' );
 __PACKAGE__->mk_select_rows( 'sel_forum_all', "SELECT $forum_cols FROM $forum_tables ORDER BY f.name" );
 __PACKAGE__->_mk_select_count( $tables->{forum} );
 

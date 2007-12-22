@@ -45,7 +45,7 @@ my $join = {
 __PACKAGE__->_mk_sql( $schema, $tables );
 
 # generate the Perl method accessors
-__PACKAGE__->_mk_db_accessors( $schema, $tables );
+__PACKAGE__->_mk_store_accessors( $schema, $tables );
 
 ## ----------------------------------------------------------------------------
 # simple accessors
@@ -56,7 +56,7 @@ my $main_tables = "$tables->{content}{sql_fqt} $join->{c_p} $join->{p_t}";
 
 # content
 __PACKAGE__->_mk_selecter( $schema, $tables->{content} );
-__PACKAGE__->_mk_selecter_using( $schema, $tables->{content}, 'name' );
+__PACKAGE__->mk_selecter_using_from( $schema, $tables->{content}, 'name' );
 __PACKAGE__->mk_select_rows( 'sel_content_all', "SELECT $tables->{content}{sql_sel_cols} FROM $tables->{content}{sql_fqt} ORDER BY c.id" );
 
 # page

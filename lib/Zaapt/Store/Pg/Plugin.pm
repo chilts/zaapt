@@ -39,7 +39,7 @@ my $join = {
 __PACKAGE__->_mk_sql( $schema, $tables );
 
 # generate the Perl method accessors
-__PACKAGE__->_mk_db_accessors( $schema, $tables );
+__PACKAGE__->_mk_store_accessors( $schema, $tables );
 
 ## ----------------------------------------------------------------------------
 # simple accessors
@@ -50,7 +50,7 @@ my $main_tables = "$tables->{plugin}{sql_fqt} $join->{p_s}";
 
 # plugin
 __PACKAGE__->_mk_selecter( $schema, $tables->{plugin} );
-__PACKAGE__->_mk_selecter_using( $schema, $tables->{plugin}, 'name' );
+__PACKAGE__->mk_selecter_using_from( $schema, $tables->{plugin}, 'name' );
 __PACKAGE__->mk_select_rows( 'sel_plugin_all', "SELECT $tables->{plugin}{sql_sel_cols} FROM $tables->{plugin}{sql_fqt} ORDER BY p.id", [] );
 
 # setting

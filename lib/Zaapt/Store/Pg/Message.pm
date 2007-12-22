@@ -41,7 +41,7 @@ my $join = {
 __PACKAGE__->_mk_sql( $schema, $table );
 
 # generate the Perl method accessors
-__PACKAGE__->_mk_db_accessors( $schema, $table );
+__PACKAGE__->_mk_store_accessors( $schema, $table );
 
 ## ----------------------------------------------------------------------------
 # simple accessors

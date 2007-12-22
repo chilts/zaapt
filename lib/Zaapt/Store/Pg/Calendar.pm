@@ -44,7 +44,7 @@ my $join = {
 __PACKAGE__->_mk_sql( $schema, $tables );
 
 # generate the Perl method accessors
-__PACKAGE__->_mk_db_accessors( $schema, $tables );
+__PACKAGE__->_mk_store_accessors( $schema, $tables );
 
 ## ----------------------------------------------------------------------------
 # simple accessors
@@ -55,7 +55,7 @@ my $main_tables = "$tables->{calendar}{sql_fqt} $join->{c_e} $join->{e_t}";
 
 # calendar
 __PACKAGE__->_mk_selecter( $schema, $tables->{calendar} );
-__PACKAGE__->_mk_selecter_using( $schema, $tables->{calendar}, 'name' );
+__PACKAGE__->mk_selecter_using_from( $schema, $tables->{calendar}, 'name' );
 __PACKAGE__->mk_select_rows( 'sel_calendar_all', "SELECT $tables->{calendar}{sql_sel_cols} FROM $tables->{calendar}{sql_fqt} ORDER BY c.id", [] );
 
 # event

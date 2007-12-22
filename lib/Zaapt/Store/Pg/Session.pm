@@ -25,7 +25,7 @@ my $table = {
 __PACKAGE__->_mk_sql( $schema, $table );
 
 # generate the SQL ins/upd/del (no sel)
-__PACKAGE__->_mk_sql_accessors( $schema, $table );
+__PACKAGE__->_mk_store_accessors( $schema, $table );
 
 ## ----------------------------------------------------------------------------
 

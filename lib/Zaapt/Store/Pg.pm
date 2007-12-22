@@ -39,7 +39,7 @@ sub _get_table {
 
 sub _mk_cols {
     my ($class, $letter, @colnames) = @_;
-    warn "_mk_cols() is deprecated, use _mk_sel_cols() instead";
+    carp "_mk_cols() is deprecated, use _mk_sel_cols() instead";
     return '' unless @colnames;
 
     my $first = shift @colnames;
@@ -239,13 +239,13 @@ sub _mk_ins_cols {
         push @colnames, $col;
     }
 
+    # surely, we could "my $cols = join(', ', @colnames)"
     my $cols = reduce { "$a, $b" } @colnames;
-    # my $qs = '?' . (', ?' x $#colnames);
 
     return $cols;
 }
 
-sub _mk_qm {
+sub _mk_question_marks {
     my ($class, @cols) = @_;
 
     return '' unless @cols;
@@ -273,6 +273,8 @@ sub _mk_upd {
     @colnames = map { m{ \A r:(\w+_id) \z }xms ? $1 : $_ } @colnames;
     @colnames = grep { !m{ \A ro: }xms } @colnames;
     @colnames = map { m{ \A (\w+):(\w+) \z }xms ? $2 : $_ } @colnames;
+
+    # warn "@colnames";
 
     my $colname = shift @colnames;
     my $cols = "$colname = COALESCE(?, $colname)";
@@ -385,7 +387,7 @@ sub _row {
 sub mk_inserter {
     my ($self, $schema, $t) = @_;
 
-    # warn "mk_inserter() is deprecated, use _mk_inserter() instead"
+    carp "mk_inserter() is deprecated, use _mk_inserter() instead";
 
     my $last = @{$t->{cols}} - 1;
     # my ($schema, $table, $prefix, @cols) = ($t->{name}, $t->{prefix}, @{$t->{cols}}[1..$last]);
@@ -430,8 +432,6 @@ sub _mk_inserter {
 sub _mk_updater {
     my ($self, $schema, $t) = @_;
 
-    # warn "mk_updater() is deprecated, use _mk_updater() instead"
-
     my $sql = "UPDATE $schema.$t->{name} SET $t->{sql_upd_cols} WHERE " . (defined $t->{pk} ? $t->{pk}[0] : 'id' ) . " = ?";
     my @hr_names = $self->_mk_hr_names( $t->{prefix}, @{$t->{cols}} );
 
@@ -460,6 +460,8 @@ sub _mk_updater {
 
 sub mk_updater {
     my ($self, $schema, $t) = @_;
+
+    carp "mk_updater() is deprecated, use _mk_updater() instead";
 
     my $sql = "UPDATE $schema.$t->{name} SET $t->{sql_upd_cols} WHERE " . (defined $t->{pk} ? $t->{pk}[0] : 'id' ) . " = ?";
     my @hr_names = $self->_mk_hr_names( $t->{prefix}, @{$t->{cols}} );
@@ -502,7 +504,7 @@ sub _mk_deleter {
 sub mk_deleter {
     my ($self, $schema, $table, $prefix, $id) = @_;
 
-    # warn "mk_deleter() is deprecated, use _mk_deleter() instead"
+    carp "mk_deleter() is deprecated, use _mk_deleter() instead";
 
     # my $sql = "DELETE FROM $schema.$table WHERE $id = ?";
     my $sql = __PACKAGE__->_mk_del("$schema.$table", $id);
@@ -537,12 +539,12 @@ sub _mk_do {
 
 sub _mk_selecter {
     my ($self, $schema, $t) = @_;
+    carp "_mk_selecter() is deprecated, use mk_selecter_from() instead";
     __PACKAGE__->mk_selecter( $schema, $t->{name}, $t->{prefix}, @{$t->{cols}} );
 }
 
 sub mk_selecter_from {
     my ($self, $schema, $t) = @_;
-    warn "mk_selecter_from() is deprecated, use _mk_selecter() instead";
     __PACKAGE__->mk_selecter( $schema, $t->{name}, $t->{prefix}, @{$t->{cols}} );
 }
 
@@ -564,7 +566,28 @@ sub mk_selecter {
     $self->_inject_method("sel_$table", $method);
 }
 
-# need to add a 'mk_selecter_all'
+sub _mk_selecter_all_from {
+    my ($self, $schema, $t) = @_;
+    __PACKAGE__->mk_selecter_all( $schema, $t->{name}, $t->{prefix}, @{$t->{cols}} );
+}
+
+sub _mk_selecter_all {
+    my ($self, $schema, $table, $prefix, $id, @cols) = @_;
+
+    my $cols = __PACKAGE__->_mk_sel_cols( $prefix, $id, @cols );
+    my $field = ref $id ? $id->[0] : $id;
+    my $sql = "SELECT $cols FROM $schema.$table $prefix ORDER BY $prefix.id";
+
+    # create the closure
+    my $method =  sub {
+        my ($self) = @_;
+        # warn "sql=$sql";
+        # warn Dumper($hr);
+        return $self->_row( $sql );
+    };
+
+    $self->_inject_method("sel_${table}_all", $method);
+}
 
 sub mk_select_row {
     my ($self, $method_name, $stm, $hr_names) = @_;
@@ -586,6 +609,8 @@ sub mk_select_rows {
     # create the closure
     my $method =  sub {
         my ($self, $hr) = @_;
+        warn "stm=$stm";
+        warn Dumper($hr_names);
         return $self->_rows( $stm, map { $hr->{$_} } @$hr_names );
     };
 
@@ -613,8 +638,15 @@ sub _mk_select_rows_offset {
 }
 
 # easier way of doing the thing below
+sub mk_selecter_using_from {
+    my ($self, $schema, $t, $col) = @_;
+    __PACKAGE__->mk_selecter_using( $schema, $t->{name}, $t->{prefix}, $col, @{$t->{cols}} );
+}
+
+# ... and the old (probably unused) version
 sub _mk_selecter_using {
     my ($self, $schema, $table, $col) = @_;
+    carp "_mk_selecter_using() is deprecated, use mk_selecter_using() instead";
     __PACKAGE__->mk_selecter_using( $schema, $table->{name}, $table->{prefix}, $col, @{$table->{cols}} );
 }
 
@@ -658,21 +690,23 @@ sub _mk_sql_for {
     $t->{sql_ins_cols} = $self->_mk_ins_cols( $t->{prefix}, @{$t->{cols}} );
     $t->{sql_upd_cols} = $self->_mk_upd_cols( $t );
 
-    $t->{qm} = $self->_mk_qm( @{$t->{cols}} );
+    $t->{qm} = $self->_mk_question_marks( @{$t->{cols}} );
 }
 
 # injects the accessors into the package's namespace
 sub _mk_sql_accessors {
     my ($self, $schema, $table) = @_;
-    # warn "_mk_sql_accessors() is deprecated, use _mk_accessors() instead"
-    foreach my $t ( values %$table ) {
-        __PACKAGE__->mk_inserter( $schema, $t );
-        __PACKAGE__->mk_updater( $schema, $t );
-        __PACKAGE__->mk_deleter( $schema, $t->{name}, $t->{prefix}, @{$t->{cols}}[0] );
-    }
+    carp "_mk_sql_accessors() is deprecated, use _mk_store_accessors() instead";
+    $self->_mk_store_accessors($schema, $table);
 }
 
 sub _mk_db_accessors {
+    my ($self, $schema, $table) = @_;
+    carp "_mk_db_accessors() is deprecated, use _mk_store_accessors() instead";
+    $self->_mk_store_accessors($schema, $table);
+}
+
+sub _mk_store_accessors {
     my ($self, $schema, $table) = @_;
     foreach my $t ( values %$table ) {
         __PACKAGE__->_mk_inserter( $schema, $t );

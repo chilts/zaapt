@@ -42,7 +42,7 @@ my $item_seq = 'menu.item_id_seq';
 __PACKAGE__->_mk_sql( $schema, $tables );
 
 # generate the Perl method accessors
-__PACKAGE__->_mk_db_accessors( $schema, $tables );
+__PACKAGE__->_mk_store_accessors( $schema, $tables );
 
 ## ----------------------------------------------------------------------------
 # simple accessors
@@ -53,7 +53,7 @@ my $main_tables = "$tables->{menu}{sql_fqt} $join->{m_i}";
 
 # menu
 __PACKAGE__->_mk_selecter( $schema, $tables->{menu} );
-__PACKAGE__->_mk_selecter_using( $schema, $tables->{menu}, 'name' );
+__PACKAGE__->mk_selecter_using_from( $schema, $tables->{menu}, 'name' );
 __PACKAGE__->mk_select_rows( 'sel_menu_all', "SELECT $tables->{menu}{sql_sel_cols} FROM $tables->{menu}{sql_fqt} ORDER BY m.name", [] );
 
 # item
@@ -65,13 +65,13 @@ __PACKAGE__->mk_select_rows( 'sel_item_all_in', "SELECT $main_cols FROM $main_ta
 
 # need this since i_display should be left to it's default value
 # ToDo: put an extra thing in Pg.pm to help do this (e.g. def:display)
-my $ins_item = __PACKAGE__->_mk_ins( 'menu.item', 'menu_id', 'level ', 'url', 'text', 'ishtml' );
+my $ins_item = __PACKAGE__->_mk_ins( 'menu.item', 'menu_id', 'level', 'url', 'text', 'ishtml' );
 sub ins_item {
     my ($self, $hr) = @_;
     $self->_do( $ins_item, $hr->{m_id}, $hr->{i_level}, $hr->{i_url}, $hr->{i_text}, $hr->{i_ishtml} );
 }
 
-# other
+# move up/dn
 my $i_t = $tables->{item};
 my $sel_items_for_move_up = "SELECT $i_t->{sql_sel_cols} FROM $i_t->{sql_fqt} WHERE i.menu_id = ? AND i.display <= ? ORDER BY i.display DESC LIMIT 2";
 my $sel_items_for_move_dn = "SELECT $i_t->{sql_sel_cols} FROM $i_t->{sql_fqt} WHERE i.menu_id = ? AND i.display >= ? ORDER BY i.display LIMIT 2";
@@ -84,7 +84,10 @@ sub upd_item_move {
 
     # get the item in question, return if it doesn't exist
     my $item = $self->sel_item( $hr );
-    return unless defined $item;
+    unless ( defined $item ) {
+        $self->dbh()->rollback();
+        return;
+    }
 
     # get the two rows to be exchanged
     my $rows = $self->_rows( $sql, $hr->{m_id}, $item->{i_display} );

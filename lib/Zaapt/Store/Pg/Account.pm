@@ -75,7 +75,7 @@ sub _get_tables { return $tables; }
 __PACKAGE__->_mk_sql( $schema, $tables );
 
 # generate the SQL ins/upd/del (no sel)
-__PACKAGE__->_mk_sql_accessors( $schema, $tables );
+__PACKAGE__->_mk_store_accessors( $schema, $tables );
 
 ## ----------------------------------------------------------------------------
 

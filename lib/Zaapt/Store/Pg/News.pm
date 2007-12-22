@@ -45,7 +45,7 @@ my $join = {
 __PACKAGE__->_mk_sql( $schema, $tables );
 
 # generate the Perl method accessors
-__PACKAGE__->_mk_db_accessors( $schema, $tables );
+__PACKAGE__->_mk_store_accessors( $schema, $tables );
 
 ## ----------------------------------------------------------------------------
 # simple DB methods
@@ -56,7 +56,7 @@ my $main_tables = "$tables->{news}{sql_fqt} $join->{n_a} $join->{a_t}";
 
 # news
 __PACKAGE__->_mk_selecter( $schema, $tables->{news} );
-__PACKAGE__->_mk_selecter_using( $schema, $tables->{news}, 'name' );
+__PACKAGE__->mk_selecter_using( $schema, $tables->{news}, 'name' );
 __PACKAGE__->mk_select_rows( 'sel_news_all', "SELECT $tables->{news}{sql_sel_cols} FROM $tables->{news}{sql_fqt} ORDER BY n.id" );
 
 # article

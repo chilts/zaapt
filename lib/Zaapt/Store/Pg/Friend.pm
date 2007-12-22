@@ -23,11 +23,16 @@ my $table = {
             [ 'to_id', 'fk', 't_id' ],
             qw(ts:inserted ts:updated) ],
     },
+    account => Zaapt::Store::Pg::Account->_get_table( 'account' ),
+    to => Zaapt::Store::Pg::Account->_get_table( 'account' ),
 };
+
+# change the prefix of the imported tables
+$table->{to}{prefix} = 't';
 
 my $join = {
     f_a   => "JOIN account.account a ON (f.account_id = a.id)",
-    f_w  => "JOIN account.account t ON (f.to_id = t.id)",
+    f_t  => "JOIN account.account t ON (f.to_id = t.id)",
 };
 
 ## ----------------------------------------------------------------------------
@@ -35,29 +40,17 @@ my $join = {
 # creates {sql_fqt} and {sql_sel_cols}
 __PACKAGE__->_mk_sql( $schema, $table );
 
-# generate the SQL ins/upd/del (no sel)
-__PACKAGE__->_mk_sql_accessors( $schema, $table );
-
-# add the 'foreign' tables
-$table->{account} = Zaapt::Store::Pg::Account->get_table_details('account');
-__PACKAGE__->_mk_sql_for( $table->{account}{schema}, $table->{account} );
-
-# 'to' is also an account, but copy the fields so we don't change the original
-
-foreach ( qw (schema name prefix cols) ) {
-    $table->{to}{$_} = $table->{account}{$_};
-}
-$table->{to}{prefix} = 't'; # change the prefix
-__PACKAGE__->_mk_sql_for( $table->{to}{schema}, $table->{to} );
+# generate the Perl method accessors
+__PACKAGE__->_mk_store_accessors( $schema, $table );
 
 ## ----------------------------------------------------------------------------
 
-# friend
-__PACKAGE__->mk_selecter( $schema, $table->{friend}{name}, $table->{friend}{prefix}, @{$table->{friend}{cols}} );
-
 # set up some useful strings
 my $friend_cols = "$table->{friend}{sql_sel_cols}, $table->{account}{sql_sel_cols}, $table->{to}{sql_sel_cols}";
-my $friend_joins = "$table->{friend}{sql_fqt} $join->{f_a} $join->{f_w}";
+my $friend_joins = "$table->{friend}{sql_fqt} $join->{f_a} $join->{f_t}";
+
+# friend
+__PACKAGE__->mk_selecter_from( $schema, $table->{friend} );
 
 # get all friends
 __PACKAGE__->mk_select_rows( 'sel_friend_all', "SELECT $friend_cols FROM $friend_joins ORDER BY f.id", [] );

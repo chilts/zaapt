@@ -39,7 +39,7 @@ my $join = {
 __PACKAGE__->_mk_sql( $schema, $table );
 
 # generate the SQL ins/upd/del (no sel)
-__PACKAGE__->_mk_sql_accessors( $schema, $table );
+__PACKAGE__->_mk_store_accessors( $schema, $table );
 
 ## ----------------------------------------------------------------------------
 
@@ -48,12 +48,12 @@ my $main_tables = "$table->{dir}{sql_fqt} $join->{d_f}";
 
 # dir
 __PACKAGE__->mk_selecter( $schema, $table->{dir}{name}, $table->{dir}{prefix}, @{$table->{dir}{cols}} );
-__PACKAGE__->mk_selecter_using( $schema, $table->{dir}{name}, $table->{dir}{prefix}, 'name', @{$table->{dir}{cols}} );
+__PACKAGE__->mk_selecter_using_from( $schema, $table->{dir}, 'name' );
 __PACKAGE__->mk_select_rows( 'sel_dir_all', "SELECT $table->{dir}{sql_sel_cols} FROM $table->{dir}{sql_fqt} ORDER BY d.id", [] );
 
 # file
 __PACKAGE__->mk_select_row( 'sel_file', "SELECT $main_cols FROM $main_tables WHERE f.id = ?", [ 'f_id' ] );
-__PACKAGE__->mk_selecter_using( $schema, $table->{file}{name}, $table->{file}{prefix}, 'name', @{$table->{file}{cols}} );
+__PACKAGE__->mk_selecter_using_from( $schema, $table->{file}, 'name' );
 __PACKAGE__->mk_select_row( 'sel_file_in_dir', "SELECT $main_cols FROM $main_tables WHERE d.id = ? AND f.name = ?", [ 'd_id', 'f_name' ] );
 __PACKAGE__->mk_select_rows( 'sel_file_all_in', "SELECT $main_cols FROM $main_tables WHERE d.id = ? ORDER BY f.name DESC", [ 'd_id' ] );
 

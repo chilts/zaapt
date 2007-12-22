@@ -82,13 +82,13 @@ my $join = {
 __PACKAGE__->_mk_sql( $schema, $table );
 
 # generate the SQL ins/upd/del (no sel)
-__PACKAGE__->_mk_sql_accessors( $schema, $table );
+__PACKAGE__->_mk_store_accessors( $schema, $table );
 
 ## ----------------------------------------------------------------------------
 
 # gallery
 __PACKAGE__->mk_selecter( $schema, $table->{gallery}{name}, $table->{gallery}{prefix}, @{$table->{gallery}{cols}} );
-__PACKAGE__->mk_selecter_using( $schema, $table->{gallery}{name}, $table->{gallery}{prefix}, 'name', @{$table->{gallery}{cols}} );
+__PACKAGE__->mk_selecter_using_from( $schema, $table->{gallery}, 'name' );
 __PACKAGE__->mk_select_rows( 'sel_gallery_all', "SELECT $table->{gallery}{sql_sel_cols} FROM $table->{gallery}{sql_fqt} ORDER BY g.id", [] );
 
 # picture
@@ -98,7 +98,7 @@ my $main_tables = "$table->{gallery}{sql_fqt} $join->{g_p}";
 __PACKAGE__->mk_select_row( 'sel_picture', "SELECT $main_cols FROM $main_tables WHERE p.id = ?", [ 'p_id' ] );
 __PACKAGE__->mk_select_row( 'sel_picture_in_gallery', "SELECT $main_cols FROM $main_tables WHERE g.id = ? AND p.name = ?", [ 'g_id', 'p_name' ] );
 __PACKAGE__->mk_select_rows( 'sel_picture_all_in', "SELECT $main_cols FROM $main_tables WHERE g.id = ? ORDER BY p.name DESC", [ 'g_id' ] );
-__PACKAGE__->mk_selecter_using( $schema, $table->{picture}{name}, $table->{picture}{prefix}, 'name', @{$table->{picture}{cols}} );
+__PACKAGE__->mk_selecter_using_from( $schema, $table->{picture}, 'name' );
 
 __PACKAGE__->mk_select_rows( 'sel_picture_detail_all', "SELECT $table->{field}{sql_sel_cols}, $table->{detail}{sql_sel_cols} FROM $table->{picture}{sql_fqt} $join->{p_d} $join->{d_f} WHERE p.id = ?", [ 'p_id' ] );
 

@@ -1,0 +1,178 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $perms
+    $_act          => 'add'
+    $c_id          => undef
+    $c_name        => ''
+    $c_title       => ''
+    $c_description => ''
+    $_admin        => ''
+    $_view         => ''
+    $_edit         => ''
+    $_publish      => ''
+</%args>
+%# ----------------------------------------------------------------------------
+<%once>
+    use URI::Escape;
+
+    my $heading = {
+        add => 'Add',
+        ins => 'Add',
+        edit => 'Edit',
+        upd  => 'Edit',
+        del  => 'Delete',
+    };
+</%once>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Content');
+
+    $m->redirect('edit-c-list.html') unless exists $perms->{super};
+
+    my $err = [];
+    my $values = {};
+    my $content;
+
+    # some data manipulation
+    $c_description = Zaapt::Utils::Conv::remove_cr( $c_description );
+
+    # let's do some of the actions
+    if ( $_act eq 'add' ) {
+        $values->{_act} = 'ins';
+        $values->{submit} = 'Add Content Section';
+    }
+    elsif ( $_act eq 'ins' ) {
+        # check that these values are valid
+        unless ( Zaapt::Utils::Valid::is_valid_name($c_name, 'Name') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+        unless ( Zaapt::Utils::Valid::has_content($c_title, 'Title') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+
+        # no Content of this name should already exist
+        unless ( @$err ) {
+            if ( $model->sel_content_using_name({ c_name => $c_name }) ) {
+                push @$err, "Content section name '$c_name' already exists."
+            }
+        }
+
+        # do the insert
+        unless ( @$err ) {
+            $model->ins_content({
+                c_name        => $c_name,
+                c_title       => $c_title,
+                c_description => $c_description,
+                _admin        => $_admin,
+                _view         => $_view,
+                _edit         => $_edit,
+                _publish      => $_publish,
+            });
+            $m->redirect("edit-c-list.html");
+            return;
+        }
+
+        $values = { %ARGS };
+        $values->{submit} = 'Add Content Section';
+    }
+    elsif ( $_act eq 'edit' ) {
+        # get 'content', check permissions
+        $content = $model->sel_content({ c_id => $c_id });
+        $m->redirect('edit-c-list.html') unless defined $content;
+        $m->redirect('edit-c-list.html?c_id=$content->{c_id}') unless exists $perms->{$content->{_admin}};
+
+        $values = $content;
+        $values->{_act} = 'upd';
+        $values->{submit} = 'Save Content Section';
+    }
+    elsif ( $_act eq 'upd' ) {
+        # get 'content', check permissions
+        $content = $model->sel_content({ c_id => $c_id });
+        $m->redirect('edit-c-list.html') unless defined $content;
+        $m->redirect('edit-c-list.html?c_id=$content->{c_id}') unless exists $perms->{$content->{_admin}};
+
+        # check that these values are valid
+        unless ( Zaapt::Utils::Valid::is_valid_name($c_name, 'Name') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+        unless ( Zaapt::Utils::Valid::has_content($c_title, 'Title') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+
+        # do the update
+        unless ( @$err ) {
+            $model->upd_content({
+                c_name        => $c_name,
+                c_title       => $c_title,
+                c_description => $c_description,
+                _admin        => $_admin,
+                _view         => $_view,
+                _edit         => $_edit,
+                _publish      => $_publish,
+                c_id          => $c_id,
+            });
+            $m->redirect("edit-c-list.html");
+            return;
+        }
+
+        $values = { %ARGS };
+        $values->{submit} = 'Add Content Section';
+    }
+    elsif ( $_act eq 'rem' ) {
+        # get 'content', check permissions
+        $content = $model->sel_content({ c_id => $c_id });
+        $m->redirect('edit-c-list.html') unless defined $content;
+        $m->redirect('edit-c-list.html?c_id=$content->{c_id}') unless exists $perms->{$content->{_admin}};
+
+        $values = $content;
+        $values->{_act} = 'del';
+        $values->{submit} = 'Delete Content Section';
+    }
+    elsif ( $_act eq 'del' ) {
+        # get 'content', check permissions
+        $content = $model->sel_content({ c_id => $c_id });
+        $m->redirect('edit-c-list.html') unless defined $content;
+        $m->redirect('edit-c-list.html?c_id=$content->{c_id}') unless exists $perms->{$content->{_admin}};
+
+        # delete
+        $model->del_content({ c_id => $c_id });
+        $m->redirect("edit-c-list.html");
+        return;
+    }
+
+    # create the dropdown options for each role
+    my $options = $m->comp('/zaapt/common/permission_options.mhtml', zaapt => $zaapt);
+</%init>
+%# ----------------------------------------------------------------------------
+<h1><% $heading->{$_act} | n %> a Content Section</h1>
+
+<p><a href="edit-c-list.html">&laquo; Back to Content Section List</a></p>
+
+% if ( defined $content ) {
+<h2>Content: <% $content->{c_name} | h %> - '<% $content->{c_title} | h %>'</h2>
+% } else {
+<h2>Content: ?</h2>
+% }
+
+<& /zaapt/common/err.mhtml, err => $err &>
+
+<& /zaapt/common/form/edit.mhtml,
+    action => '?',
+    values => $values,
+    elements => [
+        { type => 'hidden', name => '_act' },
+        { type => 'hidden', name => 'c_id', def => '' },
+        { type => 'text', field => 'Name', name => 'c_name', size => 40, def => '' },
+        { type => 'text', field => 'Title', name => 'c_title', size => 40, def => '' },
+        { type => 'textarea', field => 'Description', name => 'c_description', rows => 10, cols => 40, def => '' },
+
+        { type => 'select', field => 'Admin Perm', name => '_admin', options => $options },
+        { type => 'select', field => 'View Perm', name => '_view', options => $options },
+        { type => 'select', field => 'Edit Perm', name => '_edit', options => $options },
+        { type => 'select', field => 'Publish Perm', name => '_publish', options => $options },
+
+        { type => 'submit', name => 'submit', field => 'Actions', cancel => 1, location => 'edit-c-list.html' },
+    ]
+&>
+%# ----------------------------------------------------------------------------

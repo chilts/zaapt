@@ -1,0 +1,61 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $perms
+    $c_id => undef
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Content');
+    my $content = $model->sel_content({ c_id => $c_id });
+    unless ( defined $content ) {
+        $m->redirect('edit-f-list.html');
+        return;
+    }
+    $m->redirect('edit-f-list.html') unless exists $perms->{$content->{_view}};
+    my $pages = $model->sel_page_all_in({ c_id => $c_id });
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Page List</h1>
+
+<p><a href="edit-c-list.html">&laquo; Back to Content Section List</a></p>
+
+<h2>Content: <% $content->{c_name} | h %> - '<% $content->{c_title} | h %>'</h2>
+
+% if ( exists $perms->{$content->{_edit}} ) {
+<p>
+    * <a href="edit-p.html?_act=add&amp;c_id=<% $content->{c_id} | u %>">Add Page &raquo;</a>
+</p>
+% }
+
+<&| /zaapt/common/admin/table-list.mhtml, title => 'Page' &>
+
+% my $row = 1;
+% foreach my $page ( @$pages ) {
+        <tr class="r<% $row=1-$row %>">
+            <td><% $page->{p_name} | h %> (<% $page->{t_name} %>)</td>
+            <td>
+%         if ( exists $perms->{$page->{_edit}} ) {
+                * <a href="edit-p.html?_act=edit&amp;p_id=<% $page->{p_id} | u %>">Edit Page</a><br />
+                * <a href="edit-p.html?_act=rem&amp;p_id=<% $page->{p_id} | u %>">Delete</a><br />
+%         } else {
+                -
+%         }
+            </td>
+        </tr>
+% }
+% unless ( @$pages ) {
+        <tr class="r0">
+            <td>No pages found</td>
+            <td>
+%         if ( exists $perms->{$content->{_edit}} ) {
+                * <a href="edit-p.html?_act=add&amp;c_id=<% $content->{c_id} | u %>">Add Page</a>
+%         }
+            </td>
+        </tr>
+% }
+    </tbody>
+</table>
+
+</&>
+%# ----------------------------------------------------------------------------

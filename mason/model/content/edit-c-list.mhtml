@@ -1,0 +1,54 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $perms
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Content');
+    my $contents = $model->sel_content_all();
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Content Section List</h1>
+
+% if ( exists $perms->{super} ) {
+<p>
+    * <a href="edit-c.html?_act=add">Add Content Section &raquo;</a><br />
+</p>
+% }
+
+<&| /zaapt/common/admin/table-list.mhtml, title => 'Content Section' &>
+
+% my $r = 1;
+% foreach my $content ( @$contents ) {
+%     next unless exists $perms->{$content->{_view}};
+        <tr class="r<% $r=1-$r %>">
+            <td>
+                (<% $content->{c_id} | h %>) <strong><% $content->{c_name} | h %></strong><br />
+                <% $content->{c_title} | h %><br />
+            </td>
+            <td>
+%         if ( exists $perms->{$content->{_admin}} ) {
+                * <a href="edit-c.html?_act=edit&amp;c_id=<% $content->{c_id} | u %>">Edit Details</a><br />
+%         }
+%         if ( exists $perms->{$content->{_edit}} ) {
+                * <a href="edit-p.html?_act=add&amp;c_id=<% $content->{c_id} | u %>">Add Page</a><br />
+%         }
+                * <a href="edit-p-list.html?c_id=<% $content->{c_id} | u %>">Page List</a><br />
+%         if ( exists $perms->{$content->{_admin}} ) {
+                * <a href="edit-c.html?_act=rem&amp;c_id=<% $content->{c_id} | u %>">Delete</a><br />
+%         }
+            </td>
+        </tr>
+% }
+% unless ( @$contents ) {
+        <tr class="r0">
+            <td>no content sections found</td>
+            <td>
+                * <a href="edit-c.html?_act=add">Add Content Section</a>
+            </td>
+        </tr>
+% }
+
+</&>
+%# ----------------------------------------------------------------------------

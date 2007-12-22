@@ -39,9 +39,6 @@ CREATE TABLE news.article (
     title           TEXT NOT NULL,
     intro           TEXT NOT NULL,
     article         TEXT NOT NULL,
-    draft           BOOLEAN DEFAULT False,
-    comment         BOOLEAN NOT NULL DEFAULT False,
-    trackback       BOOLEAN NOT NULL DEFAULT False,
 
     LIKE base       INCLUDING DEFAULTS
 );

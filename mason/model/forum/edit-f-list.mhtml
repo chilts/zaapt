@@ -1,0 +1,54 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $perms
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Forum');
+    my $forums = $model->sel_forum_all();
+    use Data::Dumper;
+    warn Dumper($forums);
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Forum List</h1>
+
+% if ( exists $perms->{super} ) {
+<p>
+    * <a href="edit-f.html?_act=add">Add Forum &raquo;</a><br />
+</p>
+% }
+
+<&| /zaapt/common/admin/table-list.mhtml, title => 'Forum' &>
+
+% my $row = 1;
+% foreach my $forum ( @$forums ) {
+%     next unless exists $perms->{$forum->{_view}};
+        <tr class="r<% $row=1-$row %>">
+            <td>
+                (<% $forum->{f_id} | h %>) <strong><% $forum->{f_name} | h %></strong><br />
+                <% $forum->{f_title} | h %><br />
+                Topics: <strong><% $forum->{f_topics} | h %></strong>, Posts <strong><% $forum->{f_posts} | h %></strong>
+            </td>
+            <td>
+%         if ( exists $perms->{$forum->{_admin}} ) {
+                * <a href="edit-f.html?_act=edit&amp;f_id=<% $forum->{f_id} | u %>">Edit Details</a><br />
+                * <a href="edit-f.html?_act=rem&amp;f_id=<% $forum->{f_id} | u %>">Delete</a><br />
+%         } else {
+                * No Actions
+%         }
+            </td>
+        </tr>
+% }
+% unless ( @$forums ) {
+        <tr class="r0">
+            <td>no forums found</td>
+            <td>
+                * <a href="edit-f.html?_act=add">Add Forum</a>
+            </td>
+        </tr>
+% }
+
+</&>
+
+%# ----------------------------------------------------------------------------

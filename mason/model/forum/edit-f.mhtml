@@ -1,0 +1,183 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $perms
+    $_act          => 'add'
+    $f_id          => undef
+    $f_name        => ''
+    $f_title       => ''
+    $f_description => ''
+    $f_show        => ''
+    $_admin        => ''
+    $_view         => ''
+    $_moderator    => ''
+</%args>
+%# ----------------------------------------------------------------------------
+<%once>
+    use URI::Escape;
+
+    my $heading = {
+        add => 'Add',
+        ins => 'Add',
+        edit => 'Edit',
+        upd  => 'Edit',
+        del  => 'Delete',
+    };
+</%once>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Forum');
+
+    $m->redirect('edit-f-list.html') unless exists $perms->{super};
+
+    my $err = [];
+    my $values = {};
+    my $forum;
+
+    # some data manipulation
+    $f_description = Zaapt::Utils::Conv::remove_cr( $f_description );
+    $f_description = undef unless Zaapt::Utils::Valid::has_content( $f_description );
+
+    # let's do some of the actions
+    if ( $_act eq 'add' ) {
+        $values->{_act} = 'ins';
+        $values->{submit} = 'Add Forum';
+    }
+    elsif ( $_act eq 'ins' ) {
+        # check that these values are valid
+        unless ( Zaapt::Utils::Valid::is_valid_name($f_name, 'Name') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+        unless ( Zaapt::Utils::Valid::has_content($f_title, 'Title') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+
+        # no Forum of this name should already exist
+        unless ( @$err ) {
+            if ( $model->sel_forum_using_name({ f_name => $f_name }) ) {
+                push @$err, "Forum name '$f_name' already exists."
+            }
+        }
+
+        unless ( Zaapt::Utils::Valid::is_non_negative_integer($f_show, 'Show') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+
+        # do the insert
+        unless ( @$err ) {
+            $model->ins_forum({
+                f_name        => $f_name,
+                f_title       => $f_title,
+                f_description => $f_description,
+                f_show        => $f_show,
+                _admin        => $_admin,
+                _view         => $_view,
+                _moderator    => $_moderator,
+            });
+            $m->redirect("edit-f-list.html");
+            return;
+        }
+
+        $values = { %ARGS };
+        $values->{submit} = 'Add Forum';
+    }
+    elsif ( $_act eq 'edit' ) {
+        # get 'forum', check permissions
+        $forum = $model->sel_forum({ f_id => $f_id });
+        $m->redirect('edit-f-list.html') unless defined $forum;
+        $m->redirect('edit-f-list.html?f_id=$forum->{f_id}') unless exists $perms->{$forum->{_admin}};
+
+        $values = $forum;
+        $values->{_act} = 'upd';
+        $values->{submit} = 'Save Forum';
+    }
+    elsif ( $_act eq 'upd' ) {
+        # get 'forum', check permissions
+        $forum = $model->sel_forum({ f_id => $f_id });
+        $m->redirect('edit-f-list.html') unless defined $forum;
+        $m->redirect('edit-f-list.html?f_id=$forum->{f_id}') unless exists $perms->{$forum->{_admin}};
+
+        # check that these values are valid
+        unless ( Zaapt::Utils::Valid::is_valid_name($f_name, 'Name') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+        unless ( Zaapt::Utils::Valid::has_content($f_title, 'Title') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+
+        # do the update
+        unless ( @$err ) {
+            $model->upd_forum({
+                f_name        => $f_name,
+                f_title       => $f_title,
+                f_description => $f_description,
+                f_show        => $f_show,
+                _admin        => $_admin,
+                _view         => $_view,
+                _moderator    => $_moderator,
+                f_id          => $f_id,
+            });
+            $m->redirect("edit-f-list.html");
+            return;
+        }
+
+        $values = { %ARGS };
+        $values->{submit} = 'Add Forum';
+    }
+    elsif ( $_act eq 'rem' ) {
+        # get 'forum', check permissions
+        $forum = $model->sel_forum({ f_id => $f_id });
+        $m->redirect('edit-f-list.html') unless defined $forum;
+        $m->redirect('edit-f-list.html?f_id=$forum->{f_id}') unless exists $perms->{$forum->{_admin}};
+
+        $values = $forum;
+        $values->{_act} = 'del';
+        $values->{submit} = 'Delete Forum';
+    }
+    elsif ( $_act eq 'del' ) {
+        # get 'forum', check permissions
+        $forum = $model->sel_forum({ f_id => $f_id });
+        $m->redirect('edit-f-list.html') unless defined $forum;
+        $m->redirect('edit-f-list.html?f_id=$forum->{f_id}') unless exists $perms->{$forum->{_admin}};
+
+        # delete
+        $model->del_forum({ f_id => $f_id });
+        $m->redirect("edit-f-list.html");
+        return;
+    }
+
+    # create the dropdown options for each role
+    my $options = $m->comp('/zaapt/common/permission_options.mhtml', zaapt => $zaapt);
+</%init>
+%# ----------------------------------------------------------------------------
+<h1><% $heading->{$_act} | n %> a Forum</h1>
+
+<p><a href="edit-f-list.html">&laquo; Back to Forum List</a></p>
+
+% if ( defined $forum ) {
+<h2>Forum: <% $forum->{f_name} | h %> - '<% $forum->{f_title} | h %>'</h2>
+% } else {
+<h2>Forum: ?</h2>
+% }
+
+<& /zaapt/common/err.mhtml, err => $err &>
+
+<& /zaapt/common/form/edit.mhtml,
+    action => '?',
+    values => $values,
+    elements => [
+        { type => 'hidden', name => '_act' },
+        { type => 'hidden', name => 'f_id', def => '' },
+        { type => 'text', field => 'Name', name => 'f_name', size => 40, def => '' },
+        { type => 'text', field => 'Title', name => 'f_title', size => 40, def => '' },
+        { type => 'textarea', field => 'Description', name => 'f_description', rows => 10, cols => 40, def => '' },
+        { type => 'text', field => 'Show', name => 'f_show', size => 3, def => 20 },
+
+        { type => 'select', field => 'Admin Perm', name => '_admin', options => $options },
+        { type => 'select', field => 'View Perm', name => '_view', options => $options },
+        { type => 'select', field => 'Moderator Perm', name => '_moderator', options => $options },
+
+        { type => 'submit', name => 'submit', field => 'Actions', cancel => 1, location => 'edit-f-list.html' },
+    ]
+&>
+%# ----------------------------------------------------------------------------

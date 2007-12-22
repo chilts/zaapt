@@ -1,0 +1,54 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $perms
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('News');
+    my $newses = $model->sel_news_all(); # like Gollum
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>News List</h1>
+
+% if ( exists $perms->{super} ) {
+<p>
+    * <a href="edit-n.html?_act=add">Add News Section &raquo;</a><br />
+</p>
+% }
+
+<&| /zaapt/common/admin/table-list.mhtml, title => 'News' &>
+
+% my $r = 1;
+% foreach my $news ( @$newses ) {
+%     next unless exists $perms->{$news->{_view}};
+        <tr class="r<% $r=1-$r %>">
+            <td>
+                (<% $news->{n_id} | h %>) <strong><% $news->{n_name} | h %></strong><br />
+                <% $news->{n_title} | h %><br />
+            </td>
+            <td>
+%         if ( exists $perms->{$news->{_admin}} ) {
+                * <a href="edit-n.html?_act=edit&amp;n_id=<% $news->{n_id} | u %>">Edit Details</a><br />
+%         }
+%         if ( exists $perms->{$news->{_edit}} ) {
+                * <a href="edit-a.html?_act=add&amp;n_id=<% $news->{n_id} | u %>">Add Article</a><br />
+%         }
+                * <a href="edit-a-list.html?n_id=<% $news->{n_id} | u %>">Article List</a><br />
+%         if ( exists $perms->{$news->{_admin}} ) {
+                * <a href="edit-n.html?_act=rem&amp;n_id=<% $news->{n_id} | u %>">Delete</a><br />
+%         }
+            </td>
+        </tr>
+% }
+% unless ( @$newses ) {
+        <tr class="r0">
+            <td>no news sections found</td>
+            <td>
+                * <a href="edit-n.html?_act=add">Add News Section</a>
+            </td>
+        </tr>
+% }
+
+</&>
+%# ----------------------------------------------------------------------------

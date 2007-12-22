@@ -1,0 +1,187 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $perms
+    $_act          => 'add'
+    $n_id          => undef
+    $n_name        => ''
+    $n_title       => ''
+    $n_description => ''
+    $n_show        => ''
+    $_admin        => ''
+    $_view         => ''
+    $_edit         => ''
+    $_publish      => ''
+</%args>
+%# ----------------------------------------------------------------------------
+<%once>
+    use URI::Escape;
+
+    my $heading = {
+        add => 'Add',
+        ins => 'Add',
+        edit => 'Edit',
+        upd  => 'Edit',
+        del  => 'Delete',
+    };
+</%once>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('News');
+
+    $m->redirect('edit-n-list.html') unless exists $perms->{super};
+
+    my $err = [];
+    my $values = {};
+    my $news;
+
+    # some data manipulation
+    $n_description = Zaapt::Utils::Conv::remove_cr( $n_description );
+    $n_description = undef unless Zaapt::Utils::Valid::has_content( $n_description );
+
+    # let's do some of the actions
+    if ( $_act eq 'add' ) {
+        $values->{_act} = 'ins';
+        $values->{submit} = 'Add News';
+    }
+    elsif ( $_act eq 'ins' ) {
+        # check that these values are valid
+        unless ( Zaapt::Utils::Valid::is_valid_name($n_name, 'Name') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+        unless ( Zaapt::Utils::Valid::has_content($n_title, 'Title') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+
+        # no News of this name should already exist
+        unless ( @$err ) {
+            if ( $model->sel_news_using_name({ n_name => $n_name }) ) {
+                push @$err, "News name '$n_name' already exists."
+            }
+        }
+
+        unless ( Zaapt::Utils::Valid::is_non_negative_integer($n_show, 'Show') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+
+        # do the insert
+        unless ( @$err ) {
+            $model->ins_news({
+                n_name        => $n_name,
+                n_title       => $n_title,
+                n_description => $n_description,
+                n_show        => $n_show,
+                _admin        => $_admin,
+                _view         => $_view,
+                _edit         => $_edit,
+                _publish      => $_publish,
+            });
+            $m->redirect("edit-n-list.html");
+            return;
+        }
+
+        $values = { %ARGS };
+        $values->{submit} = 'Add News';
+    }
+    elsif ( $_act eq 'edit' ) {
+        # get 'news', check permissions
+        $news = $model->sel_news({ n_id => $n_id });
+        $m->redirect('edit-n-list.html') unless defined $news;
+        $m->redirect('edit-n-list.html?n_id=$news->{n_id}') unless exists $perms->{$news->{_admin}};
+
+        $values = $news;
+        $values->{_act} = 'upd';
+        $values->{submit} = 'Save News';
+    }
+    elsif ( $_act eq 'upd' ) {
+        # get 'news', check permissions
+        $news = $model->sel_news({ n_id => $n_id });
+        $m->redirect('edit-n-list.html') unless defined $news;
+        $m->redirect('edit-n-list.html?n_id=$news->{n_id}') unless exists $perms->{$news->{_admin}};
+
+        # check that these values are valid
+        unless ( Zaapt::Utils::Valid::is_valid_name($n_name, 'Name') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+        unless ( Zaapt::Utils::Valid::has_content($n_title, 'Title') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+
+        # do the update
+        unless ( @$err ) {
+            $model->upd_news({
+                n_name        => $n_name,
+                n_title       => $n_title,
+                n_description => $n_description,
+                n_show        => $n_show,
+                _admin        => $_admin,
+                _view         => $_view,
+                _edit         => $_edit,
+                _publish      => $_publish,
+                n_id          => $n_id,
+            });
+            $m->redirect("edit-n-list.html");
+            return;
+        }
+
+        $values = { %ARGS };
+        $values->{submit} = 'Add News';
+    }
+    elsif ( $_act eq 'rem' ) {
+        # get 'news', check permissions
+        $news = $model->sel_news({ n_id => $n_id });
+        $m->redirect('edit-n-list.html') unless defined $news;
+        $m->redirect('edit-n-list.html?n_id=$news->{n_id}') unless exists $perms->{$news->{_admin}};
+
+        $values = $news;
+        $values->{_act} = 'del';
+        $values->{submit} = 'Delete News';
+    }
+    elsif ( $_act eq 'del' ) {
+        # get 'news', check permissions
+        $news = $model->sel_news({ n_id => $n_id });
+        $m->redirect('edit-n-list.html') unless defined $news;
+        $m->redirect('edit-n-list.html?n_id=$news->{n_id}') unless exists $perms->{$news->{_admin}};
+
+        # delete
+        $model->del_news({ n_id => $n_id });
+        $m->redirect("edit-n-list.html");
+        return;
+    }
+
+    # create the dropdown options for each role
+    my $options = $m->comp('/zaapt/common/permission_options.mhtml', zaapt => $zaapt);
+</%init>
+%# ----------------------------------------------------------------------------
+<h1><% $heading->{$_act} | n %> a News Section</h1>
+
+<p><a href="edit-n-list.html">&laquo; Back to News List</a></p>
+
+% if ( defined $news ) {
+<h2>News: <% $news->{n_name} | h %> - '<% $news->{n_title} | h %>'</h2>
+% } else {
+<h2>News: ?</h2>
+% }
+
+<& /zaapt/common/err.mhtml, err => $err &>
+
+<& /zaapt/common/form/edit.mhtml,
+    action => '?',
+    values => $values,
+    elements => [
+        { type => 'hidden', name => '_act' },
+        { type => 'hidden', name => 'n_id', def => '' },
+        { type => 'text', field => 'Name', name => 'n_name', size => 40, def => '' },
+        { type => 'text', field => 'Title', name => 'n_title', size => 40, def => '' },
+        { type => 'textarea', field => 'Description', name => 'n_description', rows => 10, cols => 40, def => '' },
+        { type => 'text', field => 'Show', name => 'n_show', size => 3, def => 20 },
+
+        { type => 'select', field => 'Admin Perm', name => '_admin', options => $options },
+        { type => 'select', field => 'View Perm', name => '_view', options => $options },
+        { type => 'select', field => 'Edit Perm', name => '_edit', options => $options },
+        { type => 'select', field => 'Publish Perm', name => '_publish', options => $options },
+
+        { type => 'submit', name => 'submit', field => 'Actions', cancel => 1, location => 'edit-n-list.html' },
+    ]
+&>
+%# ----------------------------------------------------------------------------

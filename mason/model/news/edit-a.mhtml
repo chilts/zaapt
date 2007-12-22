@@ -1,0 +1,189 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $perms
+    $_act      => 'add'
+    $n_id      => undef
+    $a_id      => undef
+    $a_title   => ''
+    $a_intro   => ''
+    $a_article => ''
+    $t_id      => undef
+</%args>
+%# ----------------------------------------------------------------------------
+<%once>
+    use Zaapt::Utils::Valid;
+    use Zaapt::Utils::Conv;
+    use URI::Escape;
+
+    my $title = {
+        add => 'Add',
+        ins => 'Add',
+        edit => 'Edit',
+        upd  => 'Edit',
+        del  => 'Delete',
+    };
+</%once>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('News');
+
+    my ($news, $article);
+
+    # some data manipulation
+    $a_title   = undef unless Zaapt::Utils::Valid::has_content( $a_title );
+    $a_intro   = undef unless Zaapt::Utils::Valid::has_content( $a_intro );
+    $a_article = undef unless Zaapt::Utils::Valid::has_content( $a_article );
+    $a_title   = Zaapt::Utils::Conv::remove_cr( $a_title );
+    $a_intro   = Zaapt::Utils::Conv::remove_cr( $a_intro );
+    $a_article = Zaapt::Utils::Conv::remove_cr( $a_article );
+
+    # see if we are working with a News or a pre-existing Article
+    if ( $_act eq 'ins' or $_act eq 'add' ) {
+        $news = $model->sel_news({ n_id => $n_id });
+
+        $m->redirect('edit-n-list.html')
+            unless defined $news;
+
+        $m->redirect('edit-n-list.html?n_id=' . uri_escape($n_id))
+            unless exists $perms->{$news->{_edit}};
+    }
+    else {
+        $article = $model->sel_article({ a_id => $a_id });
+
+        $m->redirect('edit-n-list.html')
+            unless defined $article;
+
+        $m->redirect('edit-a-list.html?n_id=' . uri_escape($article->{n_id}))
+            unless exists $perms->{$article->{_edit}};
+
+        $n_id = $article->{n_id};
+    }
+
+    my $err = [];
+    my $values = {};
+
+    # let's do some of the actions
+    if ( $_act eq 'add' ) {
+        $values->{_act} = 'ins';
+        $values->{submit} = 'Add Article';
+    }
+    elsif ( $_act eq 'ins' ) {
+        # check that these values are valid
+        unless ( Zaapt::Utils::Valid::has_content($a_title, 'Title') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+        unless ( Zaapt::Utils::Valid::has_content($a_intro, 'Intro') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+        unless ( Zaapt::Utils::Valid::has_content($a_article, 'Article') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+
+        # check this type exists
+        unless ( $zaapt->get_model('Common')->sel_type({ t_id => $t_id }) ) {
+            push @$err, 'invalid type';
+        }
+
+        # do the insert
+        unless ( @$err ) {
+            $model->ins_article({
+                n_id      => $n_id,
+                a_title   => $a_title,
+                a_intro   => $a_intro,
+                a_article => $a_article,
+                t_id      => $t_id,
+            });
+            $m->redirect("edit-a-list.html?n_id=" . uri_escape( $n_id ));
+            return;
+        }
+
+        $values = { %ARGS };
+        $values->{submit} = 'Add Article';
+    }
+    elsif ( $_act eq 'edit' ) {
+        # already checked permissions
+        $values = $article;
+        $values->{_act} = 'upd';
+        $values->{submit} = 'Save Article';
+    }
+    elsif ( $_act eq 'upd' ) {
+        # check that these values are valid
+        unless ( Zaapt::Utils::Valid::has_content($a_title, 'Title') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+        unless ( Zaapt::Utils::Valid::has_content($a_intro, 'Intro') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+        unless ( Zaapt::Utils::Valid::has_content($a_article, 'Article') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+
+        # check this type exists
+        unless ( $zaapt->get_model('Common')->sel_type({ t_id => $t_id }) ) {
+            push @$err, 'invalid type';
+        }
+
+        # do the insert
+        unless ( @$err ) {
+            $model->upd_article({
+                n_id      => $n_id,
+                a_title   => $a_title,
+                a_intro   => $a_intro,
+                a_article => $a_article,
+                t_id      => $t_id,
+                a_id      => $a_id,
+            });
+            $m->redirect("edit-a-list.html?n_id=" . uri_escape( $n_id ));
+            return;
+        }
+
+        $values = { %ARGS };
+        $values->{submit} = 'Save Article';
+    }
+    elsif ( $_act eq 'rem' ) {
+        # already checked permissions
+        $values = $article;
+        $values->{_act} = 'del';
+        $values->{submit} = 'Delete Article';
+    }
+    elsif ( $_act eq 'del' ) {
+        # delete
+        $model->del_article({ a_id => $a_id });
+        $m->redirect("edit-a-list.html?n_id=" . uri_escape( $n_id ));
+        return;
+    }
+
+    my $page_types = $zaapt->get_model('Common')->sel_type_all();
+    my @options = map { { value => $_->{t_id}, text => $_->{t_name} } } @$page_types;
+</%init>
+%# ----------------------------------------------------------------------------
+<h1><% $title->{$_act} | n %> an Article</h1>
+
+<p><a href="edit-a-list.html?n_id=<% $n_id | u %>">&laquo; Back to Article List</a></p>
+
+% if ( defined $article ) {
+<h2>Article: <% $article->{a_name} | h %> - '<% $article->{a_title} | h %>'</h2>
+% } else {
+<h2>Article: ?</h2>
+% }
+
+<& /zaapt/common/err.mhtml, err => $err &>
+
+<& /zaapt/common/form/edit.mhtml,
+    action => '?',
+    values => $values,
+    elements => [
+        { type => 'hidden', name => '_act' },
+        { type => 'hidden', name => 'n_id', def => $n_id },
+        { type => 'hidden', name => 'a_id', def => $a_id },
+        { type => 'text', field => 'Title', name => 'a_title', size => 40, def => '' },
+        { type => 'textarea', field => 'Intro', name => 'a_intro', rows => 10, cols => 40, def => '' },
+        { type => 'note', value => 'Note: The intro field is plain text' },
+        { type => 'textarea', field => 'Article', name => 'a_article', rows => 10, cols => 40, def => '' },
+        { type => 'select', field => 'Type', name => 't_id', options => \@options, selected => $t_id },
+
+        { type => 'submit', name => 'submit', field => 'Actions', cancel => 1, location => 'edit-a-list.html?n_id=' . uri_escape($n_id) },
+    ]
+&>
+%# ----------------------------------------------------------------------------

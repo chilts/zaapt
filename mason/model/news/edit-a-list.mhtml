@@ -1,0 +1,67 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $perms
+    $n_id => undef
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('News');
+    my $news = $model->sel_news({ n_id => $n_id });
+    unless ( defined $news ) {
+        $m->redirect('edit-n-list.html');
+        return;
+    }
+    $m->redirect('edit-n-list.html') unless exists $perms->{$news->{_view}};
+    my $articles = $model->sel_article_all_in({ n_id => $n_id });
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Article List</h1>
+
+<p><a href="edit-n-list.html">&laquo; Back to News List</a></p>
+
+<h2>News: <% $news->{n_name} | h %> - '<% $news->{n_title} | h %>'</h2>
+
+% if ( exists $perms->{$news->{_edit}} ) {
+<p>
+    * <a href="edit-a.html?_act=add&amp;n_id=<% $news->{n_id} | u %>">Add Article &raquo;</a>
+</p>
+% }
+
+<&| /zaapt/common/admin/table-list.mhtml, title => 'Article' &>
+
+% my $row = 1;
+% foreach my $article ( @$articles ) {
+%     next unless exists $perms->{$article->{_view}};
+        <tr class="r<% $row=1-$row %>">
+            <td>
+                (<% $article->{a_id} | h %>) <strong><% $article->{a_title} | h %></strong><br />
+                <% $article->{a_intro} | h %>
+            </td>
+            <td>
+%         if ( exists $perms->{$news->{_edit}} ) {
+                * <a href="edit-a.html?_act=edit&amp;a_id=<% $article->{a_id} | u %>">Edit Article</a><br />
+                * <a href="edit-a.html?_act=rem&amp;a_id=<% $article->{a_id} | u %>">Delete</a><br />
+%         } else {
+                -
+%         }
+            </td>
+        </tr>
+% }
+% unless ( @$articles ) {
+        <tr class="r0">
+            <td>No articles found</td>
+            <td>
+%         if ( exists $perms->{$news->{_edit}} ) {
+                * <a href="edit-a.html?_act=add&amp;n_id=<% $news->{n_id} | u %>">Add Article</a>
+%         } else {
+                -
+%         }
+            </td>
+        </tr>
+% }
+    </tbody>
+</table>
+
+</&>
+%# ----------------------------------------------------------------------------

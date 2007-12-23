@@ -36,7 +36,6 @@
 
     # some data manipulation
     $f_description = Zaapt::Utils::Conv::remove_cr( $f_description );
-    $f_description = undef unless Zaapt::Utils::Valid::has_content( $f_description );
 
     # let's do some of the actions
     if ( $_act eq 'add' ) {
@@ -102,6 +101,10 @@
             push @$err, Zaapt::Utils::Valid::err();
         }
         unless ( Zaapt::Utils::Valid::has_content($f_title, 'Title') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+
+        unless ( Zaapt::Utils::Valid::is_non_negative_integer($f_show, 'Show') ) {
             push @$err, Zaapt::Utils::Valid::err();
         }
 

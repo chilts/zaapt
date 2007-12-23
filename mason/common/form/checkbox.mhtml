@@ -14,6 +14,6 @@
  type="checkbox"\
 <% defined $e->{id} ? " id=\"$e->{id}\"" : '' %>\
  name="<% $e->{name} | h %>"\
-<% $e->{checked} && ' checked="checked"' %>\
+<% $value && ' checked="checked"' %>\
  />\
 %# ----------------------------------------------------------------------------

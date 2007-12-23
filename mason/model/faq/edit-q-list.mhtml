@@ -22,17 +22,18 @@
 
 <h2>Faq: <% $faq->{f_name} | h %> - '<% $faq->{f_title} | h %>'</h2>
 
-% if ( exists $perms->{$faq->{_edit}} ) {
 <p>
+% if ( exists $perms->{$faq->{_edit}} ) {
     * <a href="edit-q.html?_act=add&amp;f_id=<% $faq->{f_id} | u %>">Add Question &raquo;</a>
-</p>
+% } else {
+    * No Actions
 % }
+</p>
 
 <&| /zaapt/common/admin/table-list.mhtml, title => 'Question' &>
 
 % my $row = 1;
 % foreach my $question ( @$questions ) {
-%     next unless exists $perms->{$question->{_view}};
         <tr class="r<% $row=1-$row %>">
             <td>
                 (<% $question->{q_id} | h %>) <strong><% $question->{q_question} | h %></strong><br />
@@ -62,8 +63,6 @@
             </td>
         </tr>
 % }
-    </tbody>
-</table>
 
 </&>
 %# ----------------------------------------------------------------------------

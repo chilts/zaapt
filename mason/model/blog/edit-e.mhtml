@@ -1,0 +1,234 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $perms
+    $id
+    $_act        => 'add'
+    $b_id        => undef
+    $e_id        => undef
+    $e_name      => ''
+    $e_title     => ''
+    $e_intro     => ''
+    $e_article   => ''
+    $t_id        => undef
+    $e_draft     => 0
+    $e_comment   => 0
+    $e_trackback => 0
+</%args>
+%# ----------------------------------------------------------------------------
+<%once>
+    use Zaapt::Utils::Valid;
+    use Zaapt::Utils::Conv;
+    use URI::Escape;
+
+    my $title = {
+        add => 'Add',
+        ins => 'Add',
+        edit => 'Edit',
+        upd  => 'Edit',
+        del  => 'Delete',
+    };
+</%once>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Blog');
+
+    my ($blog, $entry);
+
+    # some data manipulation
+    $e_title   = Zaapt::Utils::Conv::remove_cr( $e_title );
+    $e_intro   = Zaapt::Utils::Conv::remove_cr( $e_intro );
+    $e_article = Zaapt::Utils::Conv::remove_cr( $e_article );
+    $e_draft   = Zaapt::Utils::Conv::to_bool( $e_draft );
+    $e_comment = Zaapt::Utils::Conv::to_bool( $e_comment );
+    $e_trackback = Zaapt::Utils::Conv::to_bool( $e_trackback );
+
+    # see if we are working with a Blog or a pre-existing Entry
+    if ( $_act eq 'ins' or $_act eq 'add' ) {
+        $blog = $model->sel_blog({ b_id => $b_id });
+
+        $m->redirect('edit-b-list.html')
+            unless defined $blog;
+
+        $m->redirect('edit-b-list.html?b_id=' . uri_escape($b_id))
+            unless exists $perms->{$blog->{_edit}};
+    }
+    else {
+        $entry = $model->sel_entry({ e_id => $e_id });
+
+        $m->redirect('edit-b-list.html')
+            unless defined $entry;
+
+        $m->redirect('edit-e-list.html?b_id=' . uri_escape($entry->{b_id}))
+            unless exists $perms->{$entry->{_edit}};
+
+        $b_id = $entry->{b_id};
+    }
+
+    my $err = [];
+    my $values = {};
+
+    # let's do some of the actions
+    if ( $_act eq 'add' ) {
+        $values->{_act} = 'ins';
+        $values->{submit} = 'Add Entry';
+    }
+    elsif ( $_act eq 'ins' ) {
+        # check that these values are valid
+        unless ( Zaapt::Utils::Valid::is_valid_name($e_name, 'Name') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+        unless ( Zaapt::Utils::Valid::has_content($e_title, 'Title') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+        unless ( Zaapt::Utils::Valid::has_content($e_intro, 'Intro') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+        unless ( Zaapt::Utils::Valid::has_content($e_article, 'Article') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+
+        # no entry with this name should already exist
+        if ( $model->sel_entry_in_blog({ b_id => $b_id, e_name => $e_name }) ) {
+            push @$err, "Page with name '$e_name' already exists."
+        }
+
+        # check this type exists
+        unless ( $zaapt->get_model('Common')->sel_type({ t_id => $t_id }) ) {
+            push @$err, 'invalid type';
+        }
+
+        # do the insert
+        unless ( @$err ) {
+            $model->ins_entry({
+                a_id        => $id,
+                b_id        => $b_id,
+                e_name      => $e_name,
+                e_title     => $e_title,
+                e_intro     => $e_intro,
+                e_article   => $e_article,
+                t_id        => $t_id,
+                e_draft     => $e_draft,
+                e_comment   => $e_comment,
+                e_trackback => $e_trackback,
+            });
+            $m->redirect("edit-e-list.html?b_id=" . uri_escape( $b_id ));
+            return;
+        }
+
+        $values = { %ARGS };
+        $values->{submit} = 'Add Entry';
+    }
+    elsif ( $_act eq 'edit' ) {
+        # already checked permissions
+        $values = $entry;
+        $values->{_act} = 'upd';
+        $values->{submit} = 'Save Entry';
+    }
+    elsif ( $_act eq 'upd' ) {
+        # check that these values are valid
+        unless ( Zaapt::Utils::Valid::is_valid_name($e_name, 'Name') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+        unless ( Zaapt::Utils::Valid::has_content($e_title, 'Title') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+        unless ( Zaapt::Utils::Valid::has_content($e_intro, 'Intro') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+        unless ( Zaapt::Utils::Valid::has_content($e_article, 'Article') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+
+        # no entry with this name should already exist
+        my $check_entry = $model->sel_entry_in_blog({ b_id => $b_id, e_name => $e_name });
+        if ( $check_entry and $check_entry->{e_id} != $entry->{e_id} ) {
+            push @$err, "Entry with name '$e_name' already exists in this blog."
+        }
+
+        # check this type exists
+        unless ( $zaapt->get_model('Common')->sel_type({ t_id => $t_id }) ) {
+            push @$err, 'invalid type';
+        }
+
+        # do the insert
+        unless ( @$err ) {
+            $model->upd_entry({
+                a_id        => $id,
+                b_id        => $b_id,
+                e_name      => $e_name,
+                e_title     => $e_title,
+                e_intro     => $e_intro,
+                e_article   => $e_article,
+                t_id        => $t_id,
+                e_draft     => $e_draft,
+                e_comment   => $e_comment,
+                e_trackback => $e_trackback,
+                e_id        => $e_id,
+            });
+            $m->redirect("edit-e-list.html?b_id=" . uri_escape( $b_id ));
+            return;
+        }
+
+        $values = { %ARGS };
+        $values->{submit} = 'Save Entry';
+    }
+    elsif ( $_act eq 'rem' ) {
+        # already checked permissions
+        $values = $entry;
+        $values->{_act} = 'del';
+        $values->{submit} = 'Delete Entry';
+    }
+    elsif ( $_act eq 'del' ) {
+        # delete
+        $model->del_entry({ e_id => $e_id });
+        $m->redirect("edit-e-list.html?b_id=" . uri_escape( $b_id ));
+        return;
+    }
+    elsif ( $_act eq 'move-up') {
+        $model->upd_entry_move_up({ b_id => $b_id, e_id => $e_id });
+        $m->redirect("edit-e-list.html?b_id=" . uri_escape( $b_id ));
+        return;
+    }
+    elsif ( $_act eq 'move-dn') {
+        $model->upd_entry_move_dn({ b_id => $b_id, e_id => $e_id });
+        $m->redirect("edit-e-list.html?b_id=" . uri_escape( $b_id ));
+        return;
+    }
+
+    my $page_types = $zaapt->get_model('Common')->sel_type_all();
+    my @options = map { { value => $_->{t_id}, text => $_->{t_name} } } @$page_types;
+</%init>
+%# ----------------------------------------------------------------------------
+<h1><% $title->{$_act} | n %> an Entry</h1>
+
+<p><a href="edit-e-list.html?b_id=<% $b_id | u %>">&laquo; Back to Entry List</a></p>
+
+% if ( defined $entry ) {
+<h2>Entry: <% $entry->{e_name} | h %> - '<% $entry->{e_title} | h %>'</h2>
+% } else {
+<h2>Entry: ?</h2>
+% }
+
+<& /zaapt/common/err.mhtml, err => $err &>
+
+<& /zaapt/common/form/edit.mhtml,
+    action => '?',
+    values => $values,
+    elements => [
+        { type => 'hidden', name => '_act' },
+        { type => 'hidden', name => 'b_id', def => $b_id },
+        { type => 'hidden', name => 'e_id', def => $e_id },
+        { type => 'text', field => 'Name', name => 'e_name', size => 40, def => '' },
+        { type => 'text', field => 'Title', name => 'e_title', size => 40, def => '' },
+        { type => 'textarea', field => 'Intro', name => 'e_intro', rows => 10, cols => 40, def => '' },
+        { type => 'note', value => 'Note: The intro field is always plain text.' },
+        { type => 'textarea', field => 'Article', name => 'e_article', rows => 10, cols => 40, def => '' },
+        { type => 'select', field => 'Type', name => 't_id', options => \@options },
+        { type => 'checkbox', field => 'Draft', name => 'e_draft' },
+        { type => 'checkbox', field => 'Comment', name => 'e_comment' },
+        { type => 'checkbox', field => 'Trackback', name => 'e_trackback' },
+        { type => 'submit', name => 'submit', field => 'Actions', cancel => 1, location => 'edit-e.html?_act=ins&amp;b_id=' . uri_escape($b_id) },
+    ]
+&>
+%# ----------------------------------------------------------------------------

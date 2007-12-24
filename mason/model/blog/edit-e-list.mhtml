@@ -1,10 +1,10 @@
-%# --- ARGS -------------------------------------------------------------------
+%# ----------------------------------------------------------------------------
 <%args>
     $zaapt
     $perms
-    $b_id
+    $b_id => undef
 </%args>
-%# --- INIT -------------------------------------------------------------------
+%# ----------------------------------------------------------------------------
 <%init>
     my $model = $zaapt->get_model('Blog');
     my $blog = $model->sel_blog({ b_id => $b_id });
@@ -15,7 +15,7 @@
     $m->redirect('edit-b-list.html') unless exists $perms->{$blog->{_view}};
     my $entries = $model->sel_entry_all_in({ b_id => $b_id });
 </%init>
-%# --- HTML -------------------------------------------------------------------
+%# ----------------------------------------------------------------------------
 <h1>Entry List</h1>
 
 <p><a href="edit-b-list.html">&laquo; Back to Blog List</a></p>
@@ -25,7 +25,7 @@
 <p>
 % if ( exists $perms->{$blog->{_edit}} or exists $perms->{$blog->{_comment}} ) {
 %     if ( exists $perms->{$blog->{_edit}} ) {
-    * <a href="edit-e-add.html?b_id=<% $blog->{b_id} | u %>">Add Entry &raquo;</a><br />
+    * <a href="edit-e.html?_act=add&amp;b_id=<% $blog->{b_id} | u %>">Add Entry &raquo;</a><br />
 %     }
 %     if ( exists $perms->{$blog->{_comment}} ) {
     * <a href="edit-c-list.html?b_id=<% $blog->{b_id} | u %>">Audit Comments &raquo;</a><br />
@@ -35,28 +35,22 @@
 % }
 </p>
 
-<table class="edit">
-    <thead>
-        <tr>
-            <th class="list">Entry</th>
-            <th class="action">Actions</th>
-        </tr>
-    </thead>
-    <tbody>
+<&| /zaapt/common/admin/table-list.mhtml, title => 'Entry' &>
+
 % my $row = 1;
 % foreach my $entry ( @$entries ) {
         <tr class="r<% $row=1-$row %>">
             <td>
-                <% $entry->{e_name} | h %> (<% $entry->{e_inserted} | h %>)<br />
-                <% $entry->{e_comments} || '0' | h %> comments, <% $entry->{e_trackbacks} || '0' | h %> trackbacks<br />
+                (<% $entry->{e_id} | h %>) <strong><% $entry->{e_name} | h %></strong><br />
+                Inserted on <strong><% $entry->{e_inserted} | h %></strong><br />
+                <strong><% $entry->{e_comments} || '0' | h %></strong> comments,
+                <strong><% $entry->{e_trackbacks} || '0' | h %></strong> trackbacks<br />
             </td>
             <td>
 %         if ( exists $perms->{$blog->{_edit}} ) {
-                * <a href="edit-e-edit.html?e_id=<% $entry->{e_id} | u %>">Edit Entry</a><br />
+                * <a href="edit-e.html?_act=edit&amp;e_id=<% $entry->{e_id} | u %>">Edit Entry</a><br />
                 * <a href="edit-l-edit.html?e_id=<% $entry->{e_id} | u %>">Edit Labels</a><br />
-%             if ( exists $perms->{$blog->{_admin}} ) {
-                * <a href="edit-e-del.html?e_id=<% $entry->{e_id} | u %>">Delete</a><br />
-%             }
+                * <a href="edit-e.html?_act=rem&amp;e_id=<% $entry->{e_id} | u %>">Delete</a><br />
 %         } else {
                 -
 %         }
@@ -65,13 +59,12 @@
 % }
 % unless ( @$entries ) {
         <tr class="r0">
-            <td>No entries in this blog!</td>
+            <td>No entries in this blog</td>
             <td>
-                * <a href="edit-e-add.html?b_id=<% $blog->{b_id} | u %>">Add Entry</a>
+                * <a href="edit-e.html?_act=add&amp;b_id=<% $blog->{b_id} | u %>">Add Entry</a>
             </td>
         </tr>
 % }
-    </tbody>
-</table>
 
-%# --- END --------------------------------------------------------------------
+</&>
+%# ----------------------------------------------------------------------------

@@ -1,0 +1,73 @@
+%# ----------------------------------------------------------------------------
+<%doc>
+
+    The input args are:
+    - $domain - e.g. 'zaapt.org.nz' (no http:// or trailing slash)
+    - $path - e.g. 'calendar' (no preceeding/trailing slashes)
+
+</%doc>
+%# ----------------------------------------------------------------------------
+<%once>
+    use XML::RSS;
+    use HTML::Entities;
+    my $tm = {
+        '01' => 'Jan', '02' => 'Feb', '03' => 'Mar', '04' => 'Apr',
+        '05' => 'May', '06' => 'Jun', '07' => 'Jul', '08' => 'Aug',
+        '09' => 'Sep', '10' => 'Oct', '11' => 'Nov', '12' => 'Dec',
+    };
+</%once>
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $c_name
+    $domain
+    $path   => undef
+    $scheme => 'http://'
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $base_url = "$scheme$domain";
+    $base_url .= "/$path" if defined $path;
+
+    my $model = $zaapt->get_model('Calendar');
+    my $calendar = $model->sel_calendar_using_name({ c_name => $c_name });
+    unless ( defined $calendar ) {
+        die "Calendar '$c_name' not found.";
+        return;
+    }
+    my $events = $model->sel_event_latest_for({ c_id => $calendar->{c_id}, _limit => $calendar->{c_show} });
+
+    my $date = $events->[-1]{e_inserted};
+    $date =~ /(\d{4})-(\d{2})-(\d{2}) (\d{2}:\d{2}:\d{2})/;
+    $date = "$3 $tm->{$2} $1 $4 +1200";
+
+    my $rss = new XML::RSS (version => '2.0');
+    $rss->channel(
+        title        => $calendar->{c_description},
+        link         => "http://$domain/",
+        language     => 'en',
+        description  => $calendar->{c_description},
+        copyright    => "Copyright $domain",
+        pubDate      => $date,
+        lastBuildDate => $date,
+    );
+
+    foreach my $event ( @$events ) {
+        $event->{e_inserted} =~ /(\d{4})-(\d{2})-(\d{2}) (\d{2}:\d{2}:\d{2})/;
+        $event->{e_inserted} = "$3 $tm->{$2} $1 $4 +1200";
+
+        $rss->add_item(
+            title => $event->{e_title},
+            link => "$base_url/$event->{e_name}.html",
+            permaLink => "$base_url/$event->{e_name}.html",
+            description => HTML::Entities::encode($event->{e_intro}),
+            dc => {
+                creator => $domain,
+            },
+            pubDate => $a->{e_inserted},
+        );
+    }
+    print $rss->as_string();
+    return;
+</%init>
+%# ----------------------------------------------------------------------------

@@ -19,7 +19,6 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $c_name
     $domain
     $path   => undef
     $scheme => 'http://'
@@ -56,8 +55,8 @@
 
         $rss->add_item(
             title => $event->{e_title},
-            link => "$base_url/$event->{e_name}.html",
-            permaLink => "$base_url/$event->{e_name}.html",
+            link => "$base_url/$event->{c_name}/$event->{e_name}.html",
+            permaLink => "$base_url/$event->{c_name}/$event->{e_name}.html",
             description => HTML::Entities::encode($event->{e_intro}),
             dc => {
                 creator => $domain,

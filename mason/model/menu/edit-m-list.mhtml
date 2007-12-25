@@ -34,7 +34,7 @@
                 * <a href="edit-m.html?_act=edit&amp;m_id=<% $menu->{m_id} | u %>">Edit Details</a><br />
                 * <a href="edit-i.html?_act=add&amp;m_id=<% $menu->{m_id} | u %>">Add Item</a><br />
 %         }
-                * <a href="edit-i-list.html?m_id=<% $menu->{m_id} | u %>">List/Edit</a><br />
+                * <a href="edit-i-list.html?m_id=<% $menu->{m_id} | u %>">Item List</a><br />
 %         if ( exists $perms->{$menu->{_admin}} ) {
                 * <a href="edit-m.html?_act=rem&amp;m_id=<% $menu->{m_id} | u %>">Delete</a><br />
 %         }

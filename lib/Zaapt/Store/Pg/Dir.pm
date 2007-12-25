@@ -47,7 +47,7 @@ my $main_cols = "$table->{dir}{sql_sel_cols}, $table->{file}{sql_sel_cols}";
 my $main_tables = "$table->{dir}{sql_fqt} $join->{d_f}";
 
 # dir
-__PACKAGE__->mk_selecter( $schema, $table->{dir}{name}, $table->{dir}{prefix}, @{$table->{dir}{cols}} );
+__PACKAGE__->mk_selecter_from( $schema, $table->{dir} );
 __PACKAGE__->mk_selecter_using_from( $schema, $table->{dir}, 'name' );
 __PACKAGE__->mk_select_rows( 'sel_dir_all', "SELECT $table->{dir}{sql_sel_cols} FROM $table->{dir}{sql_fqt} ORDER BY d.id", [] );
 

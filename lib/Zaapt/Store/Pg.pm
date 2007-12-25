@@ -609,8 +609,8 @@ sub mk_select_rows {
     # create the closure
     my $method =  sub {
         my ($self, $hr) = @_;
-        warn "stm=$stm";
-        warn Dumper($hr_names);
+        # warn "stm=$stm";
+        # warn Dumper($hr_names);
         return $self->_rows( $stm, map { $hr->{$_} } @$hr_names );
     };
 

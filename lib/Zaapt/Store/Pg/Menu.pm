@@ -52,7 +52,7 @@ my $main_cols = "$tables->{menu}{sql_sel_cols}, $tables->{item}{sql_sel_cols}";
 my $main_tables = "$tables->{menu}{sql_fqt} $join->{m_i}";
 
 # menu
-__PACKAGE__->_mk_selecter( $schema, $tables->{menu} );
+__PACKAGE__->mk_selecter_from( $schema, $tables->{menu} );
 __PACKAGE__->mk_selecter_using_from( $schema, $tables->{menu}, 'name' );
 __PACKAGE__->mk_select_rows( 'sel_menu_all', "SELECT $tables->{menu}{sql_sel_cols} FROM $tables->{menu}{sql_fqt} ORDER BY m.name", [] );
 

@@ -1,0 +1,216 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $perms
+    $_act          => 'add'
+    $d_id          => undef
+    $d_name        => ''
+    $d_title       => ''
+    $d_description => ''
+    $d_path        => ''
+    $d_webdir      => ''
+    $_admin        => ''
+    $_view         => ''
+    $_edit         => ''
+</%args>
+%# ----------------------------------------------------------------------------
+<%once>
+    use URI::Escape;
+
+    my $heading = {
+        add => 'Add',
+        ins => 'Add',
+        edit => 'Edit',
+        upd  => 'Edit',
+        del  => 'Delete',
+    };
+</%once>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Dir');
+
+    $m->redirect('edit-d-list.html') unless exists $perms->{super};
+
+    $d_description = Zaapt::Utils::Conv::remove_cr( $d_description );
+
+    my $err = [];
+    my $values = {};
+    my $dir;
+
+    unless ( $_act eq 'add' or $_act eq 'ins' ) {
+        # get 'dir', check permissions
+        $dir = $model->sel_dir({ d_id => $d_id });
+        $m->redirect('edit-d-list.html') unless defined $dir;
+        $m->redirect('edit-d-list.html?d_id=$dir->{d_id}') unless exists $perms->{$dir->{_admin}};
+    }
+
+    # let's do some of the actions
+    if ( $_act eq 'add' ) {
+        $values->{_act} = 'ins';
+        $values->{submit} = 'Add Dir';
+    }
+    elsif ( $_act eq 'ins' ) {
+        # check that these values are valid
+        unless ( Zaapt::Utils::Valid::is_valid_name($d_name, 'Name') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+
+        # no Dir of this name should already exist
+        if ( $model->sel_dir_using_name({ d_name => $d_name }) ) {
+            push @$err, "Dir name '$d_name' already exists."
+        }
+
+        unless ( Zaapt::Utils::Valid::has_content($d_title, 'Title') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+
+        # ToDo: check that path, path/original, mapping are all valid dir-like names
+        unless ( Zaapt::Utils::Valid::has_content($d_path, 'Path') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+
+        unless ( Zaapt::Utils::Valid::has_content($d_webdir, 'Web Mapping') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+
+        # make sure that the path directory exists
+        unless ( @$err ) {
+            unless ( -d $d_path ) {
+                if ( ! mkdir $d_path ) {
+                    push @$err, "directory 'd_path' doesn't exist and couldn't be created";
+                }
+            }
+        }
+
+        # do the insert
+        unless ( @$err ) {
+            $model->ins_dir({
+                d_name        => $d_name,
+                d_title       => $d_title,
+                d_description => $d_description,
+                d_path        => $d_path,
+                d_webdir      => $d_webdir,
+                _admin        => $_admin,
+                _view         => $_view,
+                _edit         => $_edit,
+            });
+            $m->redirect("edit-d-list.html");
+            return;
+        }
+
+        $values = { %ARGS };
+        $values->{submit} = 'Add Dir';
+    }
+    elsif ( $_act eq 'edit' ) {
+        $values = $dir;
+        $values->{_act} = 'upd';
+        $values->{submit} = 'Save Dir';
+    }
+    elsif ( $_act eq 'upd' ) {
+        # check that these values are valid
+        unless ( Zaapt::Utils::Valid::is_valid_name($d_name, 'Name') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+
+        # no Dir of this name should already exist
+        my $check_dir = $model->sel_dir_using_name({ d_name => $d_name });
+        if ( $check_dir and $check_dir->{d_id} != $d_id ) {
+            push @$err, "Dir name '$d_name' already exists."
+        }
+
+        unless ( Zaapt::Utils::Valid::has_content($d_title, 'Title') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+
+        # ToDo: check that path, path/original, mapping are all valid dir-like names
+        unless ( Zaapt::Utils::Valid::has_content($d_path, 'Path') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+
+        unless ( Zaapt::Utils::Valid::has_content($d_webdir, 'Web Mapping') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+
+        # make sure that the path directory exists
+        unless ( @$err ) {
+            unless ( -d $d_path ) {
+                if ( ! mkdir $d_path ) {
+                    push @$err, "directory 'd_path' doesn't exist and couldn't be created";
+                }
+            }
+        }
+
+        # do the update
+        unless ( @$err ) {
+            $model->upd_dir({
+                d_name        => $d_name,
+                d_title       => $d_title,
+                d_description => $d_description,
+                d_path        => $d_path,
+                d_webdir      => $d_webdir,
+                _admin        => $_admin,
+                _view         => $_view,
+                _edit         => $_edit,
+                d_id          => $d_id,
+            });
+            $m->redirect("edit-d-list.html");
+            return;
+        }
+
+        $values = { %ARGS };
+        $values->{submit} = 'Add Dir';
+    }
+    elsif ( $_act eq 'rem' ) {
+        $values = $dir;
+        $values->{_act} = 'del';
+        $values->{submit} = 'Delete Dir';
+    }
+    elsif ( $_act eq 'del' ) {
+        # delete
+        $model->del_dir({ d_id => $d_id });
+        $m->redirect("edit-d-list.html");
+        return;
+    }
+
+    # create the dropdown options for each role
+    my $options = $m->comp('/zaapt/common/permission_options.mhtml', zaapt => $zaapt);
+</%init>
+%# ----------------------------------------------------------------------------
+<h1><% $heading->{$_act} | n %> a Dir</h1>
+
+<p><a href="edit-d-list.html">&laquo; Back to Dir List</a></p>
+
+% if ( defined $dir ) {
+<h2>Dir: <% $dir->{d_name} | h %> - '<% $dir->{d_title} | h %>'</h2>
+% } else {
+<h2>Dir: ?</h2>
+% }
+
+<& /zaapt/common/err.mhtml, err => $err &>
+
+<& /zaapt/common/form/edit.mhtml,
+    action => '?',
+    values => $values,
+    elements => [
+        { type => 'hidden', name => '_act' },
+        { type => 'hidden', name => 'd_id', def => '' },
+        { type => 'text', field => 'Name', name => 'd_name', size => 40, def => '' },
+        { type => 'text', field => 'Title', name => 'd_title', size => 40, def => '' },
+        { type => 'textarea', field => 'Description', name => 'd_description', rows => 10, cols => 40, def => '' },
+
+        { type => 'text', field => 'Base Path', name => 'd_path', def => '' },
+        { type => 'note', value => "Note: This is the base dir where all uploaded pictures will be stored (e.g. '/var/lib/pkgname/files')." },
+        { type => 'text', field => 'Web Location:', name => 'd_webdir', def => '' },
+        { type => 'note', value => "Note: The path where the files are mapped through in the web server (e.g. 'files')" },
+
+        { type => 'select', field => 'Admin Perm', name => '_admin', options => $options },
+        { type => 'note', def => "Note: Allows this user to delete this entire dir." },
+        { type => 'select', field => 'View Perm', name => '_view', options => $options },
+        { type => 'note', def => "Note: Allows this user to view all files." },
+        { type => 'select', field => 'Edit Perm', name => '_edit', options => $options },
+        { type => 'note', def => "Note: Allows this user to add, edit and delete files." },
+
+        { type => 'submit', name => 'submit', field => 'Actions', cancel => 1, location => 'edit-d-list.html' },
+    ]
+&>
+%# ----------------------------------------------------------------------------

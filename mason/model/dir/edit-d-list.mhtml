@@ -11,11 +11,11 @@
 %# ----------------------------------------------------------------------------
 <h1>Dir List</h1>
 
-<p>
 % if ( exists $perms->{super} ) {
-    * <a href="edit-d-add.html">Add Dir &raquo;</a><br />
-% }
+<p>
+    * <a href="edit-d.html?_act=add">Add Dir &raquo;</a><br />
 </p>
+% }
 
 <&| /zaapt/common/admin/table-edit.mhtml, title => 'Dir' &>
 
@@ -24,19 +24,21 @@
 %     next unless exists $perms->{$dir->{_view}};
         <tr class="r<% $r++%2 %>">
             <td>
-                <% $dir->{d_name} | h %> (<% $dir->{d_total} | h %> files)<br />
-                path: <% $dir->{d_path} | h %><br />
-                webdir: <% $dir->{d_webdir} | h %>
+                (<% $dir->{d_id} | h %>) <% $dir->{d_name} | h %> (<strong><% $dir->{d_total} | h %></strong> files)<br />
+                <strong><% $dir->{d_title} | h %></strong><br />
+                path: <strong><% $dir->{d_path} | h %></strong><br />
+                webdir: <strong><% $dir->{d_webdir} | h %></strong>
             </td>
             <td>
+%         if ( exists $perms->{$dir->{_admin}} ) {
+                * <a href="edit-d.html?_act=edit&amp;d_id=<% $dir->{d_id} | u %>">Edit Details</a><br />
+%         }
 %         if ( exists $perms->{$dir->{_edit}} ) {
-                * <a href="edit-f-add.html?d_id=<% $dir->{d_id} | u %>">Add File</a><br />
-                * <a href="edit-f-list.html?d_id=<% $dir->{d_id} | u %>">File List</a><br />
-%             if ( exists $perms->{$dir->{_admin}} ) {
-                * <a href="edit-d-del.html?d_id=<% $dir->{d_id} | u %>">Delete</a><br />
-%             }
-%         } else {
-                -
+                * <a href="edit-f.html?_act=add&amp;d_id=<% $dir->{f_id} | u %>">Add File</a><br />
+%         }
+                * <a href="edit-f-list.html?d_id=<% $dir->{f_id} | u %>">File List</a><br />
+%         if ( exists $perms->{$dir->{_admin}} ) {
+                * <a href="edit-d.html?_act=rem&amp;d_id=<% $dir->{d_id} | u %>">Delete</a><br />
 %         }
             </td>
         </tr>
@@ -45,7 +47,11 @@
         <tr class="r0">
             <td>no dirs found</td>
             <td>
-                * <a href="edit-d-add.html">Add Dir</a>
+%     if ( exists $perms->{super} ) {
+                * <a href="edit-d.html?_act=add">Add Dir</a>
+% } else {
+                * No Actions
+% }
             </td>
         </tr>
 % }

@@ -31,9 +31,6 @@
     my ($news, $article);
 
     # some data manipulation
-    $a_title   = undef unless Zaapt::Utils::Valid::has_content( $a_title );
-    $a_intro   = undef unless Zaapt::Utils::Valid::has_content( $a_intro );
-    $a_article = undef unless Zaapt::Utils::Valid::has_content( $a_article );
     $a_title   = Zaapt::Utils::Conv::remove_cr( $a_title );
     $a_intro   = Zaapt::Utils::Conv::remove_cr( $a_intro );
     $a_article = Zaapt::Utils::Conv::remove_cr( $a_article );

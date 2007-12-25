@@ -11,11 +11,11 @@
 %# ----------------------------------------------------------------------------
 <h1>Calendar List</h1>
 
-<p>
 % if ( exists $perms->{super} ) {
+<p>
     * <a href="edit-c.html?_act=add">Add Calendar &raquo;</a><br />
-% }
 </p>
+% }
 
 <&| /zaapt/common/admin/table-list.mhtml, title => 'Calendar' &>
 

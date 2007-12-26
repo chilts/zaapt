@@ -25,7 +25,7 @@
 
 <p>
 % if ( exists $perms->{$dir->{_edit}} ) {
-    * <a href="edit-f-add.html?d_id=<% $dir->{d_id} | u %>">Add File &raquo;</a><br />
+    * <a href="edit-f.html?_act=add&amp;d_id=<% $dir->{d_id} | u %>">Add File &raquo;</a><br />
 % } else {
     * No Actions
 % }
@@ -37,16 +37,17 @@
 % foreach my $file ( @$files ) {
     <tr class="r<% $r++%2 %>">
         <td>
-            <% $file->{f_name} | h %> (<% $file->{f_inserted} | h %>)<br />
+            (<% $file->{f_id} | h %>) <% $file->{f_name} | h %> (<% $file->{f_inserted} | h %>)<br />
             <strong><% $file->{f_title} | h %></strong><br />
             new filename: <strong><% $file->{f_name} | h %>.<% $file->{f_ext} | h %></strong><br />
             original filename: <strong><% $file->{f_filename} | h %></strong><br />
         </td>
         <td>
 %     if ( exists $perms->{$dir->{_edit}} ) {
-        * <a href="edit-f-del.html?f_id=<% $file->{f_id} | u %>">Delete</a><br />
+            * <a href="edit-f.html?_act=edit&amp;f_id=<% $file->{f_id} | u %>">Edit File</a><br />
+            * <a href="edit-f.html?_act=rem&amp;f_id=<% $file->{f_id} | u %>">Delete</a><br />
 %     } else {
-        -
+            -
 %     }
         </td>
     </tr>
@@ -55,7 +56,7 @@
     <tr class="r0">
         <td>no files yet in this dir</td>
         <td>
-            * <a href="edit-f-add.html?d_id=<% $dir->{d_id} | u %>">Add File</a>
+            * <a href="edit-f.html?_act=add&amp;d_id=<% $dir->{d_id} | u %>">Add File</a>
         </td>
     </tr>
 % }

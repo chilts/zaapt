@@ -1,0 +1,234 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $perms
+    $_act          => 'add'
+    $d_id          => undef
+    $f_id          => undef
+    $f_name        => ''
+    $f_title       => ''
+    $f_file        => ''
+    $f_description => ''
+</%args>
+%# ----------------------------------------------------------------------------
+<%once>
+    use Zaapt::Utils::Valid;
+    use Zaapt::Utils::Conv;
+    use URI::Escape;
+
+    my $title = {
+        add => 'Add',
+        ins => 'Add',
+        edit => 'Edit',
+        upd  => 'Edit',
+        del  => 'Delete',
+    };
+</%once>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Dir');
+
+    my ($dir, $file);
+
+    # some data manipulation
+    $f_description = Zaapt::Utils::Conv::remove_cr( $f_description );
+
+    # see if we are working with a Dir or a pre-existing File
+    if ( $_act eq 'ins' or $_act eq 'add' ) {
+        $dir = $model->sel_dir({ d_id => $d_id });
+
+        $m->redirect('edit-d-list.html')
+            unless defined $dir;
+
+        $m->redirect('edit-d-list.html?d_id=' . uri_escape($d_id))
+            unless exists $perms->{$dir->{_edit}};
+    }
+    else {
+        $file = $model->sel_file({ f_id => $f_id });
+
+        $m->redirect('edit-d-list.html')
+            unless defined $file;
+
+        $m->redirect('edit-f-list.html?d_id=' . uri_escape($file->{d_id}))
+            unless exists $perms->{$file->{_edit}};
+
+        $d_id = $file->{d_id};
+    }
+
+    my $err = [];
+    my $values = {};
+
+    # let's do some of the actions
+    if ( $_act eq 'add' ) {
+        $values->{_act} = 'ins';
+        $values->{submit} = 'Add File';
+    }
+    elsif ( $_act eq 'ins' ) {
+        # check that these values are valid
+        unless ( Zaapt::Utils::Valid::is_valid_name($f_name) ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+
+        unless ( Zaapt::Utils::Valid::has_content($f_title, 'Title') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+
+        # no file with this name should already exist
+        if ( $model->sel_file_using_name({ d_id => $d_id, f_name => $f_name }) ) {
+            push @$err, "File with name '$f_name' already exists."
+        }
+
+        my $upload = $r->upload('f_file');
+        unless ( defined $upload ) {
+            push @$err, "please specify a file to upload";
+        }
+
+        # now, let's get the file and save it somewhere
+        my $f_filename;
+        unless ( @$err ) {
+            # get the input filename
+            $f_filename = $upload->upload_filename();
+
+            if ( $f_filename eq '' ) {
+                push @$err, 'please specify a file to upload';
+            }
+        }
+
+        # do the insert
+        unless ( @$err ) {
+            # create the output filename
+            my ($f_ext) = $f_filename =~ m{ \. (\w+) \z }xms;
+            $f_ext ||= '';
+            my $filename = "$dir->{d_path}/$f_name" . ( $f_ext ? ".$f_ext" : '' );
+
+            # copy the incoming file
+            $upload->upload_link( $filename );
+
+            $model->ins_file({
+                d_id          => $d_id,
+                f_name        => $f_name,
+                f_ext         => $f_ext,
+                f_title       => $f_title,
+                f_description => $f_description,
+                f_filename    => $f_filename,
+            });
+            $m->redirect("edit-f-list.html?d_id=" . uri_escape( $d_id ));
+            return;
+        }
+
+        $values = { %ARGS };
+        $values->{submit} = 'Add File';
+    }
+    elsif ( $_act eq 'edit' ) {
+        # already checked permissions
+        $values = $file;
+        $values->{_act} = 'upd';
+        $values->{submit} = 'Save File';
+    }
+    elsif ( $_act eq 'upd' ) {
+        unless ( Zaapt::Utils::Valid::is_valid_name($f_name) ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+        unless ( Zaapt::Utils::Valid::has_content($f_title, 'Title') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+
+        # no file with this name should already exist (but only if it isn't this one)
+        my $check_file = $model->sel_file_using_name({ d_id => $d_id, f_name => $f_name });
+        if ( $check_file and $check_file->{f_id} != $f_id ) {
+            push @$err, "File with name '$f_name' already exists."
+        }
+
+        # ToDo: the upload should be optional here, not compulsory
+
+        my $upload = $r->upload('f_file');
+        unless ( defined $upload ) {
+            push @$err, "please specify a file to upload";
+        }
+
+        # now, let's get the file and save it somewhere
+        my $f_filename;
+        unless ( @$err ) {
+            # get the input filename
+            $f_filename = $upload->upload_filename();
+
+            if ( $f_filename eq '' ) {
+                push @$err, 'please specify a file to upload';
+            }
+        }
+
+        # do the insert
+        unless ( @$err ) {
+            # create the output filename
+            my ($f_ext) = $f_filename =~ m{ \. (\w+) \z }xms;
+            $f_ext ||= '';
+            my $filename = "$file->{d_path}/$f_name" . ( $f_ext ? ".$f_ext" : '' );
+
+            # ToDo: see if the new and the old names are the same (so rename the file too)
+
+            # remove the old file and copy the incoming file
+            unlink $filename;
+            $upload->upload_link( $filename );
+
+            $model->upd_file({
+                f_name        => $f_name,
+                f_ext         => $f_ext,
+                f_title       => $f_title,
+                f_description => $f_description,
+                f_filename    => $f_filename, # will eventually become optional
+                f_id          => $f_id,
+            });
+            $m->redirect("edit-f-list.html?d_id=" . uri_escape( $d_id ));
+            return;
+        }
+
+        $values = { %ARGS };
+        $values->{submit} = 'Save File';
+    }
+    elsif ( $_act eq 'rem' ) {
+        # already checked permissions
+        $values = $file;
+        $values->{_act} = 'del';
+        $values->{submit} = 'Delete File';
+    }
+    elsif ( $_act eq 'del' ) {
+        # delete
+        $model->del_file({ f_id => $f_id });
+        my $full_path = "$file->{d_path}/$file->{f_name}" . ( $file->{f_ext} ? ".$file->{f_ext}" : '' );
+        unlink $full_path;
+        $m->redirect("edit-f-list.html?d_id=" . uri_escape( $d_id ));
+        return;
+    }
+
+    my $options = $m->comp('/zaapt/common/options-type.mas', zaapt => $zaapt);
+</%init>
+%# ----------------------------------------------------------------------------
+<h1><% $title->{$_act} | n %> a File</h1>
+
+<p><a href="edit-f-list.html?d_id=<% $d_id | u %>">&laquo; Back to File List</a></p>
+
+% if ( defined $file ) {
+<h2>File: <% $file->{f_name} | h %></h2>
+% } else {
+<h2>File: ?</h2>
+% }
+
+<& /zaapt/common/err.mhtml, err => $err &>
+
+<& /zaapt/common/form/edit.mhtml,
+    action => '?',
+    multipart => 1,
+    values => $values,
+    elements => [
+        { type => 'hidden', name => '_act' },
+        { type => 'hidden', name => 'd_id', def => $d_id },
+        { type => 'hidden', name => 'f_id', def => $f_id },
+        { type => 'text', field => 'Name', name => 'f_name', size => 40, def => '' },
+        { type => 'text', field => 'Title', name => 'f_title', size => 40, def => '' },
+        { type => 'file', field => 'File', name => 'f_file' },
+        { type => 'textarea', field => 'Description', name => 'f_description', rows => 10, cols => 40, def => '' },
+
+        { type => 'submit', name => 'submit', field => 'Actions', cancel => 1, location => 'edit-f-list.html?d_id=' . uri_escape($d_id) },
+    ]
+&>
+%# ----------------------------------------------------------------------------

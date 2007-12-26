@@ -34,9 +34,9 @@
                 * <a href="edit-d.html?_act=edit&amp;d_id=<% $dir->{d_id} | u %>">Edit Details</a><br />
 %         }
 %         if ( exists $perms->{$dir->{_edit}} ) {
-                * <a href="edit-f.html?_act=add&amp;d_id=<% $dir->{f_id} | u %>">Add File</a><br />
+                * <a href="edit-f.html?_act=add&amp;d_id=<% $dir->{d_id} | u %>">Add File</a><br />
 %         }
-                * <a href="edit-f-list.html?d_id=<% $dir->{f_id} | u %>">File List</a><br />
+                * <a href="edit-f-list.html?d_id=<% $dir->{d_id} | u %>">File List</a><br />
 %         if ( exists $perms->{$dir->{_admin}} ) {
                 * <a href="edit-d.html?_act=rem&amp;d_id=<% $dir->{d_id} | u %>">Delete</a><br />
 %         }

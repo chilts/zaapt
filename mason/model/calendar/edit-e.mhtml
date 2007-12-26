@@ -15,9 +15,6 @@
     $e_allday      => 0
     $e_location    => ''
     $e_link        => ''
-    $e_lat         => ''
-    $e_lng         => ''
-    $e_zoom        => ''
 </%args>
 %# ----------------------------------------------------------------------------
 <%once>
@@ -44,9 +41,6 @@
     $e_allday = Zaapt::Utils::Conv::to_bool( $e_allday );
     $e_location = undef unless Zaapt::Utils::Valid::has_content( $e_location );
     $e_link     = undef unless Zaapt::Utils::Valid::has_content( $e_link     );
-    $e_lat      = undef unless Zaapt::Utils::Valid::has_content( $e_lat      );
-    $e_lng      = undef unless Zaapt::Utils::Valid::has_content( $e_lng      );
-    $e_zoom     = undef unless Zaapt::Utils::Valid::has_content( $e_zoom     );
 
     # see if we are working with a Calendar or a pre-existing Event
     if ( $_act eq 'ins' or $_act eq 'add' ) {
@@ -92,26 +86,6 @@
         unless ( Zaapt::Utils::Valid::is_datetime($e_endts, 'Start End') ) {
             push @$err, Zaapt::Utils::Valid::err();
         }
-        if ( defined $e_lat ) {
-            unless ( Zaapt::Utils::Valid::is_lat($e_lat, 'Latitude') ) {
-                push @$err, Zaapt::Utils::Valid::err();
-            }
-        }
-        if ( defined $e_lng ) {
-            unless ( Zaapt::Utils::Valid::is_lng($e_lng, 'Longitude') ) {
-                push @$err, Zaapt::Utils::Valid::err();
-            }
-        }
-        if ( defined $e_zoom ) {
-            unless ( Zaapt::Utils::Valid::is_zoom($e_zoom, 'Zoom') ) {
-                push @$err, Zaapt::Utils::Valid::err();
-            }
-        }
-        if ( defined $e_lat or defined $e_lng or defined $e_zoom ) {
-            unless ( defined $e_lat and defined $e_lng and defined $e_zoom ) {
-                push @$err, "if specifying one of Latitude, Longitude and Zoom, you must specify all three";
-            }
-        }
 
         # no Event of this name should already exist in this Calendar
         unless ( @$err ) {
@@ -134,9 +108,6 @@
                 e_allday      => $e_allday,
                 e_location    => $e_location,
                 e_link        => $e_link,
-                e_lat         => $e_lat,
-                e_lng         => $e_lng,
-                e_zoom        => $e_zoom,
             });
             $m->redirect("edit-e-list.html?c_id=" . uri_escape($c_id));
             return;
@@ -165,26 +136,6 @@
         unless ( Zaapt::Utils::Valid::is_datetime($e_endts, 'Start End') ) {
             push @$err, Zaapt::Utils::Valid::err();
         }
-        if ( defined $e_lat ) {
-            unless ( Zaapt::Utils::Valid::is_lat($e_lat, 'Latitude') ) {
-                push @$err, Zaapt::Utils::Valid::err();
-            }
-        }
-        if ( defined $e_lng ) {
-            unless ( Zaapt::Utils::Valid::is_lng($e_lng, 'Longitude') ) {
-                push @$err, Zaapt::Utils::Valid::err();
-            }
-        }
-        if ( defined $e_zoom ) {
-            unless ( Zaapt::Utils::Valid::is_zoom($e_zoom, 'Zoom') ) {
-                push @$err, Zaapt::Utils::Valid::err();
-            }
-        }
-        if ( defined $e_lat or defined $e_lng or defined $e_zoom ) {
-            unless ( defined $e_lat and defined $e_lng and defined $e_zoom ) {
-                push @$err, "if specifying one of Latitude, Longitude and Zoom, you must specify all three";
-            }
-        }
 
         # do the update
         unless ( @$err ) {
@@ -200,9 +151,6 @@
                 e_allday      => $e_allday,
                 e_location    => $e_location,
                 e_link        => $e_link,
-                e_lat         => $e_lat,
-                e_lng         => $e_lng,
-                e_zoom        => $e_zoom,
                 e_id          => $e_id,
             });
             $m->redirect("edit-e-list.html?c_id=" . uri_escape($c_id));
@@ -261,10 +209,6 @@
 
         { type => 'text', field => 'Location', name => 'e_location', size => 40, def => '' },
         { type => 'text', field => 'Link', name => 'e_link', size => 40, def => '' },
-
-        { type => 'text', field => 'Lat', id => 'e_lat', name => 'e_lat', size => 15, def => '' },
-        { type => 'text', field => 'Lng', id => 'e_lng', name => 'e_lng', size => 15, def => '' },
-        { type => 'text', field => 'Zoom', id => 'e_zoom', name => 'e_zoom', size => 3, def => '' },
 
         { type => 'submit', name => 'submit', field => 'Actions', cancel => 1, location => 'edit-e-list.html?c_id=' . uri_escape($c_id) },
     ]

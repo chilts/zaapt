@@ -39,7 +39,6 @@
                 (<% $event->{e_id} | h %>) <strong><% $event->{e_name} | h %></strong><br />
                 <% $event->{e_title} | h %><br />
                 <a href="<% $event->{e_link} | h %>"><% $event->{e_link} | h %></a><br />
-                <strong>(<% $event->{e_lat} | h %>, <% $event->{e_lng} | h %>)</strong> @ <% $event->{e_zoom} | h %><br />
             </td>
             <td>
 %         if ( exists $perms->{$event->{_edit}} ) {

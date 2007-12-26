@@ -37,10 +37,4 @@
     Link: <a href="<% $event->{e_link} | h %>"><% $event->{e_link} | h %></a><br />
 % }
 </p>
-
-% if ( defined $event->{e_zoom} ) {
-<h2>Map</h2>
-
-<p>(<% $event->{e_lat} | h %>, <% $event->{e_lng} | h %>) at Zoom <% $event->{e_zoom} | h %></p>
-% }
 %# ----------------------------------------------------------------------------

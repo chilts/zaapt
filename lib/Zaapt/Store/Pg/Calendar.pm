@@ -28,7 +28,7 @@ my $tables = {
             'id',
             [ 'calendar_id', 'fk', 'c_id' ],
             [ 'type_id', 'fk', 't_id' ],
-            qw(name title intro description dt:startts dt:endts allday location link lat lng zoom ts:inserted ts:updated) ],
+            qw(name title intro description dt:startts dt:endts allday location link ts:inserted ts:updated) ],
     },
     type => Zaapt::Store::Pg::Common->_get_table( 'type' ),
 };
@@ -54,7 +54,7 @@ my $main_cols = "$tables->{calendar}{sql_sel_cols}, $tables->{event}{sql_sel_col
 my $main_tables = "$tables->{calendar}{sql_fqt} $join->{c_e} $join->{e_t}";
 
 # calendar
-__PACKAGE__->_mk_selecter( $schema, $tables->{calendar} );
+__PACKAGE__->mk_selecter_from( $schema, $tables->{calendar} );
 __PACKAGE__->mk_selecter_using_from( $schema, $tables->{calendar}, 'name' );
 __PACKAGE__->mk_select_rows( 'sel_calendar_all', "SELECT $tables->{calendar}{sql_sel_cols} FROM $tables->{calendar}{sql_fqt} ORDER BY c.id", [] );
 

@@ -41,9 +41,6 @@ CREATE TABLE calendar.event (
     allday          BOOLEAN NOT NULL,
     location        TEXT,
     link            TEXT,
-    lat             FLOAT,
-    lng             FLOAT,
-    zoom            INTEGER,
 
     UNIQUE(calendar_id, name),
     LIKE base       INCLUDING DEFAULTS

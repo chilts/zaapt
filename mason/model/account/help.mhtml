@@ -1,0 +1,117 @@
+%# ----------------------------------------------------------------------------
+<%doc>
+
+    This is the help page for the 'Account' model.
+
+    (If you require individual pages, split them off as
+    'help-permissions.mhtml', 'help-entities.mhtml', 'help-components.mhtml' or
+    'help-???.mhtml' as you see fit.)
+
+</%doc>
+%# ----------------------------------------------------------------------------
+<h1>Account Help</h1>
+
+<p>
+    The 'account' model helps you manage accounts only.
+</p>
+
+<h2>Permissions Required</h2>
+
+<p>
+    Since 'Accounts' are not content models no permissions are assigned to
+    them. Instead, to perform any of the tasks from within the admin interface,
+    you must have the <strong>super</strong> permission.
+</p>
+
+<h2>Entities</h2>
+
+<h3>account.account</h3>
+
+<p>
+    A 'account' has the following attributes:
+</p>
+
+<ul>
+    <li>username - unique username for each account</li>
+    <li>firstname - user's firstname</li>
+    <li>lastname - user's lastname</li>
+    <li>email - email address</li>
+    <li>notify - whether the user wishes to be notified of site updates</li>
+    <li>salt - the salt for the password</li>
+    <li>password - password (encoded as md5(salt + password)</li>
+    <li>confirmed - whether the new account has been confirmed</li>
+    <li>admin - (boolean) whether this user is an administrator</li>
+    <li>logins - the number of times the user has logged in</li>
+    <li>last - the last time the user logged in</li>
+</ul>
+
+<p>
+    [Describe here what each field does.]
+</p>
+
+<h3>account.permission</h3>
+
+<ul>
+    <li>name</li>
+    <li>description</li>
+</ul>
+
+<p>
+    [Describe here what each field does.]
+</p>
+
+<h3>account.pa</h3>
+
+<ul>
+    <li>account.role_id</li>
+    <li>account.permission_id</li>
+</ul>
+
+<p>
+    [Describe here what each field does.]
+</p>
+
+<h3>account.role</h3>
+
+<ul>
+    <li>name</li>
+    <li>description</li>
+</ul>
+
+<p>
+    [Describe here what each field does.]
+</p>
+
+<h3>account.ra</h3>
+
+<ul>
+    <li>account.account_id</li>
+    <li>account.role_id</li>
+</ul>
+
+<p>
+    [Describe here what each field does.]
+</p>
+
+<h3>account.confirm</h3>
+
+<ul>
+    <li>account.account_id</li>
+    <li>code - the unique code which must be known to confirm this account</li>
+</ul>
+
+<p>
+    [Describe here what each field does.]
+</p>
+
+<h2>Components</h2>
+
+<p>
+    [Describe here of all the view/user components and when you might want to
+    override them.
+</p>
+
+<p>
+    (Ends)
+</p>
+%# ----------------------------------------------------------------------------

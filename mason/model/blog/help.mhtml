@@ -1,0 +1,85 @@
+%# ----------------------------------------------------------------------------
+<%doc>
+
+    This is the help page for the 'blog' model.
+
+    (If you require individual pages, split them off as
+    'help-permissions.mhtml', 'help-entities.mhtml', 'help-components.mhtml' or
+    'help-???.mhtml' as you see fit.)
+
+</%doc>
+%# ----------------------------------------------------------------------------
+<h1>blog Help</h1>
+
+<p>
+    The blog model helps you manage blogs and their associated entries.
+</p>
+
+<h2>Permissions Required</h2>
+
+<p>
+    Each blog had three permissions which determine who can change what in
+    that particular entry.
+</p>
+
+<dl>
+    <dt>admin</dt>
+    <dd>
+        allows you to change the attributes of the <strong>blog</strong>
+        itself
+    </dd>
+
+    <dt>view</dt>
+    <dd>
+        allows you to see the list of <strong>entries</strong> in the admin
+        interface
+    </dd>
+
+    <dt>edit</dt>
+    <dd>
+        allows you to add/edit and delete <strong>entries</strong> from this
+        <strong>blog</strong>
+    </dd>
+</dl>
+
+<h2>Entities</h2>
+
+<h3>blog</h3>
+
+<p>
+    A blog has the following attributes:
+</p>
+
+<ul>
+    <li>...</li>
+</ul>
+
+<h3>entry</h3>
+
+<p>
+    Each entry is associated with a blog.
+</p>
+
+<p>
+    A entry has the following attributes:
+</p>
+
+<ul>
+    <li>...</li>
+</ul>
+
+<p>
+    [Describe here what each field does.]
+</p>
+
+<h2>Components</h2>
+
+<p>
+    [Describe here of all the view/user components and when you might want to
+    override them.
+</p>
+
+<p>
+    (Ends)
+</p>
+%# ----------------------------------------------------------------------------

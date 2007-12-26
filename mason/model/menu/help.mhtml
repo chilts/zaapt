@@ -1,0 +1,85 @@
+%# ----------------------------------------------------------------------------
+<%doc>
+
+    This is the help page for the 'menu' model.
+
+    (If you require individual pages, split them off as
+    'help-permissions.mhtml', 'help-entities.mhtml', 'help-components.mhtml' or
+    'help-???.mhtml' as you see fit.)
+
+</%doc>
+%# ----------------------------------------------------------------------------
+<h1>menu Help</h1>
+
+<p>
+    The menu model helps you manage menus and their associated items.
+</p>
+
+<h2>Permissions Required</h2>
+
+<p>
+    Each menu had three permissions which determine who can change what in
+    that particular item.
+</p>
+
+<dl>
+    <dt>admin</dt>
+    <dd>
+        allows you to change the attributes of the <strong>menu</strong>
+        itself
+    </dd>
+
+    <dt>view</dt>
+    <dd>
+        allows you to see the list of <strong>items</strong> in the admin
+        interface
+    </dd>
+
+    <dt>edit</dt>
+    <dd>
+        allows you to add/edit and delete <strong>items</strong> from this
+        <strong>menu</strong>
+    </dd>
+</dl>
+
+<h2>Entities</h2>
+
+<h3>menu</h3>
+
+<p>
+    A menu has the following attributes:
+</p>
+
+<ul>
+    <li>...</li>
+</ul>
+
+<h3>item</h3>
+
+<p>
+    Each item is associated with a menu.
+</p>
+
+<p>
+    A item has the following attributes:
+</p>
+
+<ul>
+    <li>...</li>
+</ul>
+
+<p>
+    [Describe here what each field does.]
+</p>
+
+<h2>Components</h2>
+
+<p>
+    [Describe here of all the view/user components and when you might want to
+    override them.
+</p>
+
+<p>
+    (Ends)
+</p>
+%# ----------------------------------------------------------------------------

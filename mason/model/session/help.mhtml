@@ -1,0 +1,53 @@
+%# ----------------------------------------------------------------------------
+<%doc>
+
+    This is the help page for the 'Session' model.
+
+    (If you require individual pages, split them off as
+    'help-permissions.mhtml', 'help-entities.mhtml', 'help-components.mhtml' or
+    'help-???.mhtml' as you see fit.)
+
+</%doc>
+%# ----------------------------------------------------------------------------
+<h1>Session Help</h1>
+
+<p>
+    The 'session' model helps you manage sessions only. In fact, there are no
+    editing functions (currently) for sessions in the admin interface. This may
+    change in the future.
+</p>
+
+<h2>Permissions Required</h2>
+
+<p>
+    Since there are currently no functions in the admin interface, no
+    permissions are required for this model.
+</p>
+
+<h2>Entities</h2>
+
+<h3>Session</h3>
+
+<p>
+    A 'session' has the following attributes:
+</p>
+
+<ul>
+    <li>a_session - the session itself</li>
+</ul>
+
+<p>
+    [Describe here what each field does.]
+</p>
+
+<h2>Components</h2>
+
+<p>
+    [Describe here of all the view/user components and when you might want to
+    override them.
+</p>
+
+<p>
+    (Ends)
+</p>
+%# ----------------------------------------------------------------------------

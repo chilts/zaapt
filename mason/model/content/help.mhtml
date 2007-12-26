@@ -1,0 +1,85 @@
+%# ----------------------------------------------------------------------------
+<%doc>
+
+    This is the help page for the 'content section' model.
+
+    (If you require individual pages, split them off as
+    'help-permissions.mhtml', 'help-entities.mhtml', 'help-components.mhtml' or
+    'help-???.mhtml' as you see fit.)
+
+</%doc>
+%# ----------------------------------------------------------------------------
+<h1>content section Help</h1>
+
+<p>
+    The content section model helps you manage content sections and their associated pages.
+</p>
+
+<h2>Permissions Required</h2>
+
+<p>
+    Each content section had three permissions which determine who can change what in
+    that particular page.
+</p>
+
+<dl>
+    <dt>admin</dt>
+    <dd>
+        allows you to change the attributes of the <strong>content section</strong>
+        itself
+    </dd>
+
+    <dt>view</dt>
+    <dd>
+        allows you to see the list of <strong>pages</strong> in the admin
+        interface
+    </dd>
+
+    <dt>edit</dt>
+    <dd>
+        allows you to add/edit and delete <strong>pages</strong> from this
+        <strong>content section</strong>
+    </dd>
+</dl>
+
+<h2>Entities</h2>
+
+<h3>content section</h3>
+
+<p>
+    A content section has the following attributes:
+</p>
+
+<ul>
+    <li>...</li>
+</ul>
+
+<h3>page</h3>
+
+<p>
+    Each page is associated with a content section.
+</p>
+
+<p>
+    A page has the following attributes:
+</p>
+
+<ul>
+    <li>...</li>
+</ul>
+
+<p>
+    [Describe here what each field does.]
+</p>
+
+<h2>Components</h2>
+
+<p>
+    [Describe here of all the view/user components and when you might want to
+    override them.
+</p>
+
+<p>
+    (Ends)
+</p>
+%# ----------------------------------------------------------------------------

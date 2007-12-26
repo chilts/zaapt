@@ -1,0 +1,109 @@
+%# ----------------------------------------------------------------------------
+<%doc>
+
+    This is the help page for the 'forum' model.
+
+    (If you require individual pages, split them off as
+    'help-permissions.mhtml', 'help-entities.mhtml', 'help-components.mhtml' or
+    'help-???.mhtml' as you see fit.)
+
+</%doc>
+%# ----------------------------------------------------------------------------
+<h1>forum Help</h1>
+
+<p>
+    The forum model helps you manage forums and their associated topics.
+</p>
+
+<h2>Permissions Required</h2>
+
+<p>
+    Each forum had three permissions which determine who can change what in
+    that particular topic.
+</p>
+
+<dl>
+    <dt>admin</dt>
+    <dd>
+        allows you to change the attributes of the <strong>forum</strong>
+        itself
+    </dd>
+
+    <dt>view</dt>
+    <dd>
+        allows you to see the list of <strong>topics</strong> in the admin
+        interface
+    </dd>
+
+    <dt>edit</dt>
+    <dd>
+        allows you to add/edit and delete <strong>topics</strong> from this
+        <strong>forum</strong>
+    </dd>
+
+    <dt>moderator</dt>
+    <dd>
+        allows you to moderate this 'forum'. It is not used in the admin
+        interface, but only in the 'user' components on the front-end.
+    </dd>
+</dl>
+
+<h2>Entities</h2>
+
+<h3>forum</h3>
+
+<p>
+    A forum has the following attributes:
+</p>
+
+<ul>
+    <li>...</li>
+</ul>
+
+<h3>topic</h3>
+
+<p>
+    Each topic is associated with a forum.
+</p>
+
+<p>
+    A topic has the following attributes:
+</p>
+
+<ul>
+    <li>...</li>
+</ul>
+
+<p>
+    [Describe here what each field does.]
+</p>
+
+<h3>Post</h3>
+
+<p>
+    Each 'Post' is associated with a 'Topic'.
+</p>
+
+<p>
+    A post has the following attributes:
+</p>
+
+<ul>
+    <li>...</li>
+</ul>
+
+<p>
+    [Describe here what each field does.]
+</p>
+
+<h2>Components</h2>
+
+<p>
+    [Describe here of all the view/user components and when you might want to
+    override them.
+</p>
+
+<p>
+    (Ends)
+</p>
+%# ----------------------------------------------------------------------------

@@ -1,0 +1,96 @@
+%# ----------------------------------------------------------------------------
+<%doc>
+
+    This is the help page for the 'Calendar' model.
+
+    (If you require individual pages, split them off as
+    'help-permissions.mhtml', 'help-entities.mhtml', 'help-components.mhtml' or
+    'help-???.mhtml' as you see fit.)
+
+</%doc>
+%# ----------------------------------------------------------------------------
+<h1>Calendar Help</h1>
+
+<p>
+    The calendar model helps you manage calendars and their associated events.
+</p>
+
+<h2>Permissions Required</h2>
+
+<p>
+    Each calendar had three permissions which determine who can change what in
+    that particular calendar.
+</p>
+
+<dl>
+    <dt>admin</dt>
+    <dd>
+        allows you to change the attributes of the <strong>calendar</strong>
+        itself
+    </dd>
+
+    <dt>view</dt>
+    <dd>
+        allows you to see the list of <strong>events</strong> in the admin
+        interface
+    </dd>
+
+    <dt>edit</dt>
+    <dd>
+        allows you to add/edit and delete <strong>events</strong> from this
+        <strong>calendar</strong>
+    </dd>
+</dl>
+
+<h2>Entities</h2>
+
+<h3>Calendar</h3>
+
+<p>
+    A calendar has the following attributes:
+</p>
+
+<ul>
+    <li>name</li>
+    <li>title</li>
+    <li>description</li>
+</ul>
+
+<h3>Event</h3>
+
+<p>
+    Each event is associated with a calendar.
+</p>
+
+<p>
+    An event has the following attributes:
+</p>
+
+<ul>
+    <li>name</li>
+    <li>title</li>
+    <li>intro</li>
+    <li>description</li>
+    <li>type</li>
+    <li>startts</li>
+    <li>endts</li>
+    <li>allday</li>
+    <li>location</li>
+    <li>link</li>
+</ul>
+
+<p>
+    [Describe here what each field does.]
+</p>
+
+<h2>Components</h2>
+
+<p>
+    [Describe here of all the view/user components and when you might want to
+    override them.
+</p>
+
+<p>
+    (Ends)
+</p>
+%# ----------------------------------------------------------------------------

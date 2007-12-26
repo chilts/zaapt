@@ -35,9 +35,9 @@ CREATE TABLE dir.file (
     id              INTEGER NOT NULL DEFAULT nextval('dir.file_id_seq'::TEXT) PRIMARY KEY,
     dir_id          INTEGER NOT NULL REFERENCES dir.dir,
     name            TEXT NOT NULL,
-    ext             TEXT NOT NULL,
     title           TEXT NOT NULL,
     description     TEXT NOT NULL,
+    ext             TEXT NOT NULL,
     filename        TEXT NOT NULL,
 
     UNIQUE(dir_id, name),

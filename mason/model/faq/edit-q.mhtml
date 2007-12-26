@@ -30,7 +30,6 @@
     my ($faq, $question);
 
     # some data manipulation
-    $q_question = undef unless Zaapt::Utils::Valid::has_content( $q_question );
     $q_answer   = Zaapt::Utils::Conv::remove_cr( $q_answer );
 
     # see if we are working with a Faq or a pre-existing Question

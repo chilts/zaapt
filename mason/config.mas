@@ -1,0 +1,23 @@
+%# ----------------------------------------------------------------------------
+<%doc>
+
+    This component returns the local config for the site. This makes it easier
+    to override from site to site but mainly so that it's easier to get a
+    development version up and going. Instead of having to read from a config
+    file that you install at package install time, you can just override this
+    one.
+
+    You may want to change it in your installed version so that it reads from a
+    config file (in /etc/<pkgname>) or something similar (if you require better
+    security) but either way, it's up to you.
+
+</%doc>
+%# ----------------------------------------------------------------------------
+<%init>
+    return {
+        dbname => 'zaapt',
+        dbuser => 'zaapt',
+        domain_name => 'zaapt.org.nz',
+    };
+</%init>
+%# ----------------------------------------------------------------------------

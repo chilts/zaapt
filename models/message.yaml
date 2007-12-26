@@ -1,0 +1,8 @@
+--- 
+depends: 
+  - account
+entities: 
+  - message
+name: message
+stores: 
+  - psql

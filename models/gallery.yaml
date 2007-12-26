@@ -1,0 +1,13 @@
+--- 
+depends: 
+  - account
+entities: 
+  - gallery
+  - picture
+  - field
+  - required
+  - detail
+  - size
+name: gallery
+stores: 
+  - psql

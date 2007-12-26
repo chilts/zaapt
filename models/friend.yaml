@@ -1,0 +1,8 @@
+--- 
+depends: 
+  - account
+entities: 
+  - friend
+name: friend
+stores: 
+  - psql

@@ -1,0 +1,10 @@
+--- 
+depends: 
+  - account
+  - common
+entities: 
+  - content
+  - page
+name: content
+stores: 
+  - psql

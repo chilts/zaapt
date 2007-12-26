@@ -1,0 +1,8 @@
+--- 
+depends: []
+
+entities: 
+  - session
+name: session
+stores: 
+  - psql

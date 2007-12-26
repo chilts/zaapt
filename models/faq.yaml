@@ -1,0 +1,10 @@
+--- 
+depends: 
+  - account
+  - common
+entities: 
+  - faq
+  - question
+name: faq
+stores: 
+  - psql

@@ -1,0 +1,12 @@
+--- 
+depends: 
+  - account
+  - common
+entities: 
+  - forum
+  - topic
+  - post
+  - info
+name: forum
+stores: 
+  - psql

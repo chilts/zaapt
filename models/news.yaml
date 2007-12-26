@@ -1,0 +1,10 @@
+--- 
+depends: 
+  - account
+  - common
+entities: 
+  - news
+  - article
+name: news
+stores: 
+  - psql

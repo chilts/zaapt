@@ -1,0 +1,13 @@
+--- 
+depends: []
+
+entities: 
+  - account
+  - ra
+  - role
+  - pa
+  - permission
+  - confirm
+name: account
+stores: 
+  - psql

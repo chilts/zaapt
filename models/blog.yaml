@@ -1,0 +1,13 @@
+--- 
+depends: 
+  - account
+  - common
+entities: 
+  - blog
+  - entry
+  - entry_label
+  - comment
+  - trackback
+name: blog
+stores: 
+  - psql

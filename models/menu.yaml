@@ -1,0 +1,9 @@
+--- 
+depends: 
+  - account
+entities: 
+  - menu
+  - item
+name: menu
+stores: 
+  - psql

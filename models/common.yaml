@@ -1,0 +1,9 @@
+--- 
+depends: []
+
+entities: 
+  - label
+  - type
+name: common
+stores: 
+  - psql

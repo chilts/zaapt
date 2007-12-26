@@ -1,0 +1,9 @@
+--- 
+depends: 
+  - account
+entities: 
+  - dir
+  - file
+name: dir
+stores: 
+  - psql

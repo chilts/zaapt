@@ -57,12 +57,6 @@ my $models = [
         entities => [ qw(friend) ],
     },
     {
-        name => 'gallery',
-        depends => [ qw(account) ],
-        stores => [ 'psql' ],
-        entities => [ qw(gallery picture field required detail size) ],
-    },
-    {
         name => 'menu',
         depends => [ qw(account) ],
         stores => [ 'psql' ],

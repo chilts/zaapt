@@ -34,12 +34,12 @@ __PACKAGE__->_mk_store_accessors( $schema, $tables );
 # simple accessors
 
 # type
-__PACKAGE__->_mk_selecter( $schema, $tables->{type} );
+__PACKAGE__->mk_selecter_from( $schema, $tables->{type} );
 __PACKAGE__->mk_select_rows( 'sel_type_all', "SELECT $tables->{type}{sql_sel_cols} FROM $tables->{type}{sql_fqt} ORDER BY t.name", [] );
 __PACKAGE__->mk_selecter_using_from( $schema, $tables->{type}, 'name' );
 
 # label
-__PACKAGE__->_mk_selecter( $schema, $tables->{label} );
+__PACKAGE__->mk_selecter_from( $schema, $tables->{label} );
 __PACKAGE__->mk_selecter_using_from( $schema, $tables->{label}, 'name' );
 
 ## ----------------------------------------------------------------------------

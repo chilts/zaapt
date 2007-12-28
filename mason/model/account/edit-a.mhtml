@@ -1,0 +1,249 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $perms
+    $_act        => 'add'
+    $a_id        => undef
+    $a_username  => undef
+    $a_firstname => undef
+    $a_lastname  => undef
+    $a_email     => undef
+    $a_notify    => undef
+    $a_password => undef
+    $a_repeat    => undef
+    $a_confirmed => undef
+    $a_admin     => undef
+</%args>
+%# ----------------------------------------------------------------------------
+<%once>
+    use Zaapt::Utils::Valid;
+    use Zaapt::Utils::Conv;
+    use URI::Escape;
+    use String::Random qw(random_string);
+
+    my $title = {
+        add => 'Add',
+        ins => 'Add',
+        edit => 'Edit',
+        upd  => 'Edit',
+        del  => 'Delete',
+    };
+</%once>
+%# ----------------------------------------------------------------------------
+<%init>
+    # check the user's permissions
+    unless ( exists $perms->{super} ) {
+        $m->comp('/zaapt/common/denied.mhtml');
+        return;
+    }
+
+    my $model = $zaapt->get_model('Account');
+    my ($account);
+
+    # some data manipulation
+    $a_notify    = Zaapt::Utils::Conv::to_bool( $a_notify );
+    $a_confirmed = Zaapt::Utils::Conv::to_bool( $a_confirmed );
+    $a_admin     = Zaapt::Utils::Conv::to_bool( $a_admin );
+
+    # see if we are working with an Account or a pre-existing one
+    unless ( $_act eq 'ins' or $_act eq 'add' ) {
+        $account = $model->sel_account({ a_id => $a_id });
+
+        $m->redirect('edit-a-list.html')
+            unless defined $account;
+    }
+
+    my $err = [];
+    my $values = {};
+
+    # let's do some of the actions
+    if ( $_act eq 'add' ) {
+        $values->{_act} = 'ins';
+        $values->{submit} = 'Add Account';
+    }
+    elsif ( $_act eq 'ins' ) {
+        # check that these values are valid
+        unless ( Zaapt::Utils::Valid::is_valid_name($a_username, 'Username') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+
+        my $check_account = $model->sel_account_using_username({ a_username => $a_username });
+        if ( $check_account ) {
+            push @$err, "account username '$a_username' already exists"
+        }
+
+        unless ( Zaapt::Utils::Valid::is_min_length($a_username, 3, 'Username') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+
+        unless ( Zaapt::Utils::Valid::has_content($a_firstname, 'Firstname') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+
+        unless ( Zaapt::Utils::Valid::has_content($a_lastname, 'Lastname') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+
+        # need to do better checking for this email address
+        unless ( Zaapt::Utils::Valid::has_content($a_email, 'Email') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+
+        unless ( Zaapt::Utils::Valid::is_min_length($a_password, 6, 'Password') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+
+        unless ( $a_password eq $a_repeat ) {
+            push @$err, "'Password' and 'Repeat' are not the same";
+        }
+
+        # do the insert
+        unless ( @$err ) {
+            # generate the salt
+            my $salt = random_string('s' x 8);
+
+            $model->ins_account({
+                a_username  => $a_username,
+                a_firstname => $a_firstname,
+                a_lastname  => $a_lastname,
+                a_email     => $a_email,
+                a_notify    => $a_notify,
+                a_salt      => $salt,
+                a_password  => $a_password,
+                a_confirmed => $a_confirmed,
+                a_admin     => $a_admin,
+            });
+            $m->redirect('edit-a-list.html');
+            return;
+        }
+
+        $values = { %ARGS };
+        $values->{submit} = 'Add Account';
+    }
+    elsif ( $_act eq 'edit' ) {
+        # already checked permissions
+        $values = $account;
+        $values->{_act} = 'upd';
+        $values->{submit} = 'Save Account';
+    }
+    elsif ( $_act eq 'upd' ) {
+        # check that these values are valid
+        unless ( Zaapt::Utils::Valid::is_valid_name($a_username, 'Username') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+
+        my $check_account = $model->sel_account_using_username({ a_username => $a_username });
+        if ( $check_account and $check_account->{a_id} != $a_id ) {
+            push @$err, "account username '$a_username' already exists"
+        }
+
+        unless ( Zaapt::Utils::Valid::is_min_length($a_username, 3, 'Username') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+
+        unless ( Zaapt::Utils::Valid::has_content($a_firstname, 'Firstname') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+
+        unless ( Zaapt::Utils::Valid::has_content($a_lastname, 'Lastname') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+
+        # need to do better checking for this email address
+        unless ( Zaapt::Utils::Valid::has_content($a_email, 'Email') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+
+        # only check the passwords if either are specified
+        if ( Zaapt::Utils::Valid::has_content($a_password) or Zaapt::Utils::Valid::has_content($a_repeat) ) {
+            unless ( Zaapt::Utils::Valid::is_min_length($a_password, 6, 'Password') ) {
+                push @$err, Zaapt::Utils::Valid::err();
+            }
+
+            unless ( $a_password eq $a_repeat ) {
+                push @$err, "'Password' and 'Repeat' are not the same";
+            }
+        }
+
+        # do the update
+        unless ( @$err ) {
+            $model->upd_account({
+                a_username  => $a_username,
+                a_firstname => $a_firstname,
+                a_lastname  => $a_lastname,
+                a_email     => $a_email,
+                a_notify    => $a_notify,
+                a_confirmed => $a_confirmed,
+                a_admin     => $a_admin,
+                a_id        => $a_id,
+            });
+
+            # update the password if defined
+            if ( Zaapt::Utils::Valid::has_content( $a_password ) ) {
+                $model->upd_password({
+                    a_password => $a_password,
+                    a_id       => $a_id,
+                });
+            }
+
+            $m->redirect("edit-a-list.html");
+            return;
+        }
+
+        $values = { %ARGS };
+        $values->{submit} = 'Save Question';
+    }
+    elsif ( $_act eq 'rem' ) {
+        # already checked permissions
+        $values = $account;
+        $values->{_act} = 'del';
+        $values->{submit} = 'Delete Account';
+    }
+    elsif ( $_act eq 'del' ) {
+        # delete
+        $model->del_account({ a_id => $a_id });
+        $m->redirect("edit-a-list.html");
+        return;
+    }
+    elsif ( $_act eq 'toggle-admin' ) {
+        $model->upd_account_admin_toggle({ a_id => $a_id });
+        $m->redirect("edit-a-list.html");
+        return;
+    }
+</%init>
+%# ----------------------------------------------------------------------------
+<h1><% $title->{$_act} | n %> an Account</h1>
+
+<p><a href="edit-a-list.html">&laquo; Back to Account List</a></p>
+
+% if ( defined $account ) {
+<h2>Account: <% $account->{a_username} | h %> - '<% $account->{a_firstname} | h %> <% $account->{a_lastname} | h %>'</h2>
+% } else {
+<h2>Question: ?</h2>
+% }
+
+<& /zaapt/common/err.mhtml, err => $err &>
+
+<& /zaapt/common/form/edit.mhtml,
+    action => 'edit-a.html',
+    values => $values,
+    elements => [
+        { type => 'hidden', name => '_act' },
+        { type => 'hidden', name => 'a_id', def => '' },
+        { type => 'text', field => 'Username', name => 'a_username', size => 40, def => '' },
+        { type => 'text', field => 'Firstname', name => 'a_firstname', size => 40, def => '' },
+        { type => 'text', field => 'Lastname', name => 'a_lastname', size => 40, def => '' },
+        { type => 'text', field => 'Email', name => 'a_email', size => 40, def => '' },
+        { type => 'password', field => 'Password', name => 'a_password', size => 40, def => '' },
+        { type => 'password', field => 'Repeat', name => 'a_repeat', size => 40, def => '' },
+        { type => 'checkbox', field => 'Notify?', name => 'a_notify', def => 0 },
+        { type => 'note', def => "Note: If you have any mailing lists, 'Notify' can be used to show interest." },
+        { type => 'checkbox', field => 'Confirmed?', name => 'a_confirmed', def => 1 },
+        { type => 'note', def => "Note: This shows that the email address is valid." },
+        { type => 'checkbox', field => 'Admin?', name => 'a_admin', def => 0 },
+        { type => 'note', def => "Note: Check if this person is an administrator." },
+
+        { type => 'submit', name => 'submit', field => 'Actions', cancel => 1, location => 'edit-a-list.html' },
+    ]
+&>
+%# ----------------------------------------------------------------------------

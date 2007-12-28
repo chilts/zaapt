@@ -1,0 +1,139 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $perms
+    $_act          => 'add'
+    $p_id          => undef
+    $p_name        => ''
+    $p_description => ''
+</%args>
+%# ----------------------------------------------------------------------------
+<%once>
+    use URI::Escape;
+
+    my $heading = {
+        add => 'Add',
+        ins => 'Add',
+        edit => 'Edit',
+        upd  => 'Edit',
+        del  => 'Delete',
+    };
+</%once>
+%# ----------------------------------------------------------------------------
+<%init>
+    $m->redirect('edit.html') unless exists $perms->{super};
+
+    # some data manipulation
+    $p_description = Zaapt::Utils::Conv::remove_cr( $p_description );
+
+    my $model = $zaapt->get_model('Account');
+
+    my $err = [];
+    my $values = {};
+    my $permission;
+
+    # get the permission from the DB if needed
+    unless ( $_act eq 'add' or $_act eq 'ins' ) {
+        $permission = $model->sel_permission({ p_id => $p_id });
+
+        $m->redirect('edit.html')
+            unless defined $permission;
+    }
+
+    # let's do some of the actions
+    if ( $_act eq 'add' ) {
+        $values->{_act} = 'ins';
+        $values->{submit} = 'Add Permission';
+    }
+    elsif ( $_act eq 'ins' ) {
+        # check that these values are valid
+        unless ( Zaapt::Utils::Valid::is_valid_name($p_name, 'Name') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+
+        my $check_permission = $model->sel_permission_using_name({ p_name => $p_name });
+        if ( $check_permission ) {
+            push @$err, "permission name '$p_name' already exists"
+        }
+
+        # do the insert
+        unless ( @$err ) {
+            $model->ins_permission({
+                p_name        => $p_name,
+                p_description => $p_description,
+            });
+            $m->redirect("edit-p-list.html");
+            return;
+        }
+
+        $values = { %ARGS };
+        $values->{submit} = 'Add Permission';
+    }
+    elsif ( $_act eq 'edit' ) {
+        $values = $permission;
+        $values->{_act} = 'upd';
+        $values->{submit} = 'Save Permission';
+    }
+    elsif ( $_act eq 'upd' ) {
+        # check that these values are valid
+        unless ( Zaapt::Utils::Valid::is_valid_name($p_name, 'Name') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+
+        my $check_permission = $model->sel_permission_using_name({ p_name => $p_name });
+        if ( $check_permission and $check_permission->{p_id} != $p_id ) {
+            push @$err, "permission name '$p_name' already exists"
+        }
+
+        # do the update
+        unless ( @$err ) {
+            $model->upd_permission({
+                p_name        => $p_name,
+                p_description => $p_description,
+                p_id          => $p_id,
+            });
+            $m->redirect("edit-p-list.html");
+            return;
+        }
+
+        $values = { %ARGS };
+        $values->{submit} = 'Save Permission';
+    }
+    elsif ( $_act eq 'rem' ) {
+        $values = $permission;
+        $values->{_act} = 'del';
+        $values->{submit} = 'Delete Permission';
+    }
+    elsif ( $_act eq 'del' ) {
+        # delete
+        $model->del_permission({ p_id => $p_id });
+        $m->redirect("edit-p-list.html");
+        return;
+    }
+</%init>
+%# ----------------------------------------------------------------------------
+<h1><% $heading->{$_act} | n %> a Permission</h1>
+
+<p><a href="edit-p-list.html">&laquo; Back to Permission List</a></p>
+
+% if ( defined $permission ) {
+<h2>Permission: <% $permission->{p_name} | h %></h2>
+% } else {
+<h2>Permission: ?</h2>
+% }
+
+<& /zaapt/common/err.mhtml, err => $err &>
+
+<& /zaapt/common/form/edit.mhtml,
+    action => '?',
+    values => $values,
+    elements => [
+        { type => 'hidden', name => '_act' },
+        { type => 'hidden', name => 'p_id', def => '' },
+        { type => 'text', field => 'Name', name => 'p_name', size => 40, def => '' },
+        { type => 'textarea', field => 'Description', name => 'p_description', rows => 10, cols => 40, def => '' },
+
+        { type => 'submit', name => 'submit', field => 'Actions', cancel => 1, location => 'edit-p-list.html' },
+    ]
+&>
+%# ----------------------------------------------------------------------------

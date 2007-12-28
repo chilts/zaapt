@@ -1,0 +1,139 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $perms
+    $_act          => 'add'
+    $r_id          => undef
+    $r_name        => ''
+    $r_description => ''
+</%args>
+%# ----------------------------------------------------------------------------
+<%once>
+    use URI::Escape;
+
+    my $heading = {
+        add => 'Add',
+        ins => 'Add',
+        edit => 'Edit',
+        upd  => 'Edit',
+        del  => 'Delete',
+    };
+</%once>
+%# ----------------------------------------------------------------------------
+<%init>
+    $m->redirect('edit.html') unless exists $perms->{super};
+
+    # some data manipulation
+    $r_description = Zaapt::Utils::Conv::remove_cr( $r_description );
+
+    my $model = $zaapt->get_model('Account');
+
+    my $err = [];
+    my $values = {};
+    my $role;
+
+    # get the role from the DB if needed
+    unless ( $_act eq 'add' or $_act eq 'ins' ) {
+        $role = $model->sel_role({ r_id => $r_id });
+
+        $m->redirect('edit.html')
+            unless defined $role;
+    }
+
+    # let's do some of the actions
+    if ( $_act eq 'add' ) {
+        $values->{_act} = 'ins';
+        $values->{submit} = 'Add Role';
+    }
+    elsif ( $_act eq 'ins' ) {
+        # check that these values are valid
+        unless ( Zaapt::Utils::Valid::is_valid_name($r_name, 'Name') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+
+        my $check_role = $model->sel_role_using_name({ r_name => $r_name });
+        if ( $check_role ) {
+            push @$err, "role name '$r_name' already exists"
+        }
+
+        # do the insert
+        unless ( @$err ) {
+            $model->ins_role({
+                r_name        => $r_name,
+                r_description => $r_description,
+            });
+            $m->redirect("edit-r-list.html");
+            return;
+        }
+
+        $values = { %ARGS };
+        $values->{submit} = 'Add Role';
+    }
+    elsif ( $_act eq 'edit' ) {
+        $values = $role;
+        $values->{_act} = 'upd';
+        $values->{submit} = 'Save Role';
+    }
+    elsif ( $_act eq 'upd' ) {
+        # check that these values are valid
+        unless ( Zaapt::Utils::Valid::is_valid_name($r_name, 'Name') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+
+        my $check_role = $model->sel_role_using_name({ r_name => $r_name });
+        if ( $check_role and $check_role->{r_id} != $r_id ) {
+            push @$err, "role name '$r_name' already exists"
+        }
+
+        # do the update
+        unless ( @$err ) {
+            $model->upd_role({
+                r_name        => $r_name,
+                r_description => $r_description,
+                r_id          => $r_id,
+            });
+            $m->redirect("edit-r-list.html");
+            return;
+        }
+
+        $values = { %ARGS };
+        $values->{submit} = 'Save Role';
+    }
+    elsif ( $_act eq 'rem' ) {
+        $values = $role;
+        $values->{_act} = 'del';
+        $values->{submit} = 'Delete Role';
+    }
+    elsif ( $_act eq 'del' ) {
+        # delete
+        $model->del_role({ r_id => $r_id });
+        $m->redirect("edit-r-list.html");
+        return;
+    }
+</%init>
+%# ----------------------------------------------------------------------------
+<h1><% $heading->{$_act} | n %> a Role</h1>
+
+<p><a href="edit-r-list.html">&laquo; Back to Role List</a></p>
+
+% if ( defined $role ) {
+<h2>Role: <% $role->{r_name} | h %></h2>
+% } else {
+<h2>Role: ?</h2>
+% }
+
+<& /zaapt/common/err.mhtml, err => $err &>
+
+<& /zaapt/common/form/edit.mhtml,
+    action => '?',
+    values => $values,
+    elements => [
+        { type => 'hidden', name => '_act' },
+        { type => 'hidden', name => 'r_id', def => '' },
+        { type => 'text', field => 'Name', name => 'r_name', size => 40, def => '' },
+        { type => 'textarea', field => 'Description', name => 'r_description', rows => 10, cols => 40, def => '' },
+
+        { type => 'submit', name => 'submit', field => 'Actions', cancel => 1, location => 'edit-r-list.html' },
+    ]
+&>
+%# ----------------------------------------------------------------------------

@@ -1,15 +1,24 @@
 %# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $perms
+</%args>
+%# ----------------------------------------------------------------------------
 <h1>Account Admin</h1>
 
-<h2>General Account</h2>
+% if ( exists $perms->{super} ) {
+
+<h2>General</h2>
 
 <ul>
-    <li><a href="edit-a-list.html">Account List</a> [ <a href="edit-a-add.html">Add Account</a> ]</li>
-    <li><a href="edit-r-list.html">Role List</a> [ <a href="edit-r-add.html">Add Role</a> ]</li>
-    <li><a href="edit-p-list.html">Permission List</a> [ <a href="edit-p-add.html">Add Permission</a> ]</li>
+    <li><a href="edit-a-list.html">Account List</a> [ <a href="edit-a.html?_act=add">Add Account</a> ]</li>
+    <li><a href="edit-r-list.html">Role List</a> [ <a href="edit-r.html?_act=add">Add Role</a> ]</li>
+    <li><a href="edit-p-list.html">Permission List</a> [ <a href="edit-p.html?_act=add">Add Permission</a> ]</li>
 </ul>
 
-<h2>Your Account:</h2>
+% }
+
+<h2>Your Account</h2>
 
 <ul>
     <li><a href="edit-a-password-edit.html">Change your Password</a></li>

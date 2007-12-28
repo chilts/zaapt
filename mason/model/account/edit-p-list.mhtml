@@ -5,6 +5,8 @@
 </%args>
 %# ----------------------------------------------------------------------------
 <%init>
+    $m->redirect('edit.html') unless exists $perms->{super};
+
     my $model = $zaapt->get_model('Account');
     my $permissions = $model->sel_permission_all();
 </%init>
@@ -13,7 +15,7 @@
 
 % if ( exists $perms->{super} ) {
 <p>
-    * <a href="edit-p-add.html">Add Permission &raquo;</a><br />
+    * <a href="edit-p.html?_act=add">Add Permission &raquo;</a><br />
 </p>
 % }
 
@@ -28,7 +30,8 @@
         </td>
         <td>
 %         if ( exists $perms->{super} ) {
-            * <a href="edit-p-del.html?p_id=<% $permission->{p_id} | u %>">Delete</a><br />
+            * <a href="edit-p.html?_act=edit&amp;p_id=<% $permission->{p_id} | u %>">Edit</a><br />
+            * <a href="edit-p.html?_act=rem&amp;p_id=<% $permission->{p_id} | u %>">Delete</a><br />
 %         } else {
             * No Actions
 %         }

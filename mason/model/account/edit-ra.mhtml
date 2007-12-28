@@ -8,8 +8,6 @@
 </%args>
 %# ----------------------------------------------------------------------------
 <%init>
-    use Data::Dumper;
-    warn Dumper(\%ARGS);
     $m->redirect('edit-a-list.html') unless exists $perms->{super};
 
     my $model = $zaapt->get_model('Account');
@@ -28,8 +26,6 @@
     my $roles = $model->sel_role_all();
     my $assigned = $model->sel_role_all_for_account({ a_id => $a_id });
     my %assigned = map { $_->{r_id} => 1 } @$assigned;
-    warn Dumper($assigned);
-    warn Dumper(\%assigned);
 </%init>
 %# ----------------------------------------------------------------------------
 <h1>Role Assigner</h1>

@@ -5,6 +5,11 @@
 </%args>
 %# ----------------------------------------------------------------------------
 <%init>
+    unless ( exists $perms->{super} ) {
+        $m->comp('/zaapt/common/denied.mhtml');
+        return;
+    }
+
     my $model = $zaapt->get_model('Account');
     my $accounts = $model->sel_account_all();
 </%init>
@@ -13,7 +18,7 @@
 
 % if ( exists $perms->{super} ) {
 <p>
-    * <a href="edit-a-add.html">Add Account &raquo;</a><br />
+    * <a href="edit-a.html?_act=add">Add Account &raquo;</a><br />
 </p>
 % }
 
@@ -37,9 +42,10 @@
         <td>
 %    if ( exists $perms->{super} ) {
             * <a href="#">Reset Password (ToDo)</a><br />
-            * <a href="edit-a-admin-toggle.html?a_id=<% $account->{a_id} | u %>">Toggle Admin</a><br />
+            * <a href="edit-a.html?_act=edit&amp;a_id=<% $account->{a_id} | u %>">Edit</a><br />
+            * <a href="edit-a.html?_act=toggle-admin&amp;a_id=<% $account->{a_id} | u %>">Toggle Admin</a><br />
             * <a href="edit-ra.html?a_id=<% $account->{a_id} | u %>">Role Assigner</a><br />
-            * <a href="edit-a-del.html?a_id=<% $account->{a_id} | u %>">Delete</a><br />
+            * <a href="edit-a.html?_act=rem&amp;a_id=<% $account->{a_id} | u %>">Delete</a><br />
 %    } else {
             * No Actions
 %    }

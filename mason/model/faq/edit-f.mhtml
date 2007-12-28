@@ -33,6 +33,17 @@
     my $values = {};
     my $faq;
 
+    unless ( $_act eq 'add' or $_act eq 'ins' ) {
+        # get 'faq', check permissions
+        $faq = $model->sel_faq({ f_id => $f_id });
+
+        $m->redirect('edit-f-list.html')
+            unless defined $faq;
+
+        $m->redirect('edit-f-list.html?f_id=' . uri_escape($faq->{f_id}))
+            unless exists $perms->{$faq->{_admin}};
+    }
+
     # let's do some of the actions
     if ( $_act eq 'add' ) {
         $values->{_act} = 'ins';
@@ -75,21 +86,11 @@
         $values->{submit} = 'Add Faq';
     }
     elsif ( $_act eq 'edit' ) {
-        # get 'faq', check permissions
-        $faq = $model->sel_faq({ f_id => $f_id });
-        $m->redirect('edit-f-list.html') unless defined $faq;
-        $m->redirect('edit-f-list.html?f_id=$faq->{f_id}') unless exists $perms->{$faq->{_admin}};
-
         $values = $faq;
         $values->{_act} = 'upd';
         $values->{submit} = 'Save Faq';
     }
     elsif ( $_act eq 'upd' ) {
-        # get 'faq', check permissions
-        $faq = $model->sel_faq({ f_id => $f_id });
-        $m->redirect('edit-f-list.html') unless defined $faq;
-        $m->redirect('edit-f-list.html?f_id=$faq->{f_id}') unless exists $perms->{$faq->{_admin}};
-
         # check that these values are valid
         unless ( Zaapt::Utils::Valid::is_valid_name($f_name, 'Name') ) {
             push @$err, Zaapt::Utils::Valid::err();
@@ -117,24 +118,14 @@
         }
 
         $values = { %ARGS };
-        $values->{submit} = 'Add Faq';
+        $values->{submit} = 'Save Faq';
     }
     elsif ( $_act eq 'rem' ) {
-        # get 'faq', check permissions
-        $faq = $model->sel_faq({ f_id => $f_id });
-        $m->redirect('edit-f-list.html') unless defined $faq;
-        $m->redirect('edit-f-list.html?f_id=$faq->{f_id}') unless exists $perms->{$faq->{_admin}};
-
         $values = $faq;
         $values->{_act} = 'del';
         $values->{submit} = 'Delete Faq';
     }
     elsif ( $_act eq 'del' ) {
-        # get 'faq', check permissions
-        $faq = $model->sel_faq({ f_id => $f_id });
-        $m->redirect('edit-f-list.html') unless defined $faq;
-        $m->redirect('edit-f-list.html?f_id=$faq->{f_id}') unless exists $perms->{$faq->{_admin}};
-
         # delete
         $model->del_faq({ f_id => $f_id });
         $m->redirect("edit-f-list.html");

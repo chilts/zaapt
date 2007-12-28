@@ -95,7 +95,7 @@ my $post_cols = "$tables->{forum}{sql_sel_cols}, $tables->{topic}{sql_sel_cols},
 my $post_tables = "$tables->{forum}{sql_fqt} $join->{f_tp} $join->{tp_p}";
 
 # forum
-__PACKAGE__->_mk_selecter( $schema, $tables->{forum} );
+__PACKAGE__->mk_selecter_from( $schema, $tables->{forum} );
 __PACKAGE__->mk_selecter_using_from( $schema, $tables->{forum}, 'name' );
 __PACKAGE__->mk_select_rows( 'sel_forum_all', "SELECT $forum_cols FROM $forum_tables ORDER BY f.name" );
 __PACKAGE__->_mk_select_count( $tables->{forum} );
@@ -113,7 +113,7 @@ __PACKAGE__->_mk_select_rows_offset( 'sel_post_all_for', "SELECT $post_cols, $ta
 __PACKAGE__->_mk_select_count( $tables->{post} );
 
 # info
-__PACKAGE__->_mk_selecter( $schema, $tables->{info} );
+__PACKAGE__->mk_selecter_from( $schema, $tables->{info} );
 
 ## ----------------------------------------------------------------------------
 # methods

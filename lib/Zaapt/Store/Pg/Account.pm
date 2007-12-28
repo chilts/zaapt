@@ -91,12 +91,14 @@ __PACKAGE__->mk_select_rows( 'sel_account_all', "SELECT $tables->{account}{sql_s
 __PACKAGE__->mk_selecter_from( $schema, $tables->{role} );
 __PACKAGE__->mk_select_rows( 'sel_role_all', "SELECT $tables->{role}{sql_sel_cols} FROM $tables->{role}{sql_fqt} ORDER BY r.name" );
 __PACKAGE__->mk_select_rows( 'sel_role_all_for_account', "SELECT $tables->{account}{sql_sel_cols}, $tables->{role}{sql_sel_cols}  FROM $tables->{account}{sql_fqt} $join->{a_ra} $join->{ra_r} WHERE a.id = ? ORDER BY r.id", [ 'a_id' ] );
+__PACKAGE__->mk_selecter_using_from( $schema, $tables->{role}, 'name' );
 
 # permission
 __PACKAGE__->mk_selecter_from( $schema, $tables->{permission} );
 __PACKAGE__->mk_select_rows( 'sel_permission_all', "SELECT $tables->{permission}{sql_sel_cols} FROM $tables->{permission}{sql_fqt} ORDER BY p.id", [] );
 __PACKAGE__->mk_select_rows( 'sel_permission_all_for_role', "SELECT $tables->{role}{sql_sel_cols}, $tables->{permission}{sql_sel_cols} FROM $tables->{role}{sql_fqt} $join->{r_pa} $join->{pa_p} WHERE r.id = ? ORDER BY p.id", [ 'r_id' ] );
 __PACKAGE__->mk_select_rows( 'sel_permission_all_for_account', "SELECT $main_cols FROM $main_joins WHERE a.id = ? ORDER BY p.id", [ 'a_id' ] );
+__PACKAGE__->mk_selecter_using_from( $schema, $tables->{permission}, 'name' );
 
 # confirm
 __PACKAGE__->mk_selecter_from( $schema, $tables->{confirm} );

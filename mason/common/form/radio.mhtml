@@ -17,7 +17,7 @@
 <% defined $o->{id} ? " id=\"$o->{id}\"" : '' %>\
  name="<% $e->{name} | h %>"\
  value="<% $o->{value} | h %>"\
-<% $e->{checked} eq $o->{value} ? ' checked="checked"' : '' %>\
+<% $value eq $o->{value} ? ' checked="checked"' : '' %>\
  />
 %     if ( $e->{is_html} ) {
     <% $o->{text} %>

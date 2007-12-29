@@ -25,11 +25,32 @@
 </%doc>
 %# ----------------------------------------------------------------------------
 <%args>
-    $zaapt => undef
+    $zaapt
     $id
+    $sess
 </%args>
 %# ----------------------------------------------------------------------------
 <%init>
+    my $model = $zaapt->get_model('Account');
+    my $account = $model->sel_account({ a_id => $id });
+
+    return unless defined $account;
+
+    # refresh all these fields
+    foreach ( qw( id username firstname lastname email admin logins last ) ) {
+        $sess->{$_} = $account->{"a_$_"};
+    }
+
+    # get the permissions for this user sel_permission_all_for_account
+    my $permissions = $model->sel_permission_all_for_account({ a_id => $account->{a_id} });
+    $sess->{perms} = {};
+    foreach my $permission ( @$permissions ) {
+        $sess->{perms}{$permission->{p_id}} = $permission->{p_name};
+        if ( $permission->{p_name} eq 'super' ) {
+            $sess->{perms}{super} = $permission->{p_id};
+        }
+    }
+
     die "this component should be overriden";
     return;
 </%init>

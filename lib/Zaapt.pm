@@ -28,6 +28,11 @@ sub new {
     return $self;
 }
 
+sub dbh {
+    my ($self) = @_;
+    return $self->{dbh};
+}
+
 sub get_model {
     my ($self, $model) = @_;
 

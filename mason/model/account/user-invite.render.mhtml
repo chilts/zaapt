@@ -1,0 +1,55 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $_act => ''
+    $i_name
+    $i_email
+    $err
+</%args>
+%# ----------------------------------------------------------------------------
+<h1>Invite others to join the site</h1>
+
+<& /zaapt/common/err.mhtml, err => $err &>
+
+% if ( $_act eq 'invite' ) {
+%     if ( @$err ) {
+<& .form, i_name => $i_name, i_email => $i_email &>
+%     } else {
+<p>
+    Your invitation to <code>&lt;<% $i_email | h %>&gt;</code> has been sent.
+</p>
+<p>
+    Thanks for spreading the word. You're doing a great job getting people
+    interested in writing or letting them know about the great resources you
+    can find here.
+</p>
+
+<h2>Why not tell someone else?</h2>
+
+<& .form, i_name => '', i_email => '' &>
+
+%     }
+
+% } else {
+<& .form, i_name => $i_name, i_email => $i_email &>
+% }
+%# ----------------------------------------------------------------------------
+<%def .form>
+<%args>
+    $i_name
+    $i_email
+</%args>
+<div class="box center">
+    <form action="?" method="post">
+        <p>
+            Name<br />
+            <input type="hidden" name="_act" value="invite" /><br />
+            <input type="text" name="i_name" value="<% $i_name | h %>" /><br />
+            Email Address<br />
+            <input type="text" name="i_email" value="<% $i_email | h %>" /><br />
+            <br />
+            <input type="submit" value="Send Invitation" /><br />
+        </p>
+    </form>
+</div>
+</%def>
+%# ----------------------------------------------------------------------------

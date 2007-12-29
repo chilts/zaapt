@@ -1,0 +1,9 @@
+%# ----------------------------------------------------------------------------
+<h1>You are already logged in</h1>
+
+<p>
+    To be able to log in, you must have already confirmed your account. You do
+    not need to do this again. Now go take a look around the
+    <a href=".">site</a>.
+</p>
+%# ----------------------------------------------------------------------------

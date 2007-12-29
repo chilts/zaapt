@@ -2,16 +2,38 @@
 <%args>
     $zaapt
     $id
+    $sess
     $page
 </%args>
 %# ----------------------------------------------------------------------------
+<%once>
+    my $pages = {
+        'index'    => 1,
+        'edit'     => 1,
+        'sign-in'  => 1,
+        'sign-out' => 1,
+        'sign-up'  => 1,
+        'info'     => 1,
+        'invite'   => 1,
+        'confirm'  => 1,
+        'reset'    => 1,
+    };
+</%once>
+%# ----------------------------------------------------------------------------
 <%init>
-    if ( $page eq 'info' ) {
-        # main index page
-        $m->comp('/zaapt/model/account/user-info.mhtml',
+    if ( exists $pages->{$page} ) {
+        $m->comp(
+            "/zaapt/model/account/user-$page.mhtml",
+            %ARGS,
             zaapt => $zaapt,
+            sess  => $sess,
             id    => $id,
         );
+    }
+    else {
+        $m->clear_buffer();
+        $m->abort(404);
+        return;
     }
     return;
 </%init>

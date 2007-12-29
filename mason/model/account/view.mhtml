@@ -1,17 +1,32 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
-    $id
+    $sess
     $page
 </%args>
 %# ----------------------------------------------------------------------------
+<%once>
+    my $pages = {
+        'index'    => 1,
+        'edit'     => 1,
+        'sign-in'  => 1,
+        'sign-out' => 1,
+        'sign-up'  => 1,
+        'info'     => 1,
+        'invite'   => 1,
+        'confirm'  => 1,
+        'reset'    => 1,
+    };
+</%once>
+%# ----------------------------------------------------------------------------
 <%init>
-    # check for the index page
-    if ( $page eq 'index' ) {
-        $m->comp('/zaapt/model/account/view-index.mhtml', zaapt => $zaapt, id => $id);
-    }
-    elsif ( $page eq 'info' ) {
-        $m->comp('/zaapt/model/account/view-info.mhtml', zaapt => $zaapt, id => $id);
+    if ( exists $pages->{$page} ) {
+        $m->comp(
+            "/zaapt/model/account/view-$page.mhtml",
+            %ARGS,
+            zaapt => $zaapt,
+            sess => $sess,
+        );
     }
     else {
         $m->clear_buffer();

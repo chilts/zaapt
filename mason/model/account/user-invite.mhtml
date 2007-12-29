@@ -1,0 +1,51 @@
+%# ----------------------------------------------------------------------------
+<%doc>
+
+    # ToDo: search for the email in the 'invite' table so not invite them
+
+    # ToDo: send the actual email
+    # - the contents of which, we should get from somewhere
+
+    Future work: add a note so the person can send something personal
+
+</%doc>
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $id
+    $_act    => ''
+    $i_name  => ''
+    $i_email => ''
+    $invitee => undef
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my @err;
+
+    if ( $_act eq 'invite' ) {
+        unless ( $i_email =~ /\S/ ) {
+            push @err, 'Please specify a valid email address';
+        }
+
+        unless ( @err ) {
+            my $email = $m->comp( 'invite-email.mas',
+                i_name  => $i_name,
+                i_email => $i_email,
+                invitee => $invitee,
+            );
+
+            # add this email to the outgoing queue (or immediately if configured)
+            unless ( $m->comp('/zaapt/model/email/send.mas', email => $email) ) {
+                push @err, 'There was an error sending your invitation. Please try again later.';
+            }
+        }
+    }
+</%init>
+%# ----------------------------------------------------------------------------
+<& user-invite.render.mhtml,
+    _act    => $_act,
+    i_name  => $i_name,
+    i_email => $i_email,
+    err => \@err
+&>
+%# ----------------------------------------------------------------------------

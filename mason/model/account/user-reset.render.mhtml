@@ -1,0 +1,8 @@
+%# ----------------------------------------------------------------------------
+<h1>You are already logged in</h1>
+
+<p>
+    To be able to ask for a new password you mustn't be logged in. Please
+    <a href="sign-out.html">sign out first</a>.
+</p>
+%# ----------------------------------------------------------------------------

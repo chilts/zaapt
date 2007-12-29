@@ -1,0 +1,31 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $a_username => undef
+    $c_code     => undef
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $err;
+    my $is_confirmed = 0;
+
+    if ( defined $a_username or defined $c_code ) {
+        # firstly look up this username
+        my $model = $zaapt->get_model('Account');
+
+        if ( $model->confirm({ a_username => $a_username, c_code => $c_code }) ) {
+            $is_confirmed = 1;
+        }
+        else {
+            $err = 'Username/Confirmation code not found. If you have already confirmed your account you do not need to do it again.';
+        }
+    }
+</%init>
+%# ----------------------------------------------------------------------------
+<& view-confirm.render.mhtml,
+    a_username   => $a_username,
+    c_code       => $c_code,
+    is_confirmed => $is_confirmed,
+    err          => $err,
+&>
+%# ----------------------------------------------------------------------------

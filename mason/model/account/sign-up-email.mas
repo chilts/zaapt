@@ -1,0 +1,47 @@
+%# ----------------------------------------------------------------------------
+<%doc>
+
+    You should override this component so that you can have a personalised
+    message for your new sign-ups.
+
+</%doc>
+%# ----------------------------------------------------------------------------
+<%args>
+    $domain
+    $path
+    $a_username
+    $c_code
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    return {
+        To => $a_email,
+        From => 'noreply@kiwiwriters.org',
+        Subject => 'Confirmation email...',
+        'X-Mailer' => "Mail::Sendmail version $Mail::Sendmail::VERSION",
+        Message => <<"EOF",
+Dear $a_username,
+
+Welcome to KiwiWriters.org. Please click on the following link to confirm your
+account and email address.
+
+http://$domain/$path/confirm.html?a_username=$a_username&c_code=$c_code
+
+If you can't click that link, please go to the following address and type in
+your username and confirmation code:
+
+URL      : http://$domain/$path/confirm.html
+Username : $a_username
+Code     : $c_code
+
+Many thanks for joining us, we hope you'll have a great time. Don't forget to
+look out for the forums and the site-wide challenges. Why not invite all your
+other friends to join in the fun - or even better, set yourself a challenge and
+get them to join you.
+
+Yours faithfully,
+The KiwiWriters.org Team
+EOF
+    };
+<%init>
+%# ----------------------------------------------------------------------------

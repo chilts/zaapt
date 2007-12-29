@@ -1,0 +1,11 @@
+%# ----------------------------------------------------------------------------
+<h1>You are not currently signed in</h1>
+
+<p>
+    ... so there is no need to sign out.
+</p>
+
+<p>
+    Or goto the <a href="sign-in.html">sign in</a> page and take a look around.
+</p>
+%# ----------------------------------------------------------------------------

@@ -1,0 +1,52 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $a_username => undef
+    $c_code => undef
+    $is_confirmed
+    $err => undef
+</%args>
+%# ----------------------------------------------------------------------------
+% if ( $is_confirmed ) {
+<h1>Congratulations</h1>
+
+<p>
+    Your account has been confirmed, you may proceed to <a href="sign-in.html">sign in</a>.
+</p>
+
+% } else {
+<h1>...confirm your account</h1>
+
+<& /zaapt/common/err.mhtml, err => $err &>
+
+<p>
+    Please type in your username and confirmation code from the email you were
+    sent when you signed up. Or even simpler still, click the link given in the
+    email or paste it into the URL address bar.
+</p>
+
+<p>
+    Your email should arrive in the next few minutes. If it doesn't arrive in
+    the next hour or so, please check your <em>Bulk</em> or <em>Spam</em>
+    folders since some email providers (Yahoo!, Gmail, Hotmail) may incorrectly
+    categorise it as spam.
+</p>
+
+<div class="box center">
+<form action="confirm.html" method="post">
+    Username<br />
+    <input type="text" name="a_username" value="<% $a_username | h %>" /><br />
+    Code<br />
+    <input type="text" name="c_code" value="<% $c_code | h %>"/><br />
+    <br />
+    <input type="submit" name="action" value="Confirm Account" /><br />
+</form>
+</div>
+
+<p class="soft center">
+    If you do not receive an email at all, or if you have lost your
+    confirmation code, please use the <a href="/contact.html">Contact</a> page
+    to let us know. Thanks.
+</p>
+
+% }
+%# ----------------------------------------------------------------------------

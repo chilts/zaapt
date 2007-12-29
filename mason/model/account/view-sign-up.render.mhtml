@@ -1,0 +1,42 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $a_username  => undef
+    $a_firstname => undef
+    $a_lastname  => undef
+    $a_email     => undef
+    $a_notify    => undef
+    $err         => undef
+</%args>
+%# ----------------------------------------------------------------------------
+<h1>Join us in 2 easy steps...</h1>
+
+<& /zaapt/common/err.mhtml, err => $err &>
+
+<div class="box center">
+<form action="?" method="post">
+    Username<br />
+    <input type="text" name="username" value="<% $a_username | h %>" /><br />
+    Password<br />
+    <input type="password" name="password" /><br />
+    Password (re-type)<br />
+    <input type="password" name="repeat" /><br />
+    Firstname<br />
+    <input type="text" name="firstname" value="<% $a_firstname | h %>" /><br />
+    Lastname<br />
+    <input type="text" name="lastname" value="<% $a_lastname | h %>" /><br />
+    Email<br />
+    <input type="text" name="email" value="<% $a_email | h %>" /><br />
+    Receive Site Notifications?<br />
+    <input type="radio" name="notify" value="1"<% $a_notify ? ' checked="checked"' : '' %> />Yes
+    <input type="radio" name="notify" value="0"<% $a_notify ? '' : ' checked="checked"' %> />No
+    <br />
+    <input type="submit" name="action" value="Join Us!" /><br />
+</form>
+</div>
+
+<p class="center soft">
+    Note that once you have signed up, you will need to click the confirmation
+    link in the email sent to you. Therefore, you should double check your
+    email address.
+</p>
+%# ----------------------------------------------------------------------------

@@ -1,0 +1,48 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $values
+    $err_info
+    $err_pass
+</%args>
+%# ----------------------------------------------------------------------------
+<h1>Edit your Account Info</h1>
+
+<a href="./">&laquo; Back to Index</a>
+
+<h2>Change Details</h2>
+
+<& /zaapt/common/err.mhtml, err => $err_info &>
+
+<& /zaapt/common/form/edit.mhtml,
+    action => '?',
+    values => $values,
+    elements => [
+        { type => 'hidden', name => '_act', def => 'update' },
+        { type => 'text', field => 'Firstname', name => 'a_firstname', size => 30, maxlength => 30, def => '' },
+        { type => 'text', field => 'Lastname', name => 'a_lastname', size => 30, maxlength => 30, def => '' },
+        { type => 'text', field => 'Email', name => 'a_email', size => 30, maxlength => 30, def => '' },
+        {
+            type => 'radio',
+            field => 'Receive Site Notifications',
+            name => 'a_notify',
+            options => [ { text => 'Yes', value => 1 }, { text => 'No', value => 0 } ],
+        },
+        { type => 'submit', name => 'submit', field => '', cancel => 1, location => '.', def => 'Save Changes' },
+    ]
+&>
+
+<h2>Change Password</h2>
+
+<& /zaapt/common/err.mhtml, err => $err_pass &>
+
+<& /zaapt/common/form/edit.mhtml,
+    action => '?',
+    values => $values,
+    elements => [
+        { type => 'hidden', name => '_act', def => 'password' },
+        { type => 'password', field => 'Password', name => 'a_password', size => 30, maxlength => 30, def => '' },
+        { type => 'password', field => 'Repeat', name => 'a_repeat', size => 30, maxlength => 30, def => '' },
+        { type => 'submit', name => 'submit', field => '', cancel => 1, location => '.', def => 'Update Password' },
+    ]
+&>
+%# ----------------------------------------------------------------------------

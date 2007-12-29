@@ -1,0 +1,41 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $a_username
+    $a_email
+    $t_token
+</%args>
+%# ----------------------------------------------------------------------------
+<h2>Forgotten your password?</h2>
+
+<p>
+    To reset your password we need to know your username and email address. We
+    will then send you an email containing a link back to this page which also
+    contains a secret token. When you click this link, you will be allowed to
+    reset your own password.
+</p>
+
+<p>
+    If you remember your old password you may safely ignore the email. The link
+    is valid only once and for a maximum of 1 hour. If the token expires, you
+    must request a new one.
+</p>
+
+<div class="box center">
+    <form action="?" method="post">
+        <input type="hidden" name="_act" value="reset" /><br />
+        Username<br />
+        <input type="text" name="a_username" value="<% $a_username | h %>" /><br />
+        <br />
+        Email<br />
+        <input type="text" name="a_email" value="<% $a_email | h %>" /><br />
+        <br />
+        <input type="submit" value="Request Token" /><br />
+    </form>
+</div>
+
+<p class="center soft">
+    Please note that for security reasons, we do not store your passwords in
+    plain text. This means that we can only reset your password - we cannot
+    send you your current one.
+</p>
+%# ----------------------------------------------------------------------------

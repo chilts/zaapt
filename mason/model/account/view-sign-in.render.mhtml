@@ -1,0 +1,23 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $a_username => ''
+    $err => undef
+</%args>
+%# ----------------------------------------------------------------------------
+<h1>Please sign in...</h1>
+
+<& /zaapt/common/err.mhtml, err => $err &>
+
+<div class="box center">
+<form action="?" method="post">
+    <p>
+        Username<br />
+        <input type="text" name="a_username" value="<% $a_username | h %>" /><br />
+        Password<br />
+        <input type="password" name="a_password" /><br />
+        <br />
+        <input type="submit" value="Sign In" /><br />
+    </p>
+</form>
+</div>
+%# ----------------------------------------------------------------------------

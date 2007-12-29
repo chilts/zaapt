@@ -1,19 +1,23 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
+    $sess
     $id
 </%args>
 %# ----------------------------------------------------------------------------
 <%init>
+    # update last login info
     my $model = $zaapt->get_model('Account');
+    $model->upd_last({ a_id => $id });
 
-    my $account = $model->sel_account({ a_id => $id });
-    unless ( defined $account ) {
-        $m->clear_buffer();
-        $m->abort(404);
-        return;
-    }
+    # sign out
+    $m->comp('/zaapt/model/session/session-sign-out.mas',
+        sess_rh => $sess,
+        domain  => ".$CFG->{domain_name}",
+    );
+
+    # back to user index page
+    $m->redirect('.');
+    return;
 </%init>
-%# ----------------------------------------------------------------------------
-<& user-info.render.mhtml, account => $account &>
 %# ----------------------------------------------------------------------------

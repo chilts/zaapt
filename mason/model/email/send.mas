@@ -1,0 +1,24 @@
+%# ----------------------------------------------------------------------------
+<%doc>
+
+    Issue #7 says we'll add a proper Email model but for now, just send it.
+
+</%doc>
+%# ----------------------------------------------------------------------------
+<%args>
+    $email
+</%args>
+%# ----------------------------------------------------------------------------
+<%once>
+    use Mail::Sendmail qw();
+</%once>
+%# ----------------------------------------------------------------------------
+<%init>
+    # we should do some checking for things here, but for now, just send it
+    unless ( Mail::Sendmail::sendmail(%mail) ) {
+        warn "Error sending mail: $Mail::Sendmail::error";
+        return 0;
+    }
+    return 1;
+</%init>
+%# ----------------------------------------------------------------------------

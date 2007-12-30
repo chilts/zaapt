@@ -2,7 +2,15 @@
 <h1>You are already logged in</h1>
 
 <p>
-    To be able to ask for a new password you mustn't be logged in. Please
-    <a href="sign-out.html">sign out first</a>.
+    If you are already logged in, are you sure you need to ask for a password
+    reset? Either:
 </p>
+
+<ul>
+    <li>ignore this page and go to your <a href=".">user homepage</a></li>
+    <li>
+        <a href="sign-out.html">sign out</a> first, then come back to this page
+        to ask for a reset - though that's probably not what you want
+    </li>
+</ul>
 %# ----------------------------------------------------------------------------

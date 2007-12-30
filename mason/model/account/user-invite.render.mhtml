@@ -11,12 +11,13 @@
 <& /zaapt/common/err.mhtml, err => $err &>
 
 % if ( $_act eq 'invite' ) {
-%     if ( @$err ) {
 <& .form, i_name => $i_name, i_email => $i_email &>
-%     } else {
-<p>
-    Your invitation to <code>&lt;<% $i_email | h %>&gt;</code> has been sent.
+
+% } elsif( $_act eq 'sent') {
+<p class="info">
+    Your invitation has been sent.
 </p>
+
 <p>
     Thanks for spreading the word. You're doing a great job getting people
     interested in writing or letting them know about the great resources you
@@ -27,10 +28,8 @@
 
 <& .form, i_name => '', i_email => '' &>
 
-%     }
-
 % } else {
-<& .form, i_name => $i_name, i_email => $i_email &>
+<& .form, i_name => '', i_email => '' &>
 % }
 %# ----------------------------------------------------------------------------
 <%def .form>

@@ -11,7 +11,7 @@
     $path   => 'my'
     $i_email
     $i_name
-    $invitee
+    $invitor
 </%args>
 %# ----------------------------------------------------------------------------
 <%init>
@@ -23,7 +23,7 @@
         Message => <<"EOF",
 Dear $person,
 
-   Sender: $invitee
+   Sender: $invitor
 
 Your friend thinks you might be interested in the site KiwiWriters.org. It's a
 hip and happening place for writers everywhere but most especially for those in

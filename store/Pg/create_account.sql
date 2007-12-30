@@ -118,4 +118,31 @@ CREATE TABLE account.confirm (
 CREATE TRIGGER confirm_updated BEFORE UPDATE ON account.confirm
     FOR EACH ROW EXECUTE PROCEDURE updated();
 
+-- table: invitation
+CREATE SEQUENCE account.invitation_id_seq;
+CREATE TABLE account.invitation (
+    id              INTEGER NOT NULL DEFAULT nextval('account.invitation_id_seq'::TEXT) PRIMARY KEY,
+    account_id      INTEGER NOT NULL REFERENCES account.account,
+    name            TEXT NOT NULL DEFAULT '',
+    email           TEXT NOT NULL,
+
+    UNIQUE(email),
+    LIKE base       INCLUDING DEFAULTS
+);
+CREATE TRIGGER invitation_updated BEFORE UPDATE ON account.invitation
+    FOR EACH ROW EXECUTE PROCEDURE updated();
+
+-- table: token
+CREATE SEQUENCE account.token_id_seq;
+CREATE TABLE account.token (
+    id              INTEGER NOT NULL DEFAULT nextval('account.token_id_seq'::TEXT) PRIMARY KEY,
+    account_id      INTEGER NOT NULL REFERENCES account.account,
+    code            VARCHAR(32) NOT NULL,
+
+    UNIQUE(code),
+    LIKE base       INCLUDING DEFAULTS
+);
+CREATE TRIGGER token_updated BEFORE UPDATE ON account.token
+    FOR EACH ROW EXECUTE PROCEDURE updated();
+
 -- ----------------------------------------------------------------------------

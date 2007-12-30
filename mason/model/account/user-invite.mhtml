@@ -1,10 +1,11 @@
 %# ----------------------------------------------------------------------------
 <%doc>
 
-    # ToDo: search for the email in the 'invite' table so not invite them
+    # ToDo: search for the email in the 'invite' table so not invite them again
 
-    # ToDo: send the actual email
-    # - the contents of which, we should get from somewhere
+    # ToDo: add a link (with a confirmation code) so that the invitee can click
+    # that and have the account confirmed straight away - you'd still have to
+    # ask about their details though.
 
     Future work: add a note so the person can send something personal
 
@@ -16,26 +17,47 @@
     $_act    => ''
     $i_name  => ''
     $i_email => ''
-    $invitee => undef
+    $invitor => undef
 </%args>
 %# ----------------------------------------------------------------------------
 <%init>
     my @err;
+
+    my $model = $zaapt->get_model('Account');
 
     if ( $_act eq 'invite' ) {
         unless ( $i_email =~ /\S/ ) {
             push @err, 'Please specify a valid email address';
         }
 
+        # check that this person has not been sent an email before
+        my $check_invitation = $model->sel_invitation_using_email({ i_email => $i_email });
+        if ( $check_invitation ) {
+            push @err, 'This email address has already been sent an invitation once before. Feel free to invite others.';
+        }
+
         unless ( @err ) {
+            # insert this invite into the invitation table
+            $model->ins_invitation({
+                a_id    => $id,
+                i_name  => $i_name,
+                i_email => $i_email,
+            });
+
+            # send the invite
             my $email = $m->comp( 'invite-email.mas',
                 i_name  => $i_name,
                 i_email => $i_email,
-                invitee => $invitee,
+                invitor => $invitor,
             );
 
             # add this email to the outgoing queue (or immediately if configured)
-            unless ( $m->comp('/zaapt/model/email/send.mas', email => $email) ) {
+            if ( $m->comp('/zaapt/model/email/send.mas', email => $email) ) {
+                $m->clear_buffer();
+                $m->redirect('?_act=sent');
+                return;
+            }
+            else {
                 push @err, 'There was an error sending your invitation. Please try again later.';
             }
         }
@@ -46,6 +68,6 @@
     _act    => $_act,
     i_name  => $i_name,
     i_email => $i_email,
-    err => \@err
+    err     => \@err
 &>
 %# ----------------------------------------------------------------------------

@@ -57,6 +57,26 @@ my $tables = {
             qw(account_id code ts:inserted ts:updated)
         ],
     },
+    invitation => {
+        schema => $schema,
+        name   => 'invitation',
+        prefix => 'i',
+        cols   => [
+            'id',
+            [ 'account_id', 'fk', 'a_id' ],
+            qw(name email ts:inserted ts:updated)
+        ],
+    },
+    token => {
+        schema => $schema,
+        name   => 'token',
+        prefix => 't',
+        cols   => [
+            'id',
+            [ 'account_id', 'fk', 'a_id' ],
+            qw(code ts:inserted ts:updated)
+        ],
+    },
 };
 
 my $join = {
@@ -86,6 +106,7 @@ my $main_joins = "$tables->{account}{sql_fqt} $join->{a_ra} $join->{ra_r} $join-
 # account
 __PACKAGE__->mk_selecter_from( $schema, $tables->{account} );
 __PACKAGE__->mk_select_rows( 'sel_account_all', "SELECT $tables->{account}{sql_sel_cols} FROM $tables->{account}{sql_fqt} ORDER BY a.id" );
+__PACKAGE__->mk_selecter_using_from( $schema, $tables->{account}, 'username' );
 
 # role
 __PACKAGE__->mk_selecter_from( $schema, $tables->{role} );
@@ -109,6 +130,10 @@ __PACKAGE__->_mk_do( 'del_ra_for', "DELETE FROM account.ra WHERE account_id = ?"
 # pa
 __PACKAGE__->_mk_do( 'del_pa_for', "DELETE FROM account.pa WHERE role_id = ?", [ 'r_id' ] );
 
+# invitation
+__PACKAGE__->mk_select_rows( 'sel_invitation_all', "SELECT $tables->{invitation}{sql_sel_cols} FROM $tables->{invitation}{sql_fqt} ORDER BY i.id" );
+__PACKAGE__->mk_selecter_using_from( $schema, $tables->{invitation}, 'email' );
+
 ## ----------------------------------------------------------------------------
 # methods
 
@@ -122,12 +147,6 @@ my $sel_roles_for_account = "SELECT a.username AS a_username, r.id AS r_id, r.na
 sub sel_roles_for_account {
     my ($self, $hr) = @_;
     return $self->_rows( $sel_roles_for_account, $hr->{a_id} );
-}
-
-my $sel_account_using_username = "SELECT $tables->{account}{sql_sel_cols} FROM $tables->{account}{sql_fqt} WHERE a.username = ?";
-sub sel_account_using_username {
-    my ($self, $hr) = @_;
-    return $self->_row( $sel_account_using_username, $hr->{a_username} );
 }
 
 my $sel_account_for_authentication = "SELECT $tables->{account}{sql_sel_cols} FROM $tables->{account}{sql_fqt} WHERE a.username = ? AND a.password = md5(salt || ?)";

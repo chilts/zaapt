@@ -21,8 +21,8 @@
 <h2>Your Account</h2>
 
 <ul>
-    <li><a href="edit-a-password-edit.html">Change your Password</a></li>
-    <li><a href="#">List My Privileges (ToDo)</a></li>
+    <li><a href="edit-my-r-list.html">List My Roles</a></li>
+    <li><a href="edit-my-p-list.html">List My Permissions</a></li>
 </ul>
 
 %# ----------------------------------------------------------------------------

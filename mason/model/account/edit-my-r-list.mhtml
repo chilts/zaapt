@@ -1,0 +1,32 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $perms
+    $id
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    $m->redirect('edit.html') unless exists $perms->{super};
+
+    my $model = $zaapt->get_model('Account');
+    my $roles = $model->sel_role_all();
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Role List</h1>
+
+<&| /zaapt/common/admin/table-edit.mhtml, title => 'Role' &>
+
+% my $row = 1;
+% foreach my $role ( @$roles ) {
+    <tr class="r<% $row=1-$row %>">
+        <td>
+            (<% $role->{r_id} | h %>) <strong><% $role->{r_name} | h %></strong>
+            <br />
+            <% $role->{r_description} | h %>
+        </td>
+        <td>-</td>
+    </tr>
+% }
+
+</&>
+%# ----------------------------------------------------------------------------

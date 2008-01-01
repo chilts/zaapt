@@ -1,0 +1,32 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $perms
+    $id
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    $m->redirect('edit.html') unless exists $perms->{super};
+
+    my $model = $zaapt->get_model('Account');
+    my $permissions = $model->sel_permission_all_for_account({ a_id => $id });
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Permission List</h1>
+
+<&| /zaapt/common/admin/table-edit.mhtml, title => 'Permission' &>
+
+% my $row = 1;
+% foreach my $permission ( @$permissions ) {
+    <tr class="r<% $row=1-$row %>">
+        <td>
+            (<% $permission->{p_id} | h %>) <strong><% $permission->{p_name} | h %></strong>
+            <br />
+            <% $permission->{p_description} | h %>
+        </td>
+        <td>-</td>
+    </tr>
+% }
+
+</&>
+%# ----------------------------------------------------------------------------

@@ -21,7 +21,7 @@
 
 <p><a href="edit-d-list.html">&laquo; Back to Dir List</a></p>
 
-<& edit-render-d-title.mhtml, dir => $dir &>
+<h2>Dir: <% $dir->{d_name} | h %> - '<% $dir->{d_title} | h %>'</h2>
 
 <p>
 % if ( exists $perms->{$dir->{_edit}} ) {

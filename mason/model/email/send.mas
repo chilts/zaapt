@@ -14,7 +14,7 @@
 </%once>
 %# ----------------------------------------------------------------------------
 <%init>
-    $email->{'X-Mailer'} = "Mail::Sendmail version $Mail::Sendmail::VERSION",
+    $email->{'X-Mailer'} = "Mail::Sendmail version $Mail::Sendmail::VERSION";
 
     # use Data::Dumper;
     # warn 'email=' . Dumper($email);

@@ -134,6 +134,11 @@ __PACKAGE__->_mk_do( 'del_pa_for', "DELETE FROM account.pa WHERE role_id = ?", [
 __PACKAGE__->mk_select_rows( 'sel_invitation_all', "SELECT $tables->{invitation}{sql_sel_cols} FROM $tables->{invitation}{sql_fqt} ORDER BY i.id" );
 __PACKAGE__->mk_selecter_using_from( $schema, $tables->{invitation}, 'email' );
 
+# token
+__PACKAGE__->_mk_do( 'del_token_invalid_for', "DELETE FROM account.token WHERE account_id = ? AND inserted < current_timestamp - '1 hour'::INTERVAL", [ 'a_id' ]);
+__PACKAGE__->mk_select_row( 'sel_token_using_account_id', "SELECT $tables->{token}{sql_sel_cols} FROM $tables->{token}{sql_fqt} WHERE account_id = ?", [ 'a_id' ]);
+__PACKAGE__->mk_select_row( 'sel_token_valid', "SELECT $tables->{token}{sql_sel_cols} FROM $tables->{token}{sql_fqt} WHERE t.code = ? AND t.inserted > current_timestamp - '1 hour'::INTERVAL", [ 't_code' ]);
+
 ## ----------------------------------------------------------------------------
 # methods
 

@@ -1,11 +1,28 @@
 %# ----------------------------------------------------------------------------
 <%args>
+    $_act
     $a_username
     $a_email
-    $t_token
+    $t_code
+    $msg
+    $err
 </%args>
 %# ----------------------------------------------------------------------------
+<h1>Password Reset</h1>
+
+<& /zaapt/common/msg.mhtml, msg => $msg &>
+
+<p>
+    To be able to reset your password, you need to enter your username and your
+    email address. These must be the same as what we have on our
+    accounts. Please contact us if you do not have either of these.
+</p>
+
 <h2>Forgotten your password?</h2>
+
+% if ( $_act eq 'reset' ) {
+<& /zaapt/common/err.mhtml, err => $err &>
+% }
 
 <p>
     To reset your password we need to know your username and email address. We
@@ -30,6 +47,39 @@
         <input type="text" name="a_email" value="<% $a_email | h %>" /><br />
         <br />
         <input type="submit" value="Request Token" /><br />
+    </form>
+</div>
+
+<h2>Token Entry</h2>
+
+% if ( $_act eq 'new' ) {
+<& /zaapt/common/err.mhtml, err => $err &>
+% }
+
+<p>
+    If you already have a token, please enter it here along with the requested
+    information and your new password:
+</p>
+
+<div class="box center">
+    <form action="?" method="post">
+        <input type="hidden" name="_act" value="new" /><br />
+        Token<br />
+        <input type="text" name="t_code" value="<% $t_code | h %>" /><br />
+        <br />
+        Confirm your username<br />
+        <input type="text" name="a_username" value="<% $a_username | h %>" /><br />
+        <br />
+        Confirm your email<br />
+        <input type="text" name="a_email" value="<% $a_email | h %>" /><br />
+        <br />
+        New Password<br />
+        <input type="password" name="a_password" value="" /><br />
+        Repeat<br />
+        <br />
+        <input type="password" name="a_repeat" value="" /><br />
+        <br />
+        <input type="submit" value="Change Password" /><br />
     </form>
 </div>
 

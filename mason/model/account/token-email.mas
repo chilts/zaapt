@@ -1,0 +1,46 @@
+%# ----------------------------------------------------------------------------
+<%doc>
+
+    You should override this component so that you can have a personalised
+    message for your reset tokens.
+
+</%doc>
+%# ----------------------------------------------------------------------------
+<%args>
+    $domain => 'kiwiwriters.org'
+    $path   => 'my'
+    $a_email
+    $t_code
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    return {
+        To      => $a_email,
+        From    => 'noreply@kiwiwriters.org',
+        Subject => 'KiwiWriters Reset Password Token',
+        Message => <<"EOF",
+Someone has asked for a token to be able to reset your password on KiwiWriters.org.
+
+If this was not you, please ignore this message.
+
+If this was you, please click the following link and then follow the
+instructions to be able to reset your password.
+
+http://$domain/$path/reset.html?_act=token&t_code=$t_code
+
+If you can't click that link, please go to the following address and type in
+the following code there.
+
+URL      : http://$domain/$path/reset.html
+Token    : $t_code
+
+If you have any problems with resetting your password, please contact us at:
+
+http://$domain/contact.html
+
+Yours faithfully,
+The KiwiWriters.org Team
+EOF
+    };
+</%init>
+%# ----------------------------------------------------------------------------

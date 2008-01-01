@@ -1,21 +1,135 @@
 %# ----------------------------------------------------------------------------
 <%args>
-    $_act       => undef
+    $zaapt
+    $_act       => 'request'
     $a_username => undef
+    $a_password => undef
+    $a_repeat   => undef
     $a_email    => undef
-    $t_token    => undef
+    $t_code     => undef
 </%args>
 %# ----------------------------------------------------------------------------
+<%once>
+    use String::Random qw(random_string);
+</%once>
+%# ----------------------------------------------------------------------------
 <%init>
-    # need to do some stuff here
-    if ( $_act eq 'reset' ) {
+    my $model = $zaapt->get_model('Account');
 
+    my $msg;
+    my @err;
+
+    # need to do some stuff here
+    if ( $_act eq 'request' ) {
+        # nothing to do here, first page
+    }
+    elsif ( $_act eq 'reset' ) {
+        # they have asked for the reset
+
+        my $error = 0;
+
+        my $account = $model->sel_account_using_username({ a_username => $a_username });
+        unless ( defined $account ) {
+            $error++;
+        }
+
+        # check that this email address is valid
+        if ( defined $account and $a_email eq $account->{a_email} ) {
+            # remove any old tokens they may have lieing around
+            $model->del_token_invalid_for({ a_id => $account->{a_id} });
+
+            # check that they do not already have a (now valid) token
+            my $token = $model->sel_token_using_account_id({ a_id => $account->{a_id} });
+            if ( defined $token ) {
+                push @err, 'this account has already asked for a reset. Please wait for the email containing the password reset token';
+            }
+            else {
+                # insert a new token
+                my $t_code = random_string('0' x 32, [ 'A'..'Z', 'a'..'z', '0'..'9' ]);
+                $model->ins_token({ a_id => $account->{a_id}, t_code => $t_code });
+
+                # send the token
+                my $email = $m->comp( 'token-email.mas',
+                    a_email => $account->{a_email},
+                    t_code => $t_code,
+                );
+
+                # add this email to the outgoing queue (or immediately if configured)
+                if ( $m->comp('/zaapt/model/email/send.mas', email => $email) ) {
+                    $m->clear_buffer();
+                    $m->redirect('?_act=sent');
+                    return;
+                }
+                else {
+                    push @err, 'There was an error sending your invitation. Please try again later.';
+                }
+            }
+        }
+        else {
+            $error++;
+        }
+
+        if ( $error ) {
+            push @err, 'Username and email address combination is invalid. Please try again or contact us for a manual reset.';
+        }
+    }
+    elsif ( $_act eq 'sent' ) {
+        $msg = 'Your token to reset your email address has been emailed to you. Please follow the instructions in that email.';
+    }
+    elsif ( $_act eq 'token' ) {
+        # the person has entered the token, not much else to do except show it
+    }
+    elsif ( $_act eq 'new' ) {
+        # check that this account exists
+        my $account = $model->sel_account_using_username({ a_username => $a_username });
+        unless ( defined $account ) {
+            push @err, 'Username and email address combination is invalid. Please try again or contact us for a manual reset.';
+        }
+
+        unless ( @err ) {
+            # do the reset after some checks (ToDo: change to look in past hour only)
+            my $token = $model->sel_token_valid({ t_code => $t_code });
+            if ( defined $token ) {
+                unless ( $a_password eq $a_repeat ) {
+                    push @err, "Password and confirmation are different";
+                }
+
+                unless ( $a_password =~ /\S/ ) {
+                    push @err, "Password mustn't be blank";
+                }
+
+                unless ( length $a_password >= 6 ) {
+                    push @err, "Password must be at least 6 characters long";
+                }
+
+                unless ( @err ) {
+                    # reset the password
+                    $model->upd_password({ a_id => $token->{a_id}, a_password => $a_password });
+                    $model->del_token({ t_id => $token->{t_id} });
+
+                    # ToDo: should now send them a confirmation email
+
+                    $m->clear_buffer();
+                    $m->redirect('?_act=complete');
+                    return;
+                }
+            }
+            else {
+                push @err, 'invalid token';
+            }
+        }
+    }
+    elsif ( $_act eq 'complete' ) {
+        $msg = 'Your password change is complete. Please try and sign in with your new password.';
     }
 </%init>
 %# ----------------------------------------------------------------------------
 <& view-reset.render.mhtml,
+    _act       => $_act,
     a_username => $a_username,
     a_email    => $a_email,
-    t_token    => $t_token,
+    t_code     => $t_code,
+    msg        => $msg,
+    err        => \@err,
 &>
 %# ----------------------------------------------------------------------------

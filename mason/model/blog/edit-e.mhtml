@@ -228,7 +228,8 @@
         { type => 'checkbox', field => 'Draft', name => 'e_draft' },
         { type => 'checkbox', field => 'Comment', name => 'e_comment' },
         { type => 'checkbox', field => 'Trackback', name => 'e_trackback' },
-        { type => 'submit', name => 'submit', field => 'Actions', cancel => 1, location => 'edit-e.html?_act=ins&amp;b_id=' . uri_escape($b_id) },
+
+        { type => 'submit', name => 'submit', field => 'Actions', cancel => 1, location => 'edit-e-list.html?b_id=' . uri_escape($b_id) },
     ]
 &>
 %# ----------------------------------------------------------------------------

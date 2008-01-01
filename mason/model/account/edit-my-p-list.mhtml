@@ -6,8 +6,6 @@
 </%args>
 %# ----------------------------------------------------------------------------
 <%init>
-    $m->redirect('edit.html') unless exists $perms->{super};
-
     my $model = $zaapt->get_model('Account');
     my $permissions = $model->sel_permission_all_for_account({ a_id => $id });
 </%init>

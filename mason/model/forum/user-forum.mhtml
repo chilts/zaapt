@@ -89,6 +89,7 @@
 %# ----------------------------------------------------------------------------
 <& render-user-forum.mhtml,
     zaapt  => $zaapt,
+    perms  => $perms,
     forum  => $forum,
     err    => $err,
     tp_subject => $tp_subject,

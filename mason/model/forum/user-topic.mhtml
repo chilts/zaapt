@@ -140,6 +140,7 @@
 </%init>
 %# ----------------------------------------------------------------------------
 <& render-user-topic.mhtml,
+    perms  => $perms,
     forum => $forum,
     topic => $topic,
     err => $err,

@@ -20,9 +20,9 @@
 <p>
     <span class="floatright">
 % if ( $perms->{$forum->{_moderator}} or !$topic->{tp_locked} ) {
-        <a href="#" onclick="removeElementClass('reply1', 'hide');"><& /zaapt/common/icon.mhtml, name => 'script_add', title => 'Reply' &> Reply &raquo;&raquo;</a>
+        <a href="#" onclick="removeElementClass('reply1', 'hide');"><& /zaapt/common/icon.mhtml, name => 'script_add', title => 'Reply' &> &raquo;&raquo;</a>
 % } else {
-        <& /zaapt/common/icon.mhtml, name => 'script_link', title => 'Locked' &> Locked
+        <& /zaapt/common/icon.mhtml, name => 'script_link', title => 'Locked' &>
 % }
 % if ( $perms->{$forum->{_moderator}} ) {
         <br />
@@ -87,13 +87,13 @@
 
 %         if ( $perms->{$forum->{_moderator}} ) {
             <hr />
-            <a href="moderator-edit-post.html?p_id=<% $post->{p_id} | u %>&amp;p=<% $p | u %>" title="Edit Post"><& /zaapt/common/icon.mhtml, name => 'script_edit', title => 'Edit Post' &> Edit Post</a>
+            <a href="moderator-edit-post.html?p_id=<% $post->{p_id} | u %>&amp;p=<% $p | u %>" title="Edit Post"><& /zaapt/common/icon.mhtml, name => 'script_edit', title => 'Edit Post' &></a>
             <br />
-            <a href="moderator-del-post.html?p_id=<% $post->{p_id} | u %>&amp;p=<% $p | u %>" title="Del Post"><& /zaapt/common/icon.mhtml, name => 'script_delete', title => 'Del Post' &> Del Post</a>
+            <a href="moderator-del-post.html?p_id=<% $post->{p_id} | u %>&amp;p=<% $p | u %>" title="Del Post"><& /zaapt/common/icon.mhtml, name => 'script_delete', title => 'Del Post' &></a>
 %         } else {
 %             if ( is_editable($posts, $post, $forum, $id, $p) ) {
             <hr />
-            <a href="user-edit-post.html?p_id=<% $post->{p_id} | u %>&amp;p=<% $p | u %>" title="Edit Post"><& /zaapt/common/icon.mhtml, name => 'script_edit', title => 'Edit Post' &> Edit Your Post</a>
+            <a href="user-edit-post.html?p_id=<% $post->{p_id} | u %>&amp;p=<% $p | u %>" title="Edit Post"><& /zaapt/common/icon.mhtml, name => 'script_edit', title => 'Edit Your Post' &></a>
 %             }
 %         }
 
@@ -111,9 +111,9 @@
 <p>
     <span class="floatright">
 % if ( $perms->{$forum->{_moderator}} or !$topic->{tp_locked} ) {
-        <a href="#" onclick="removeElementClass('reply2', 'hide'); return false;"><& /zaapt/common/icon.mhtml, name => 'script_add', title => 'Reply' &> Reply &raquo;&raquo;</a>
+        <a href="#" onclick="removeElementClass('reply2', 'hide'); return false;"><& /zaapt/common/icon.mhtml, name => 'script_add', title => 'Reply' &> &raquo;&raquo;</a>
 % } else {
-        <& /zaapt/common/icon.mhtml, name => 'script_link', title => 'Locked' &> Locked
+        <& /zaapt/common/icon.mhtml, name => 'script_link', title => 'Locked' &>
 % }
     </span>
     &nbsp;
@@ -133,6 +133,6 @@
 % }
 
 <h2>Key</h2>
-<& /zaapt/common/icon.mhtml, name => 'script_add', title => 'New Post' &> New Post<br />
-<& /zaapt/common/icon.mhtml, name => 'script', title => 'Old Post' &> Old Post<br />
+<& /zaapt/common/icon.mhtml, name => 'script_add', title => 'New Post' &><br />
+<& /zaapt/common/icon.mhtml, name => 'script', title => 'Old Post' &><br />
 %# ----------------------------------------------------------------------------

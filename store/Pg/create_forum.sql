@@ -133,4 +133,20 @@ CREATE FUNCTION forum.delpost() RETURNS trigger as '
 CREATE TRIGGER delpost_deleted AFTER DELETE ON forum.post
     FOR EACH ROW EXECUTE PROCEDURE forum.delpost();
 
+-- function: updtopic
+CREATE OR REPLACE FUNCTION forum.topic_bu() RETURNS trigger as '
+    BEGIN
+        IF OLD.forum_id != NEW.forum_id THEN
+            UPDATE forum.forum SET topics = topics - 1 WHERE id = OLD.forum_id;
+            UPDATE forum.forum SET posts = posts - OLD.posts WHERE id = OLD.forum_id;
+
+            UPDATE forum.forum SET topics = topics + 1 WHERE id = NEW.forum_id;
+            UPDATE forum.forum SET posts = posts + NEW.posts WHERE id = NEW.forum_id;
+        END IF;
+        RETURN NEW;
+    END;
+' LANGUAGE plpgsql;
+CREATE TRIGGER topic_bu BEFORE UPDATE ON forum.topic
+    FOR EACH ROW EXECUTE PROCEDURE forum.topic_bu();
+
 -- ----------------------------------------------------------------------------

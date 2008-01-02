@@ -140,14 +140,15 @@
 </%init>
 %# ----------------------------------------------------------------------------
 <& render-user-topic.mhtml,
-    perms  => $perms,
-    forum => $forum,
-    topic => $topic,
-    err => $err,
+    zaapt     => $zaapt,
+    perms     => $perms,
+    forum     => $forum,
+    topic     => $topic,
+    err       => $err,
     p_message => $p_message,
-    posts => $posts,
-    id => $id,
-    last => $last,
-    p => $p,
+    posts     => $posts,
+    id        => $id,
+    last      => $last,
+    p         => $p,
 &>
 %# ----------------------------------------------------------------------------

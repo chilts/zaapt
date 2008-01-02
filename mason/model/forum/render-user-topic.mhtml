@@ -1,5 +1,6 @@
 %# ----------------------------------------------------------------------------
 <%args>
+    $zaapt
     $forum
     $perms
     $topic
@@ -17,28 +18,34 @@
 %# ----------------------------------------------------------------------------
 <h1><% $forum->{f_title} | h %></h1>
 
-<p>
-    <span class="floatright">
-% if ( $perms->{$forum->{_moderator}} or !$topic->{tp_locked} ) {
-        <a href="#" onclick="removeElementClass('reply1', 'hide');"><& /zaapt/common/icon.mhtml, name => 'script_add', title => 'Reply' &> &raquo;&raquo;</a>
-% } else {
-        <& /zaapt/common/icon.mhtml, name => 'script_link', title => 'Locked' &>
-% }
 % if ( $perms->{$forum->{_moderator}} ) {
-        <br />
+<p class="floatright">
+    Moderator Actions:
 %     if ( $topic->{tp_sticky} ) {
         <a href="?a=sticky-remove&amp;tp_id=<% $topic->{tp_id} | u %>&amp;p=<% $p | u %>" title="Remove Stickiness"><& /zaapt/common/icon.mhtml, name => 'script', title => 'Remove Stickiness' &></a>
 %     } else {
         <a href="?a=sticky-add&amp;tp_id=<% $topic->{tp_id} | u %>&amp;p=<% $p | u %>" title="Make Sticky"><& /zaapt/common/icon.mhtml, name => 'script_key', title => 'Make Sticky' &></a>
 %     }
+      |
 %     if ( $topic->{tp_locked} ) {
         <a href="?a=locked-remove&amp;tp_id=<% $topic->{tp_id} | u %>&amp;p=<% $p | u %>" title="Remove Lock"><& /zaapt/common/icon.mhtml, name => 'script_go', title => 'Remove Lock' &></a>
 %     } else {
         <a href="?a=locked-add&amp;tp_id=<% $topic->{tp_id} | u %>&amp;p=<% $p | u %>" title="Add Lock"><& /zaapt/common/icon.mhtml, name => 'script_link', title => 'Add Lock' &></a>
 %     }
+      |
       <a href="?a=del&amp;tp_id=<% $topic->{tp_id} | u %>&amp;p=<% $p | u %>" title="Delete Topic"><& /zaapt/common/icon.mhtml, name => 'script_delete', title => 'Delete Topic' &></a>
+      |
+      <a href="moderate-topic.html?_act=move&amp;tp_id=<% $topic->{tp_id} | u %>" title="Move Topic"><& /zaapt/common/icon.mhtml, name => 'script_go', title => 'Move Topic' &></a>
+</p>
 % }
-    </span>
+
+<p>
+% if ( $perms->{$forum->{_moderator}} or !$topic->{tp_locked} ) {
+    <a href="#" onclick="removeElementClass('reply1', 'hide');"><& /zaapt/common/icon.mhtml, name => 'script_add', title => 'Reply' &> &raquo;&raquo;</a>
+% } else {
+    <& /zaapt/common/icon.mhtml, name => 'script_link', title => 'Locked' &>
+% }
+    <br />
     <a href="../">&laquo; Back to Main Forums</a>
     <br />
     <a href="./">&laquo; Back to Topic List</a>

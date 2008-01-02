@@ -1,0 +1,82 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $perms
+    $f_name
+    $_act  => 'move'
+    $f_id  => undef
+    $tp_id => undef
+</%args>
+%# ----------------------------------------------------------------------------
+<%once>
+    use URI::Escape;
+</%once>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Forum');
+    my $topic = $model->sel_topic({ tp_id => $tp_id });
+
+    # check this topic exists
+    unless ( defined $topic ) {
+        $m->clear_buffer();
+        $m->abort(404);
+        return;
+    }
+
+    # check they are allowed to moderate this topic
+    unless ( exists $perms->{$topic->{_moderator}} ) {
+        $m->clear_buffer();
+        $m->abort(403);
+        return;
+    }
+
+    # check the forum name is the same
+    unless ( $f_name eq $topic->{f_name} ) {
+        $m->clear_buffer();
+        $m->abort(404);
+        return;
+    }
+
+    my @err;
+    my $values = {};
+    my $forums = $model->sel_forum_all();
+
+    if ( $_act eq 'move' ) {
+        # nothing to do here
+        $values = $topic;
+        $values->{_act} = 'to';
+        $values->{submit} = 'Move Topic';
+    }
+    elsif ( $_act eq 'to' ) {
+        # move this topic to the other forum
+        $model->upd_topic({ tp_id => $tp_id, f_id => $f_id });
+        $m->clear_buffer();
+        $m->redirect('.');
+        return;
+    }
+
+    # create the dropdown options for each forum
+    my @options = map { { value => $_->{f_id}, text => $_->{f_name} } } @$forums;
+</%init>
+%# ----------------------------------------------------------------------------
+<h1><% $topic->{f_name} | h %> - <% $topic->{f_title} | h %></h1>
+
+<& /zaapt/common/err.mhtml, err => \@err &>
+
+<h2><% $topic->{tp_subject} | h %></h2>
+
+<& /zaapt/common/form/edit.mhtml,
+    action => '?',
+    values => $values,
+    elements => [
+        { type => 'hidden', name => '_act' },
+        { type => 'hidden', name => 'tp_id' },
+        { type => 'note', field => 'Subject', name => 'tp_subject' },
+        { type => 'note', field => 'Posts', name => 'tp_posts' },
+
+        { type => 'select', field => 'Move to Forum', name => 'f_id', options => \@options },
+
+        { type => 'submit', name => 'submit', field => 'Actions', cancel => 1, location => uri_escape($topic->{tp_id}) . ".html" },
+    ]
+&>
+%# ----------------------------------------------------------------------------

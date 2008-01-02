@@ -88,14 +88,14 @@
 </%init>
 %# ----------------------------------------------------------------------------
 <& render-user-forum.mhtml,
-    zaapt  => $zaapt,
-    perms  => $perms,
-    forum  => $forum,
-    err    => $err,
+    zaapt      => $zaapt,
+    perms      => $perms,
+    forum      => $forum,
+    err        => $err,
     tp_subject => $tp_subject,
-    p_message => $p_message,
-    topics => $topics,
-    last   => $last,
-    p      => $p,
+    p_message  => $p_message,
+    topics     => $topics,
+    last       => $last,
+    p          => $p,
 &>
 %# ----------------------------------------------------------------------------

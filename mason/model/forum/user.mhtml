@@ -3,6 +3,7 @@
     $zaapt
     $perms
     $a          => ''
+    $_act       => ''
     $f_name
     $page       => ''
     $id       => undef
@@ -41,11 +42,20 @@
             last       => $last,
         );
     }
+    elsif ( $page eq 'moderate-topic' ) {
+        # the moderator is wanting to move the topic
+        $m->comp('/zaapt/model/forum/user-moderate-topic.mhtml',
+            %ARGS,
+            zaapt      => $zaapt,
+            perms      => $perms,
+            f_name     => $f_name,
+        );
+    }
     elsif ( $page eq 'moderator-edit-post' ) {
         # the moderator is editing the post
         $m->comp('/zaapt/model/forum/moderator-edit-post.mhtml',
             zaapt      => $zaapt,
-            perms   => $perms,
+            perms      => $perms,
             a          => $a,
             f_name     => $f_name,
             p_id       => $p_id,

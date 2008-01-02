@@ -89,6 +89,8 @@
             <br />
             <a href="?a=del&amp;tp_id=<% $topic->{tp_id} | u %>&amp;p=<% $p | u %>" title="Delete Topic"><& /zaapt/common/icon.mhtml, name => 'script_delete', title => 'Delete Topic' &></a>
             <br />
+            <a href="moderate-topic.html?_act=move&amp;tp_id=<% $topic->{tp_id} | u %>" title="Move Topic"><& /zaapt/common/icon.mhtml, name => 'script_go', title => 'Move Topic' &></a>
+            <br />
 %         }
         </td>
 

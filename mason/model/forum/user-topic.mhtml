@@ -40,6 +40,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
+    $perms
     $a         => ''
     $f_name
     $tp_id
@@ -84,7 +85,7 @@
     my $err = [];
     if ( $a eq 'reply' ) {
         # firstly, check the error cases
-        unless ( $SESS->{roles}{$forum->{_moderator}} or !$topic->{tp_locked} ) {
+        unless ( $perms->{$forum->{_moderator}} or !$topic->{tp_locked} ) {
             $m->clear_buffer();
             $m->abort(404);
             return;
@@ -109,7 +110,7 @@
     }
     elsif ( exists $allowed->{moderator}{$a} ) {
         # these actions are just for moderators, so make sure they are one
-        if ( exists $SESS->{roles}{$forum->{_moderator}} ) {
+        if ( exists $perms->{$forum->{_moderator}} ) {
             if ( $a eq 'sticky-remove' ) {
                 $model->upd_topic({ tp_id => $tp_id, tp_sticky => 0 });
             }

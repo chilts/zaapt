@@ -1,6 +1,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $forum
+    $perms
     $topic
     $err
     $p_message
@@ -18,12 +19,12 @@
 
 <p>
     <span class="floatright">
-% if ( $SESS->{roles}{$forum->{_moderator}} or !$topic->{tp_locked} ) {
+% if ( $perms->{$forum->{_moderator}} or !$topic->{tp_locked} ) {
         <a href="#" onclick="removeElementClass('reply1', 'hide');"><& /zaapt/common/icon.mhtml, name => 'script_add', title => 'Reply' &> Reply &raquo;&raquo;</a>
 % } else {
         <& /zaapt/common/icon.mhtml, name => 'script_link', title => 'Locked' &> Locked
 % }
-% if ( $SESS->{roles}{$forum->{_moderator}} ) {
+% if ( $perms->{$forum->{_moderator}} ) {
         <br />
 %     if ( $topic->{tp_sticky} ) {
         <a href="?a=sticky-remove&amp;tp_id=<% $topic->{tp_id} | u %>&amp;p=<% $p | u %>" title="Remove Stickiness"><& /zaapt/common/icon.mhtml, name => 'script', title => 'Remove Stickiness' &></a>
@@ -45,7 +46,7 @@
 
 <& /zaapt/common/err.mhtml, err => $err &>
 
-% if ( $SESS->{roles}{$forum->{_moderator}} or !$topic->{tp_locked} ) {
+% if ( $perms->{$forum->{_moderator}} or !$topic->{tp_locked} ) {
 <div id="reply1"<% @$err ? '' : ' class="hide"' %>>
 <& /zaapt/common/form.mhtml, action => '?', elements => [
         { type => 'hidden', name => 'a', value => 'reply' },
@@ -84,7 +85,7 @@
             Posts: <% $post->{i_posts} | h %><br />
             </span>
 
-%         if ( $SESS->{roles}{$forum->{_moderator}} ) {
+%         if ( $perms->{$forum->{_moderator}} ) {
             <hr />
             <a href="moderator-edit-post.html?p_id=<% $post->{p_id} | u %>&amp;p=<% $p | u %>" title="Edit Post"><& /zaapt/common/icon.mhtml, name => 'script_edit', title => 'Edit Post' &> Edit Post</a>
             <br />
@@ -109,7 +110,7 @@
 
 <p>
     <span class="floatright">
-% if ( $SESS->{roles}{$forum->{_moderator}} or !$topic->{tp_locked} ) {
+% if ( $perms->{$forum->{_moderator}} or !$topic->{tp_locked} ) {
         <a href="#" onclick="removeElementClass('reply2', 'hide'); return false;"><& /zaapt/common/icon.mhtml, name => 'script_add', title => 'Reply' &> Reply &raquo;&raquo;</a>
 % } else {
         <& /zaapt/common/icon.mhtml, name => 'script_link', title => 'Locked' &> Locked
@@ -118,7 +119,7 @@
     &nbsp;
 </p>
 
-% if ( $SESS->{roles}{$forum->{_moderator}} or !$topic->{tp_locked} ) {
+% if ( $perms->{$forum->{_moderator}} or !$topic->{tp_locked} ) {
 <div id="reply2"<% @$err ? '' : ' class="hide"' %>>
 <& /zaapt/common/form.mhtml, action => '?', elements => [
         { type => 'hidden', name => 'a', value => 'reply' },

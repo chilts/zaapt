@@ -1,6 +1,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
+    $perms
     $forum
     $err
     $tp_subject
@@ -72,7 +73,7 @@
             <br />
             <& /zaapt/common/paginator.mhtml, url => "$topic->{tp_id}.html?", btext => 'Page:', to => $topic->{tp_posts}, perpage => $forum->{f_show} &>
 %         }
-%         if ( exists $SESS->{roles}{$forum->{_moderator}} ) {
+%         if ( exists $perms->{$forum->{_moderator}} ) {
             <hr />
 %             if ( $topic->{tp_sticky} ) {
             <a href="?a=sticky-remove&amp;tp_id=<% $topic->{tp_id} | u %>&amp;p=<% $p | u %>" title="Remove Stickiness"><& /zaapt/common/icon.mhtml, name => 'script', title => 'Remove Stickiness' &> Remove Stickiness</a>

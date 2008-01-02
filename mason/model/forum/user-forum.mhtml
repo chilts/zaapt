@@ -1,6 +1,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $zaapt
+    $perms
     $a          => ''
     $f_name
     $id
@@ -54,31 +55,31 @@
     }
     elsif ( $a eq 'sticky-remove' ) {
         # check they have moderator on this forum
-        if ( exists $SESS->{roles}{$forum->{_moderator}} ) {
+        if ( exists $perms->{$forum->{_moderator}} ) {
             $model->upd_topic({ tp_id => $tp_id, tp_sticky => 0 });
         }
     }
     elsif ( $a eq 'sticky-add' ) {
         # check they have moderator on this forum
-        if ( exists $SESS->{roles}{$forum->{_moderator}} ) {
+        if ( exists $perms->{$forum->{_moderator}} ) {
             $model->upd_topic({ tp_id => $tp_id, tp_sticky => 1 });
         }
     }
     elsif ( $a eq 'locked-remove' ) {
         # check they have moderator on this forum
-        if ( exists $SESS->{roles}{$forum->{_moderator}} ) {
+        if ( exists $perms->{$forum->{_moderator}} ) {
             $model->upd_topic({ tp_id => $tp_id, tp_locked => 0 });
         }
     }
     elsif ( $a eq 'locked-add' ) {
         # check they have moderator on this forum
-        if ( exists $SESS->{roles}{$forum->{_moderator}} ) {
+        if ( exists $perms->{$forum->{_moderator}} ) {
             $model->upd_topic({ tp_id => $tp_id, tp_locked => 1 });
         }
     }
     elsif ( $a eq 'del' ) {
         # check they have moderator on this forum
-        if ( exists $SESS->{roles}{$forum->{_moderator}} ) {
+        if ( exists $perms->{$forum->{_moderator}} ) {
             $model->del_topic({ tp_id => $tp_id });
         }
     }

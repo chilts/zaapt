@@ -1,4 +1,11 @@
 %# ----------------------------------------------------------------------------
+<%doc>
+
+    This is used throughout the Zaapt components, so adjust this to suit
+    wherever your sign-in URL is.
+
+</%doc>
+%# ----------------------------------------------------------------------------
 <%args>
     $text
 </%args>

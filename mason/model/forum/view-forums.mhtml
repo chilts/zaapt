@@ -15,5 +15,5 @@
     my $forums = $model->sel_forum_all();
 </%init>
 %# ----------------------------------------------------------------------------
-<& render-view-forums.mhtml, forums => $forums &>
+<& view-forums.render.mhtml, forums => $forums &>
 %# ----------------------------------------------------------------------------

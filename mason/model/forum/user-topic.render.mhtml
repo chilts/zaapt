@@ -106,7 +106,7 @@
 
         </td>
 
-        <& render-post.mhtml, post => $post &>
+        <& post.render.mhtml, post => $post &>
 
     </tr>
 %     }

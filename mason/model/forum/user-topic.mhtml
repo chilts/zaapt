@@ -139,7 +139,7 @@
     my $posts = $model->sel_post_all_in_offset({ tp_id => $tp_id, _offset => ($p-1) * $forum->{f_show}, _limit => $forum->{f_show} });
 </%init>
 %# ----------------------------------------------------------------------------
-<& render-user-topic.mhtml,
+<& user-topic.render.mhtml,
     zaapt     => $zaapt,
     perms     => $perms,
     forum     => $forum,

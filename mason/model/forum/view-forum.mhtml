@@ -19,7 +19,7 @@
     my $topics = $model->sel_topic_all_in_offset({ f_id => $forum->{f_id}, _offset => ($p-1) * $forum->{f_show}, _limit => $forum->{f_show} });
 </%init>
 %# ----------------------------------------------------------------------------
-<& render-view-forum.mhtml,
+<& view-forum.render.mhtml,
     zaapt  => $zaapt,
     forum  => $forum,
     topics => $topics,

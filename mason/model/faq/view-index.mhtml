@@ -16,7 +16,7 @@
     my $questions = $model->sel_question_all_in({ f_id => $faq->{f_id} });
 </%init>
 %# ----------------------------------------------------------------------------
-<& render-view-index.mhtml,
+<& view-index.render.mhtml,
     faq       => $faq,
     questions => $questions,
 &>

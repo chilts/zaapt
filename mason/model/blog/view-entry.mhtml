@@ -105,19 +105,19 @@
 % }
 
 %# call all these things so if the user wants to override anything, they can
-<& render-entry.mhtml,
+<& entry.render.mhtml,
     entry => $entry,
     labels => $labels,
 &>
-<& render-trackbacks.mhtml,
+<& trackbacks.render.mhtml,
     entry => $entry,
     trackbacks => $trackbacks
 &>
-<& render-comments.mhtml,
+<& comments.render.mhtml,
     entry => $entry,
     comments => $comments
 &>
-<& render-comment-form.mhtml,
+<& comment-form.render.mhtml,
     entry => $entry,
     c_name => $c_name,
     c_email => $c_email,

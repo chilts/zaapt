@@ -11,7 +11,7 @@
 <h2 id="comments">Comments</h2>
 % if ( @$comments ) {
 %     foreach my $comment ( @$comments ) {
-<& render-comment.mhtml, comment => $comment &>
+<& comment.render.mhtml, comment => $comment &>
 %     }
 % } else {
 <p>No comments yet.</p>

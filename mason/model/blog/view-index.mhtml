@@ -16,7 +16,7 @@
 %# ----------------------------------------------------------------------------
 % if ( @$entries ) {
 %     foreach my $entry ( @$entries ) {
-<& render-entry-summary.mhtml, entry => $entry &>
+<& entry-summary.render.mhtml, entry => $entry &>
 %     }
 % } else {
 <p>Currently, there are no entries in this blog.</p>

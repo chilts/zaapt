@@ -9,7 +9,7 @@
     $entries = [ $entries ] unless ref $entries eq 'ARRAY';
 
     foreach my $entry ( $entries ) {
-        $m->comp('render-entry-summary.mhtml', entry => $entry);
+        $m->comp('entry-summary.render.mhtml', entry => $entry);
     }
     return;
 </%init>

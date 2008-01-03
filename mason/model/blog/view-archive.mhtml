@@ -20,5 +20,5 @@
 
 <p>Found <% scalar @$entries | h %> <% scalar @$entries == 1 ? 'entry' : 'entries' %>.</p>
 
-<& render-entries.mhtml, entries => $entries &>
+<& entries.render.mhtml, entries => $entries &>
 %# ----------------------------------------------------------------------------

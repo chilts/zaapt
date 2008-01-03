@@ -39,7 +39,7 @@
     }
 </%init>
 %# ----------------------------------------------------------------------------
-<& render-user-add.mhtml,
+<& user-add.render.mhtml,
     t_username => $t_username,
     err => \@err,
 &>

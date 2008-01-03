@@ -11,7 +11,7 @@
     my $tos = $model->sel_friend_to({ t_id => $id });
 </%init>
 %# ----------------------------------------------------------------------------
-<& render-view-info.mhtml,
+<& view-info.render.mhtml,
     friends => $friends,
     tos     => $tos,
 &>

@@ -10,7 +10,7 @@
     my $friends = $model->sel_friend_for({ a_id => $id });
 </%init>
 %# ----------------------------------------------------------------------------
-<& render-view-info-friends.mhtml,
+<& view-info-friends.render.mhtml,
     friends => $friends,
 &>
 %# ----------------------------------------------------------------------------

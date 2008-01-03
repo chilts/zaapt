@@ -155,7 +155,7 @@
         return;
     }
 
-    my $options = $m->comp('/zaapt/common/type_options.mhtml', zaapt => $zaapt);
+    my $options = $m->comp('/zaapt/common/options-type.mas', zaapt => $zaapt);
 </%init>
 %# ----------------------------------------------------------------------------
 <h1><% $title->{$_act} | n %> a Page</h1>

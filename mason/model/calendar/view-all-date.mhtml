@@ -11,7 +11,7 @@
     my $events = $model->sel_event_all_archive({ _from => $date, _for => $for });
 </%init>
 %# ----------------------------------------------------------------------------
-<& render-view-all-date.mhtml,
+<& view-all-date.render.mhtml,
     events => $events,
     date   => $date,
 &>

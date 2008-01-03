@@ -9,7 +9,7 @@
     my $events = $model->sel_event_latest({ _limit => 3 });
 </%init>
 %# ----------------------------------------------------------------------------
-<& render-view-all-latest.mhtml,
+<& view-all-latest.render.mhtml,
     events => $events,
 &>
 %# ----------------------------------------------------------------------------

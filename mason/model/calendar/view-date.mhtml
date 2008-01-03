@@ -20,7 +20,7 @@
     });
 </%init>
 %# ----------------------------------------------------------------------------
-<& render-view-all-date.mhtml,
+<& view-all-date.render.mhtml,
     events => $events,
     date   => $date,
 &>

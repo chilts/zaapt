@@ -35,7 +35,7 @@
     }
 </%init>
 %# ----------------------------------------------------------------------------
-<& widget-render-view-all-month.mhtml,
+<& widget-view-all-month.render.mhtml,
     today     => $today,
     the_first => $the_first,
     dates     => $dates,

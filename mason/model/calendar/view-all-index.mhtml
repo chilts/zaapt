@@ -8,7 +8,7 @@
     my $calendars = $model->sel_calendar_all();
 </%init>
 %# ----------------------------------------------------------------------------
-<& render-view-all-index.mhtml,
+<& view-all-index.render.mhtml,
     calendars => $calendars,
 &>
 %# ----------------------------------------------------------------------------

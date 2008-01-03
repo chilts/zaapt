@@ -14,7 +14,7 @@
     my $events = $model->sel_event_all_in({ c_id => $calendar->{c_id} });
 </%init>
 %# ----------------------------------------------------------------------------
-<& render-view-index.mhtml,
+<& view-index.render.mhtml,
     calendar => $calendar,
     events   => $events,
 &>

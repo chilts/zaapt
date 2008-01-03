@@ -20,7 +20,7 @@
     }
 </%init>
 %# ----------------------------------------------------------------------------
-<& render-view-event.mhtml,
+<& view-event.render.mhtml,
     calendar => $calendar,
     event    => $event,
 &>

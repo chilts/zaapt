@@ -14,7 +14,7 @@
     my $articles = $model->sel_article_latest({ n_id => $news->{n_id}, _limit => $news->{n_show} });
 </%init>
 %# ----------------------------------------------------------------------------
-<& render-view-index.mhtml,
+<& view-index.render.mhtml,
     articles => $articles,
 &>
 %# ----------------------------------------------------------------------------

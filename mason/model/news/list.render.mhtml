@@ -3,13 +3,14 @@
     $articles
 </%args>
 %# ----------------------------------------------------------------------------
-<div class="z_news">
-% if ( @$articles ) {
-%     foreach my $article ( @$articles ) {
-<& render-article-summary.mhtml, article => $article &>
-%     }
-% } else {
-<p>Currently, there are no articles in this news section.</p>
-% }
-</div>
+<%init>
+    return unless defined $articles;
+
+    $articles = [ $articles ] unless ref $articles eq 'ARRAY';
+
+    foreach my $article ( $articles ) {
+        $m->comp('article-summary.render.mhtml', article => $article);
+    }
+    return;
+</%init>
 %# ----------------------------------------------------------------------------

@@ -10,7 +10,8 @@
 <h1>Congratulations</h1>
 
 <p>
-    Your account has been confirmed, you may proceed to <a href="sign-in.html">sign in</a>.
+    Your account has been confirmed, you may proceed to
+    <& /zaapt/common/sign-in-url.mhtml, text => 'sign in' &>.
 </p>
 
 % } else {

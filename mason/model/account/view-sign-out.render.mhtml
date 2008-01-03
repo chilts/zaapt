@@ -6,6 +6,7 @@
 </p>
 
 <p>
-    Or goto the <a href="sign-in.html">sign in</a> page and take a look around.
+    Or goto the <& /zaapt/common/sign-in-url.mhtml, text => 'sign in' &> page
+    and take a look around.
 </p>
 %# ----------------------------------------------------------------------------

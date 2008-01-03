@@ -3,6 +3,6 @@
 
 <p>
     To be able to edit your account information, you must
-    <a href="sign-in.html">sign in first</a>.
+    <& /zaapt/common/sign-in-url.mhtml, text => 'sign in' &>sign in first</a>.
 </p>
 %# ----------------------------------------------------------------------------

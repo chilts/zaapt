@@ -7,8 +7,6 @@
 <%init>
     my $model = $zaapt->get_model('Forum');
     my $forums = $model->sel_forum_all();
-    use Data::Dumper;
-    warn Dumper($forums);
 </%init>
 %# ----------------------------------------------------------------------------
 <h1>Forum List</h1>

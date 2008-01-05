@@ -18,7 +18,7 @@
 % foreach my $permission ( @$permissions ) {
     <tr class="r<% $row=1-$row %>">
         <td>
-            (<% $permission->{p_id} | h %>) <strong><% $permission->{p_name} | h %></strong>
+            (<% $permission->{p_id} | h %>) <strong><% $permission->{p_name} | h %></strong> (from role <strong><% $permission->{r_name} | h %></strong>)
             <br />
             <% $permission->{p_description} | h %>
         </td>

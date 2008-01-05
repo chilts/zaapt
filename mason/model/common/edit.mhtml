@@ -1,0 +1,15 @@
+%# ----------------------------------------------------------------------------
+<%doc>
+
+    This is the edit page for the 'Common' model. Future possibilities include
+    assigning permissions to common.type and various other things.
+
+</%doc>
+%# ----------------------------------------------------------------------------
+<h1>Model: Common</h1>
+
+<p>
+    Currently, there is nothing in this model that can be changed from the
+    admin interface.
+</p>
+%# ----------------------------------------------------------------------------

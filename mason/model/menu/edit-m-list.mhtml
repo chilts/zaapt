@@ -7,8 +7,6 @@
 <%init>
     my $model = $zaapt->get_model('Menu');
     my $menus = $model->sel_menu_all();
-    use Data::Dumper;
-    warn Dumper($perms);
 </%init>
 %# ----------------------------------------------------------------------------
 <h1>Menu List</h1>

@@ -16,10 +16,6 @@
 <%init>
     $email->{'X-Mailer'} = "Mail::Sendmail version $Mail::Sendmail::VERSION";
 
-    # use Data::Dumper;
-    # warn 'email=' . Dumper($email);
-    # return 1;
-
     # we should do some checking for things here, but for now, just send it
     unless ( Mail::Sendmail::sendmail( %$email ) ) {
         warn "Error sending mail: $Mail::Sendmail::error";

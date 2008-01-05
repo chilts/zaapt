@@ -14,7 +14,6 @@
 %# ----------------------------------------------------------------------------
 <%once>
     use URI::Escape;
-    use Data::Dumper;
 
     my $title = {
         add => 'Add',
@@ -26,8 +25,6 @@
 </%once>
 %# ----------------------------------------------------------------------------
 <%init>
-    # warn Data::Dumper->Dump([\%ARGS], ['args']);
-
     my $model = $zaapt->get_model('Calendar');
 
     $m->redirect('edit-c-list.html') unless exists $perms->{super};
@@ -143,8 +140,6 @@
         $m->redirect("edit-c-list.html");
         return;
     }
-
-    # warn Data::Dumper->Dump([$values], ['values']);
 
     # create the dropdown options for each role
     my $options = $m->comp('/zaapt/common/permission_options.mhtml', zaapt => $zaapt);

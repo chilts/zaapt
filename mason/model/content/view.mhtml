@@ -6,7 +6,6 @@
 </%args>
 %# ----------------------------------------------------------------------------
 <%init>
-    use Data::Dumper;
     my $model = $zaapt->get_model('Content');
     my $content = $model->sel_content_using_name({ c_name => $c_name });
 

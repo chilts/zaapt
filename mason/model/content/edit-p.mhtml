@@ -123,9 +123,6 @@
             push @$err, 'invalid type';
         }
 
-        use Data::Dumper;
-        warn Dumper($err);
-
         # do the update
         unless ( @$err ) {
             $model->upd_page({

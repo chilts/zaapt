@@ -22,7 +22,7 @@
 
 <h2>Menu: <% $menu->{m_name} | h %> - '<% $menu->{m_title} | h %>'</h2>
 
-% if ( exists $perms->{$menu->{_admin}} ) {
+% if ( exists $perms->{$menu->{_edit}} ) {
 <p>
     * <a href="edit-i.html?_act=add&amp;m_id=<% $menu->{m_id} | u %>">Add Item &raquo;</a>
 </p>
@@ -41,10 +41,8 @@
             <td>
 %         if ( exists $perms->{$item->{_edit}} ) {
                 * <a href="edit-i.html?_act=edit&amp;i_id=<% $item->{i_id} | u %>">Edit Item</a><br />
-%             if ( exists $perms->{$item->{_admin}} ) {
                 * <a href="edit-i.html?_act=rem&amp;i_id=<% $item->{i_id} | u %>">Delete</a><br />
                 * Move <a href="edit-i.html?_act=move-up&amp;i_id=<% $item->{i_id} | u %>">Up</a> / <a href="edit-i.html?_act=move-dn&amp;i_id=<% $item->{i_id} | u %>">Dn</a><br />
-%             }
 %         } else {
                 -
 %         }

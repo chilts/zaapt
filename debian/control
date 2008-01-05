@@ -17,5 +17,4 @@ Description: content framework for websites, specifically Mason ones
  made content modules and let you get on with the creative part. This comes
  with no CSS or design, though it does come with example HTML (in Mason) which
  can be used or overridden. It is very clean and therefore is easy to
- style. This approach also allows you to get on and use whatever session
- management process you want since this is not provided.
+ style.

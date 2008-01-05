@@ -95,7 +95,7 @@
             push @$err, Zaapt::Utils::Valid::err();
         }
 
-        # do the insert
+        # do the update
         unless ( @$err ) {
             $model->upd_question({
                 f_id       => $f_id,

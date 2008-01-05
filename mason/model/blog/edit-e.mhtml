@@ -151,7 +151,7 @@
             push @$err, 'invalid type';
         }
 
-        # do the insert
+        # do the update
         unless ( @$err ) {
             $model->upd_entry({
                 a_id        => $id,

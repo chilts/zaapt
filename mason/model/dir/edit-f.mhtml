@@ -157,7 +157,7 @@
             }
         }
 
-        # do the insert
+        # do the update
         unless ( @$err ) {
             # create the output filename
             my ($f_ext) = $f_filename =~ m{ \. (\w+) \z }xms;

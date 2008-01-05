@@ -126,7 +126,7 @@
         use Data::Dumper;
         warn Dumper($err);
 
-        # do the insert
+        # do the update
         unless ( @$err ) {
             $model->upd_page({
                 c_id      => $c_id,

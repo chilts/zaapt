@@ -7,3 +7,4 @@ entities:
 name: friend
 stores: 
   - psql
+title: Friend

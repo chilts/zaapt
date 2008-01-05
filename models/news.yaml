@@ -9,3 +9,4 @@ entities:
 name: news
 stores: 
   - psql
+title: News

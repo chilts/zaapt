@@ -11,3 +11,4 @@ entities:
 name: forum
 stores: 
   - psql
+title: Forum

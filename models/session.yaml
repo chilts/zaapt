@@ -6,3 +6,4 @@ entities:
 name: session
 stores: 
   - psql
+title: Session

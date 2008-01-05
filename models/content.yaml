@@ -9,3 +9,4 @@ entities:
 name: content
 stores: 
   - psql
+title: Content

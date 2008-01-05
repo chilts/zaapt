@@ -7,3 +7,4 @@ entities:
 name: common
 stores: 
   - psql
+title: Common

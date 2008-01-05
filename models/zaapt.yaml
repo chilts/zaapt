@@ -6,3 +6,4 @@ entities:
 name: zaapt
 stores: 
   - psql
+title: Zaapt

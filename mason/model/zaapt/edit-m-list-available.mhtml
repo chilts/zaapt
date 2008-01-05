@@ -1,0 +1,46 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $perms
+</%args>
+%# ----------------------------------------------------------------------------
+<%once>
+    use File::Glob;
+    use YAML::Syck;
+</%once>
+%# ----------------------------------------------------------------------------
+<%init>
+    my @models = map { LoadFile($_) } glob('/usr/share/zaapt/models/*.yaml');
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Model List</h1>
+
+<&| /zaapt/common/admin/table-list.mhtml, title => 'Model' &>
+
+% my $r = 1;
+% foreach my $model ( @models ) {
+        <tr class="r<% $r=1-$r %>">
+            <td>
+                <strong><% $model->{name} | h %></strong> - '<% $model->{title} | h %>'<br />
+                Entities: <% join(', ', @{$model->{entities}}) | h %><br />
+                Depends: <% join(', ', @{$model->{depends}}) | h %><br />
+                Stores: <% join(', ', @{$model->{stores}}) | h %><br />
+            </td>
+            <td>
+                -
+%     if ( $perms->{super} ) {
+%# ToDo: eventually be able to install right from here
+%     }
+            </td>
+        </tr>
+% }
+% unless ( @models ) {
+        <tr class="r0">
+            <td>no models found</td>
+            <td>&nbsp;</td>
+        </tr>
+% }
+
+</&>
+
+%# ----------------------------------------------------------------------------

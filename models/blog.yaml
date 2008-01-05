@@ -12,3 +12,4 @@ entities:
 name: blog
 stores: 
   - psql
+title: Blog

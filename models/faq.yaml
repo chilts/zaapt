@@ -9,3 +9,4 @@ entities:
 name: faq
 stores: 
   - psql
+title: Faq

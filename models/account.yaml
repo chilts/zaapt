@@ -11,3 +11,4 @@ entities:
 name: account
 stores: 
   - psql
+title: Account

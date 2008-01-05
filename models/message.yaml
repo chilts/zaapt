@@ -7,3 +7,4 @@ entities:
 name: message
 stores: 
   - psql
+title: Message

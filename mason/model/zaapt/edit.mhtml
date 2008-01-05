@@ -1,0 +1,20 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $perms
+</%args>
+%# ----------------------------------------------------------------------------
+<h1>Zaapt Admin</h1>
+
+<h2>Installed Models</h2>
+
+<ul>
+    <li><a href="edit-m-list.html">Installed Models</a></li>
+</ul>
+
+<h2>Available Models</h2>
+
+<ul>
+    <li><a href="edit-m-list-available.html">Available Models</a></li>
+</ul>
+%# ----------------------------------------------------------------------------

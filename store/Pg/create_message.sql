@@ -16,4 +16,7 @@ CREATE TABLE message.message (
 CREATE TRIGGER message_updated BEFORE UPDATE ON message.message
     FOR EACH ROW EXECUTE PROCEDURE updated();
 
+-- we now we need to tell Zaapt of the blog and it's settings
+INSERT INTO zaapt.model(name, title, module) VALUES('message', 'Message', 'Zaapt::Store::Pg::Message');
+
 -- ----------------------------------------------------------------------------

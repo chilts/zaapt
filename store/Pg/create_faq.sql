@@ -41,4 +41,7 @@ CREATE TABLE faq.question (
 CREATE TRIGGER question_updated BEFORE UPDATE ON faq.question
     FOR EACH ROW EXECUTE PROCEDURE updated();
 
+-- we now we need to tell Zaapt of the blog and it's settings
+INSERT INTO zaapt.model(name, title, module) VALUES('faq', 'Faq', 'Zaapt::Store::Pg::Faq');
+
 -- ----------------------------------------------------------------------------

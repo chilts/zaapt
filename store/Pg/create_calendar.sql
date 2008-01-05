@@ -83,4 +83,7 @@ CREATE OR REPLACE FUNCTION calendar.event_ad() RETURNS trigger as '
 CREATE TRIGGER event_ad AFTER DELETE ON calendar.event
     FOR EACH ROW EXECUTE PROCEDURE calendar.event_ad();
 
+-- we now we need to tell Zaapt of the blog and it's settings
+INSERT INTO zaapt.model(name, title, module) VALUES('calendar', 'Calendar', 'Zaapt::Store::Pg::Calendar');
+
 -- ----------------------------------------------------------------------------

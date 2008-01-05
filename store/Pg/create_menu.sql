@@ -44,4 +44,7 @@ CREATE TRIGGER item_updated BEFORE UPDATE ON menu.item
 
 CREATE INDEX item_display ON menu.item(display);
 
+-- we now we need to tell Zaapt of the blog and it's settings
+INSERT INTO zaapt.model(name, title, module) VALUES('menu', 'Menu', 'Zaapt::Store::Pg::Menu');
+
 -- ----------------------------------------------------------------------------

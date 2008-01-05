@@ -81,4 +81,7 @@ CREATE OR REPLACE FUNCTION dir.file_ad() RETURNS trigger as '
 CREATE TRIGGER file_ad AFTER DELETE ON dir.file
     FOR EACH ROW EXECUTE PROCEDURE dir.file_ad();
 
+-- we now we need to tell Zaapt of the blog and it's settings
+INSERT INTO zaapt.model(name, title, module) VALUES('dir', 'Dir', 'Zaapt::Store::Pg::Dir');
+
 -- ----------------------------------------------------------------------------

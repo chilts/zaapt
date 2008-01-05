@@ -1,0 +1,8 @@
+--- 
+depends: []
+
+entities: 
+  - model
+name: zaapt
+stores: 
+  - psql

@@ -1,0 +1,38 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $perms
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Zaapt');
+    my $models = $model->sel_model_all();
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Model List</h1>
+
+<&| /zaapt/common/admin/table-list.mhtml, title => 'Model' &>
+
+% my $r = 1;
+% foreach my $model ( @$models ) {
+        <tr class="r<% $r=1-$r %>">
+            <td>
+                (<% $model->{m_id} | h %>) <strong><% $model->{m_name} | h %></strong><br />
+                <% $model->{m_title} | h %><br />
+                <code><% $model->{m_module} %></code>
+            </td>
+            <td>
+                * <a href="edit-s-list.html?m_id=<% $model->{m_id} | u %>">Setting List</a><br />
+            </td>
+        </tr>
+% }
+% unless ( @$models ) {
+        <tr class="r0">
+            <td>no models found</td>
+            <td>&nbsp;</td>
+        </tr>
+% }
+
+</&>
+
+%# ----------------------------------------------------------------------------

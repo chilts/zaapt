@@ -12,4 +12,7 @@ CREATE TABLE session.session (
 CREATE TRIGGER session_updated BEFORE UPDATE ON session.session
     FOR EACH ROW EXECUTE PROCEDURE updated();
 
+-- we now we need to tell Zaapt of the blog and it's settings
+INSERT INTO zaapt.model(name, title, module) VALUES('session', 'Session', 'Zaapt::Store::Pg::Session');
+
 -- ----------------------------------------------------------------------------

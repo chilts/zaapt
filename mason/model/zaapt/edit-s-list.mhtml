@@ -1,0 +1,50 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $perms
+    $m_id => undef
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Zaapt');
+    my $zaapt_model = $model->sel_model({ m_id => $m_id });
+    unless ( defined $zaapt_model ) {
+        $m->redirect('edit-m-list.html');
+        return;
+    }
+    my $settings = $model->sel_setting_all_in({ m_id => $m_id });
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Setting List</h1>
+
+<p><a href="edit-m-list.html">&laquo; Back to Model List</a></p>
+
+<h2>Model: <% $zaapt_model->{m_name} | h %> - '<% $zaapt_model->{m_title} | h %>'</h2>
+
+<&| /zaapt/common/admin/table-list.mhtml, title => 'Setting' &>
+
+% my $row = 1;
+% foreach my $setting ( @$settings ) {
+        <tr class="r<% $row=1-$row %>">
+            <td>
+                (<% $setting->{s_id} | h %>) <strong><% $setting->{s_name} | h %></strong><br />
+                Value: <strong><% $setting->{s_value} | h %></strong>
+            </td>
+            <td>
+%     if ( exists $perms->{super} ) {
+                * <a href="edit-s.html?_act=edit&amp;s_id=<% $setting->{s_id} | u %>">Edit Setting</a><br />
+%     } else {
+                -
+%     }
+            </td>
+        </tr>
+% }
+% unless ( @$settings ) {
+        <tr class="r0">
+            <td>No settings found for this model</td>
+            <td>&nbsp;</td>
+        </tr>
+% }
+
+</&>
+%# ----------------------------------------------------------------------------

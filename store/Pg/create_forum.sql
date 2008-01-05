@@ -149,4 +149,7 @@ CREATE OR REPLACE FUNCTION forum.topic_bu() RETURNS trigger as '
 CREATE TRIGGER topic_bu BEFORE UPDATE ON forum.topic
     FOR EACH ROW EXECUTE PROCEDURE forum.topic_bu();
 
+-- we now we need to tell Zaapt of the blog and it's settings
+INSERT INTO zaapt.model(name, title, module) VALUES('forum', 'Forum', 'Zaapt::Store::Pg::Forum');
+
 -- ----------------------------------------------------------------------------

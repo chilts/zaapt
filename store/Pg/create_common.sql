@@ -30,4 +30,7 @@ CREATE TRIGGER label_updated BEFORE UPDATE ON
     common.label FOR EACH ROW EXECUTE PROCEDURE updated();
 CREATE INDEX label_name ON common.label(name);
 
+-- we now we need to tell Zaapt of the blog and it's settings
+INSERT INTO zaapt.model(name, title, module) VALUES('common', 'Common', 'Zaapt::Store::Pg::Common');
+
 -- ----------------------------------------------------------------------------

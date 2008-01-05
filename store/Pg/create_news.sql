@@ -46,4 +46,7 @@ CREATE TRIGGER article_updated BEFORE UPDATE ON news.article
     FOR EACH ROW EXECUTE PROCEDURE updated();
 CREATE INDEX article_inserted ON news.article(inserted);
 
+-- we now we need to tell Zaapt of the blog and it's settings
+INSERT INTO zaapt.model(name, title, module) VALUES('news', 'News', 'Zaapt::Store::Pg::News');
+
 -- ----------------------------------------------------------------------------

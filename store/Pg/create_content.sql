@@ -44,4 +44,7 @@ CREATE TABLE content.page (
 CREATE TRIGGER page_updated BEFORE UPDATE ON content.page
     FOR EACH ROW EXECUTE PROCEDURE updated();
 
+-- we now we need to tell Zaapt of the blog and it's settings
+INSERT INTO zaapt.model(name, title, module) VALUES('content', 'Content', 'Zaapt::Store::Pg::Content');
+
 -- ----------------------------------------------------------------------------

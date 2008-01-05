@@ -145,4 +145,7 @@ CREATE TABLE account.token (
 CREATE TRIGGER token_updated BEFORE UPDATE ON account.token
     FOR EACH ROW EXECUTE PROCEDURE updated();
 
+-- we now we need to tell Zaapt of the blog and it's settings
+INSERT INTO zaapt.model(name, title, module) VALUES('account', 'Account', 'Zaapt::Store::Pg::Account');
+
 -- ----------------------------------------------------------------------------

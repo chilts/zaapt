@@ -1,6 +1,7 @@
 --- 
 depends: 
   - account
+  - zaapt
 entities: 
   - message
 name: message

@@ -1,0 +1,71 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $perms
+    $_act    => 'edit'
+    $s_id    => undef
+    $s_value => undef
+</%args>
+%# ----------------------------------------------------------------------------
+<%once>
+    use Zaapt::Utils::Valid;
+    use Zaapt::Utils::Conv;
+    use URI::Escape;
+</%once>
+%# ----------------------------------------------------------------------------
+<%init>
+    # must be super to be able to edit settings for any model
+    $m->redirect('edit-f-list.html') unless exists $perms->{super};
+
+    my $model = $zaapt->get_model('Zaapt');
+    my $setting = $model->sel_setting({ s_id => $s_id });
+
+    my $err = [];
+    my $values = {};
+
+    # let's do some of the actions
+    if ( $_act eq 'edit' ) {
+        # already checked permissions
+        $values = $setting;
+        $values->{_act} = 'upd';
+        $values->{submit} = 'Save Setting';
+    }
+    elsif ( $_act eq 'upd' ) {
+        # no validation, since it could be anything (even blank)
+
+        # do the update
+        unless ( @$err ) {
+            $model->upd_setting({
+                s_value    => $s_value,
+                s_id       => $s_id,
+            });
+            $m->redirect("edit-s-list.html?m_id=" . uri_escape( $setting->{m_id} ));
+            return;
+        }
+
+        $values = { %ARGS };
+        $values->{submit} = 'Save Setting';
+    }
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Edit a Setting</h1>
+
+<p><a href="edit-s-list.html?m_id=<% $setting->{m_id} | u %>">&laquo; Back to Setting List</a></p>
+
+<h2>Setting: <% $setting->{s_name} | h %></h2>
+
+<& /zaapt/common/err.mhtml, err => $err &>
+
+<& /zaapt/common/form/edit.mhtml,
+    action => '?',
+    values => $values,
+    elements => [
+        { type => 'hidden', name => '_act' },
+        { type => 'hidden', name => 's_id', def => $s_id },
+        { type => 'note', field => 'Name', name => 's_name' },
+        { type => 'text', field => 'Value', name => 's_value', def => '' },
+
+        { type => 'submit', name => 'submit', field => 'Actions', cancel => 1, location => 'edit-s-list.html?m_id=' . uri_escape($setting->{m_id}) },
+    ]
+&>
+%# ----------------------------------------------------------------------------

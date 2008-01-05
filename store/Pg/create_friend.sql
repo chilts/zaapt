@@ -22,4 +22,7 @@ COMMENT ON COLUMN friend.friend.account_id IS
 COMMENT ON COLUMN friend.friend.to_id IS
     'This signifies the acount.account who is the friend.';
 
+-- we now we need to tell Zaapt of the blog and it's settings
+INSERT INTO zaapt.model(name, title, module) VALUES('friend', 'Friend', 'Zaapt::Store::Pg::Friend');
+
 -- ----------------------------------------------------------------------------

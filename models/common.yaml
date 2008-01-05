@@ -1,6 +1,6 @@
 --- 
-depends: []
-
+depends: 
+  - zaapt
 entities: 
   - label
   - type

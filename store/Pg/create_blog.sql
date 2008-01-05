@@ -212,4 +212,7 @@ CREATE FUNCTION blog.trackback_ad() RETURNS trigger as '
 CREATE TRIGGER trackback_ad BEFORE DELETE ON blog.trackback
     FOR EACH ROW EXECUTE PROCEDURE blog.trackback_ad();
 
+-- we now we need to tell Zaapt of the blog and it's settings
+INSERT INTO zaapt.model(name, title, module) VALUES('blog', 'Blog', 'Zaapt::Store::Pg::Blog');
+
 -- ----------------------------------------------------------------------------

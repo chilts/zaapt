@@ -568,7 +568,7 @@ sub mk_selecter {
 
 sub _mk_selecter_all_from {
     my ($self, $schema, $t) = @_;
-    __PACKAGE__->mk_selecter_all( $schema, $t->{name}, $t->{prefix}, @{$t->{cols}} );
+    __PACKAGE__->_mk_selecter_all( $schema, $t->{name}, $t->{prefix}, @{$t->{cols}} );
 }
 
 sub _mk_selecter_all {
@@ -582,8 +582,7 @@ sub _mk_selecter_all {
     my $method =  sub {
         my ($self) = @_;
         # warn "sql=$sql";
-        # warn Dumper($hr);
-        return $self->_row( $sql );
+        return $self->_rows( $sql );
     };
 
     $self->_inject_method("sel_${table}_all", $method);

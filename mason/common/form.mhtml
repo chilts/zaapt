@@ -5,6 +5,10 @@
     $elements
 </%args>
 %# ----------------------------------------------------------------------------
+<%init>
+    warn "/mason/common/form.mhtml is deprecated, use /mason/common/form/edit.mhtml instead";
+</%init>
+%# ----------------------------------------------------------------------------
 <form action="<% $action || '?' %>" method="post"<% defined $enctype ? " enctype=\"$enctype\"" : '' %>>
 % foreach my $e ( @$elements ) {
 %     if ( $e->{type} eq 'hidden' ) {

@@ -13,6 +13,7 @@
     $zaapt
     $id
     $sess
+    $redirect    => '.'
     $_act        => ''
     $a_firstname => ''
     $a_lastname  => ''
@@ -55,7 +56,7 @@
                 sess => $sess
             );
             $m->clear_buffer();
-            $m->redirect('.');
+            $m->redirect($redirect);
             return;
         }
     }
@@ -82,7 +83,7 @@
                 a_id       => $id,
             });
             $m->clear_buffer();
-            $m->redirect('.');
+            $m->redirect($redirect);
             return;
         }
     }

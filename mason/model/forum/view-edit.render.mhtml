@@ -1,0 +1,8 @@
+%# ----------------------------------------------------------------------------
+<h1>Not signed in</h1>
+
+<p>
+    To be able to edit your account information, you must
+    <& /zaapt/common/sign-in-url.mhtml, text => 'sign in' &>sign in first</a>.
+</p>
+%# ----------------------------------------------------------------------------

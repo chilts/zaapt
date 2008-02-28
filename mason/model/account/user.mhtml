@@ -21,6 +21,9 @@
 </%once>
 %# ----------------------------------------------------------------------------
 <%init>
+    use Data::Dumper;
+    warn Dumper(\%ARGS);
+
     if ( exists $pages->{$page} ) {
         $m->comp(
             "/zaapt/model/account/user-$page.mhtml",

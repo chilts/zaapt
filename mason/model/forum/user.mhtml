@@ -85,6 +85,13 @@
             p          => $p,
         );
     }
+    elsif ( $page eq 'edit' ) {
+        # allow the user to edit their details
+        $m->comp('/zaapt/model/forum/user-edit.mhtml',
+            zaapt      => $zaapt,
+            id         => $id,
+        );
+    }
     else {
         $m->comp( '/zaapt/model/forum/user-topic.mhtml',
             zaapt     => $zaapt,

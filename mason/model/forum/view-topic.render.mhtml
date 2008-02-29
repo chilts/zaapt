@@ -54,5 +54,5 @@
 % }
 
 <h2>Key</h2>
-<& /zaapt/common/icon.mhtml, name => 'script', title => 'A Post' &><br />
+<& /zaapt/common/icon.mhtml, name => 'script', title => 'A Post' &> A Post<br />
 %# ----------------------------------------------------------------------------

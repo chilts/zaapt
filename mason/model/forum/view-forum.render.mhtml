@@ -74,7 +74,6 @@
 </p>
 
 <h2>Key</h2>
-<& /zaapt/common/icon.mhtml, name => 'script_key', title => 'Sticky Topic' &><br />
-<& /zaapt/common/icon.mhtml, name => 'script_link', title => 'Locked Topic' &><br />
-<& /zaapt/common/icon.mhtml, name => 'bullet_blue', title => 'No New Posts' &><br />
+<& /zaapt/common/icon.mhtml, name => 'script_key', title => 'Sticky Topic' &> Sticky Topic<br />
+<& /zaapt/common/icon.mhtml, name => 'script_link', title => 'Locked Topic' &> Locked Topic<br />
 %# ----------------------------------------------------------------------------

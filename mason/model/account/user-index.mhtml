@@ -5,16 +5,5 @@
     $sess
 </%args>
 %# ----------------------------------------------------------------------------
-<h1>User Homepage</h1>
-
-<p class="info">
-    Welcome back! You are signed in as
-    <& /zaapt/common/a_username.mhtml, a_username => $SESS->{username} &>.
-</p>
-
-<h2>Tell someone about this site</h2>
-
-<p>
-   Do you know someone who would just <a href="invite.html">love this site</a>?
-</p>
+<& user-index.render.mhtml, zaapt => $zaapt, id => $id, sess => $sess &>
 %# ----------------------------------------------------------------------------

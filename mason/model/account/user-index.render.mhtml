@@ -1,9 +1,13 @@
 %# ----------------------------------------------------------------------------
+<%args>
+    $sess
+</%args>
+%# ----------------------------------------------------------------------------
 <h1>User Homepage</h1>
 
 <p class="info">
     Welcome back! You are signed in as
-    <& /zaapt/common/a_username.mhtml, a_username => $SESS->{username} &>.
+    <& /zaapt/common/a_username.mhtml, a_username => $sess->{username} &>.
 </p>
 
 <h2>Tell someone about this site</h2>

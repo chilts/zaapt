@@ -77,13 +77,13 @@
 %     } elsif ( $e->{type} eq 'submit' ) {
             <button class="button" type="submit"><% $e->{value} | h %></button>\
 %         if ( defined $e->{cancel} ) {
-            <button class="button" type="button" onclick="document.location='<% $e->{cancel} %>';">Cancel</button>\
+            <button class="button" type="button" onclick="document.location='<% $e->{cancel} | n %>';">Cancel</button>\
 %         }
 %         if ( defined $e->{cancel_href} ) {
-            <button class="button" type="button" onclick="document.location='<% $e->{cancel_href} %>';">Cancel</button>\
+            <button class="button" type="button" onclick="document.location='<% $e->{cancel_href} | n %>';">Cancel</button>\
 %         }
 %         if ( defined $e->{cancel_js} ) {
-            <button class="button" type="button" onclick="<% $e->{cancel_js} %>">Cancel</button>\
+            <button class="button" type="button" onclick="<% $e->{cancel_js} | n %>">Cancel</button>\
 %         }
 %         if ( defined $e->{reset} ) {
             <button class="button" type="reset">Reset</button>\

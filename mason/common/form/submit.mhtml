@@ -14,11 +14,11 @@
 <button class="button" type="submit"><% $value | h %></button>\
 % if ( $e->{cancel} ) {
 %     if ( defined $e->{location} ) {
-<button class="button" type="button" onclick="document.location='<% $e->{location} %>';">Cancel</button>\
+<button class="button" type="button" onclick="document.location='<% $e->{location} | n %>';">Cancel</button>\
 %     } elsif ( defined $e->{href} ) {
-<button class="button" type="button" onclick="document.location='<% $e->{cancel_href} %>';">Cancel</button>\
+<button class="button" type="button" onclick="document.location='<% $e->{cancel_href} | n %>';">Cancel</button>\
 %     } elsif ( defined $e->{js} ) {
-<button class="button" type="button" onclick="<% $e->{cancel_js} %>">Cancel</button>\
+<button class="button" type="button" onclick="<% $e->{cancel_js} | n %>">Cancel</button>\
 %     } else {
 %         die "One of 'location', 'href' or 'js' must be defined.";
 %     }

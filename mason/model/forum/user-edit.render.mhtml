@@ -12,7 +12,7 @@
     values => $values,
     elements => [
         { type => 'hidden', name => '_act', def => 'upd' },
-        { type => 'note', field => 'Posts', def => '' },
+        { type => 'note', field => 'Posts', name => 'i_posts', def => '' },
         { type => 'textarea', field => 'Signature', name => 'i_signature', rows => 4, cols => 40, def => '' },
         { type => 'html', field => 'Help', value => $m->scomp('help-link.mhtml') },
         { type => 'submit', name => 'submit', field => '', cancel => 1, location => '.', def => 'Save Settings' },

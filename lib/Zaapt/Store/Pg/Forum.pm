@@ -57,6 +57,7 @@ my $tables = {
             [ 'account_id', 'fk', 'a_id' ],
             qw(posts signature ts:inserted ts:updated)
         ],
+        pk => [ 'account_id', 'fk', 'a_id' ],
     },
 };
 

@@ -558,9 +558,11 @@ sub mk_selecter {
     # create the closure
     my $method =  sub {
         my ($self, $hr) = @_;
+        my $key = ref $id ? $id->[2] : "${prefix}_${id}";
+        # warn "key=$key";
         # warn "sql=$sql";
-        # warn Dumper($hr);
-        return $self->_row( $sql, $hr->{"${prefix}_${id}"} );
+        # warn 'hr=' . Dumper($hr);
+        return $self->_row( $sql, $hr->{$key} );
     };
 
     $self->_inject_method("sel_$table", $method);

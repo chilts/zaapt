@@ -57,12 +57,12 @@ my $main_tables = "$tables->{news}{sql_fqt} $join->{n_a} $join->{a_t}";
 # news
 __PACKAGE__->mk_selecter_from( $schema, $tables->{news} );
 __PACKAGE__->mk_selecter_using_from( $schema, $tables->{news}, 'name' );
-__PACKAGE__->mk_select_rows( 'sel_news_all', "SELECT $tables->{news}{sql_sel_cols} FROM $tables->{news}{sql_fqt} ORDER BY n.id" );
+__PACKAGE__->mk_select_rows( 'sel_news_all', "SELECT $tables->{news}{sql_sel_cols} FROM $tables->{news}{sql_fqt} ORDER BY n.inserted" );
 
 # article
 
 __PACKAGE__->mk_select_row( 'sel_article', "SELECT $main_cols FROM $main_tables WHERE a.id = ?", [ 'a_id' ] );
-__PACKAGE__->mk_select_rows( 'sel_article_all_in', "SELECT $main_cols FROM $main_tables WHERE n.id = ? ORDER BY a.id", [ 'n_id' ] );
+__PACKAGE__->mk_select_rows( 'sel_article_all_in', "SELECT $main_cols FROM $main_tables WHERE n.id = ? ORDER BY a.inserted", [ 'n_id' ] );
 __PACKAGE__->mk_select_row( 'sel_article_in_news', "SELECT $main_cols FROM $main_tables WHERE n.id = ? AND a.id = ?", [ 'n_id', 'a_id' ] );
 __PACKAGE__->mk_select_rows( 'sel_article_latest', "SELECT $main_cols FROM $main_tables WHERE n.id = ? ORDER BY a.inserted DESC LIMIT ?", [ 'n_id', '_limit' ] );
 

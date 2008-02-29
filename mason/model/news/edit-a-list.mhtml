@@ -31,12 +31,13 @@
 <&| /zaapt/common/admin/table-list.mhtml, title => 'Article' &>
 
 % my $row = 1;
-% foreach my $article ( @$articles ) {
+% foreach my $article ( reverse @$articles ) {
 %     next unless exists $perms->{$article->{_view}};
         <tr class="r<% $row=1-$row %>">
             <td>
                 (<% $article->{a_id} | h %>) <strong><% $article->{a_title} | h %></strong><br />
-                <% $article->{a_intro} | h %>
+                <% $article->{a_intro} | h %><br />
+                Inserted: <strong><% $article->{a_inserted} | h %></strong>
             </td>
             <td>
 %         if ( exists $perms->{$news->{_edit}} ) {

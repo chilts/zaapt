@@ -28,6 +28,13 @@
 <%init>
     my $model = $zaapt->get_model('Forum');
 
+    # check $tp_id looks like an id
+    unless ( $tp_id =~ m{ \A \d+ \z }xms ) {
+        $m->clear_buffer();
+        $m->abort(404);
+        return;
+    }
+
     my $forum = $model->sel_forum_using_name({ f_name => $f_name} );
     unless ( defined $forum ) {
         die "Forum '$f_name' not found.";

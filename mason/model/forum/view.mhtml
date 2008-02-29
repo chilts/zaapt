@@ -28,20 +28,16 @@
             p          => $p,
         );
     }
-    elsif ( $page eq 'info' ) {
-        # main index page
-        $m->comp('/zaapt/model/forum/view-info.mhtml',
-            zaapt      => $zaapt,
-            id         => $id,
-            t_name     => $t_name,
-        );
-    }
     elsif ( $page eq 'user-posts' ) {
         # show all the posts by this user
         $m->comp('/zaapt/model/forum/view-user-posts.mhtml',
             zaapt      => $zaapt,
             id         => $id,
         );
+    }
+    elsif ( $page eq 'edit' ) {
+        # can't edit anything if not logged in
+        $m->comp('/zaapt/model/forum/view-edit.mhtml' );
     }
     else {
         $m->comp( '/zaapt/model/forum/view-topic.mhtml',

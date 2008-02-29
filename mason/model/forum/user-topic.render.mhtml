@@ -40,12 +40,13 @@
 % }
 
 <p>
+    <span class="floatright">
 % if ( $perms->{$forum->{_moderator}} or !$topic->{tp_locked} ) {
     <a href="#" onclick="removeElementClass('reply1', 'hide');"><& /zaapt/common/icon.mhtml, name => 'script_add', title => 'Reply' &> Reply &raquo;&raquo;</a>
 % } else {
     <& /zaapt/common/icon.mhtml, name => 'script_link', title => 'Locked' &> Locked
 % }
-    <br />
+    </span>
     <a href="../">&laquo; Back to Main Forums</a>
     <br />
     <a href="./">&laquo; Back to Topic List</a>

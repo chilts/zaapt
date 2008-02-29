@@ -21,7 +21,7 @@
 <h3>Add a Friend</h3>
 
 <p id="add-show">
-    <a href="#" onclick="removeElementClass('add-form', 'hide'); addElementClass('add-show', 'hide'); return false;">
+    <a href="#" onclick="$('#add-form, #add-show').toggleClass('hide'); return false;">
         <& /zaapt/common/icon.mhtml, name => 'user_add', title => "Add a Friend" &> Add a Friend &raquo;&raquo;
     </a>
 </p>
@@ -29,7 +29,7 @@
 <div id="add-form" class="hide">
 <& /zaapt/common/form.mhtml, action => 'add.html', elements => [
         { type => 'text', field => 'Add who?', name => 't_username', value => '' },
-        { type => 'submit', field => 'Actions', value => 'Add Friend', cancel_js => "removeElementClass('add-show', 'hide'); addElementClass('add-form', 'hide');" },
+        { type => 'submit', field => 'Actions', value => 'Add Friend', cancel_js => "\$('#add-form').toggleClass('hide'); $('#add-show').toggleClass('hide');" },
     ]
 &>
 </div>

@@ -19,7 +19,7 @@
 
 <p class="right"><& widget-stats.mhtml, zaapt => $zaapt &></p>
 <p>
-    <span class="floatright"><a href="#" onclick="removeElementClass('topic', 'hide');"><& /zaapt/common/icon.mhtml, name => 'script_add', title => 'New Topic' &> New Topic &raquo;&raquo;</a></span>
+    <span class="floatright"><a href="#" onclick="$('#topic').toggleClass('hide'); return false;"><& /zaapt/common/icon.mhtml, name => 'script_add', title => 'New Topic' &> New Topic &raquo;&raquo;</a></span>
     <a href="../">&laquo; Back to Main Forums</a>
 </p>
 
@@ -32,7 +32,7 @@
         { type => 'text', field => 'Subject', name => 'tp_subject', size => 40, value => $tp_subject || '' },
         { type => 'textarea', field => 'Message', name => 'p_message', rows => 10, cols => 40, value => $p_message || '' },
         { type => 'html', field => 'Help', value => $m->scomp('help-link.mhtml') },
-        { type => 'submit', field => 'Actions', value => 'Add Topic', cancel_js => "addElementClass('topic', 'hide');" },
+        { type => 'submit', field => 'Actions', value => 'Add Topic', cancel_js => "\$('#topic').toggleClass('hide');" },
     ]
 &>
 </p>

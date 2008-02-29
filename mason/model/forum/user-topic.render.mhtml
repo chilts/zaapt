@@ -39,7 +39,7 @@
 <p>
     <span class="floatright">
 % if ( $perms->{$forum->{_moderator}} or !$topic->{tp_locked} ) {
-    <a href="#" onclick="removeElementClass('reply1', 'hide');"><& /zaapt/common/icon.mhtml, name => 'script_add', title => 'Reply' &> Reply &raquo;&raquo;</a>
+    <a href="#" onclick="$('#reply1').toggleClass('hide'); return false;"><& /zaapt/common/icon.mhtml, name => 'script_add', title => 'Reply' &> Reply &raquo;&raquo;</a>
 % } else {
     <& /zaapt/common/icon.mhtml, name => 'script_link', title => 'Locked' &> Locked
 % }
@@ -58,7 +58,7 @@
         { type => 'hidden', name => 'p', value => $p },
         { type => 'textarea', field => 'Message', name => 'p_message', rows => 10, cols => 40, value => $p_message || '' },
         { type => 'html', field => 'Help', value => $m->scomp('help-link.mhtml') },
-        { type => 'submit', field => 'Actions', value => 'Post', cancel_js => "addElementClass('reply1', 'hide');" },
+        { type => 'submit', field => 'Actions', value => 'Post', cancel_js => "\$('#reply1').toggleClass('hide');" },
     ]
 &>
 </div>
@@ -116,7 +116,7 @@
 <p>
     <span class="floatright">
 % if ( $perms->{$forum->{_moderator}} or !$topic->{tp_locked} ) {
-        <a href="#" onclick="removeElementClass('reply2', 'hide'); return false;"><& /zaapt/common/icon.mhtml, name => 'script_add', title => 'Reply' &> Reply &raquo;&raquo;</a>
+        <a href="#" onclick="$('#reply2').toggleClass('hide'); return false;"><& /zaapt/common/icon.mhtml, name => 'script_add', title => 'Reply' &> Reply &raquo;&raquo;</a>
 % } else {
         <& /zaapt/common/icon.mhtml, name => 'script_link', title => 'Locked' &> Locked
 % }
@@ -131,7 +131,7 @@
         { type => 'hidden', name => 'p', value => $p },
         { type => 'textarea', field => 'Message', name => 'p_message', rows => 10, cols => 40, value => $p_message || '' },
         { type => 'html', field => 'Help', value => $m->scomp('help-link.mhtml') },
-        { type => 'submit', field => 'Actions', value => 'Post', cancel_js => "addElementClass('reply2', 'hide');" },
+        { type => 'submit', field => 'Actions', value => 'Post', cancel_js => "\$('#reply2').toggleClass('hide');" },
     ]
 &>
 </div>

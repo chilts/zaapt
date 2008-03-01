@@ -90,7 +90,8 @@
 </%init>
 %# ----------------------------------------------------------------------------
 <& user-edit.render.mhtml,
-    values => $account,
+    values   => $account,
+    redirect => $redirect,
     err_info => $err_info,
     err_pass => $err_pass
 &>

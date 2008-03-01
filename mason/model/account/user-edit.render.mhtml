@@ -1,6 +1,7 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $values
+    $redirect => '.'
     $err_info
     $err_pass
 </%args>
@@ -27,7 +28,7 @@
             name => 'a_notify',
             options => [ { text => 'Yes', value => 1 }, { text => 'No', value => 0 } ],
         },
-        { type => 'submit', name => 'submit', field => '', cancel => 1, location => '.', def => 'Save Changes' },
+        { type => 'submit', name => 'submit', field => '', cancel => 1, location => $redirect, def => 'Save Changes' },
     ]
 &>
 
@@ -42,7 +43,7 @@
         { type => 'hidden', name => '_act', def => 'password' },
         { type => 'password', field => 'Password', name => 'a_password', size => 30, maxlength => 30, def => '' },
         { type => 'password', field => 'Repeat', name => 'a_repeat', size => 30, maxlength => 30, def => '' },
-        { type => 'submit', name => 'submit', field => '', cancel => 1, location => '.', def => 'Update Password' },
+        { type => 'submit', name => 'submit', field => '', cancel => 1, location => $redirect, def => 'Update Password' },
     ]
 &>
 %# ----------------------------------------------------------------------------

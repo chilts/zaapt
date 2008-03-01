@@ -9,6 +9,7 @@
     $id
     $_act        => ''
     $i_signature => undef
+    $redirect    => '.'
 </%args>
 %# ----------------------------------------------------------------------------
 <%init>
@@ -44,10 +45,10 @@
                 i_signature => $i_signature,
             });
         }
-        $m->redirect("?");
+        $m->redirect( $redirect );
         return;
     }
 </%init>
 %# ----------------------------------------------------------------------------
-<& user-edit.render.mhtml, values => $values &>
+<& user-edit.render.mhtml, values => $values, redirect => $redirect &>
 %# ----------------------------------------------------------------------------

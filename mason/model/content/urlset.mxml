@@ -23,7 +23,7 @@
         return;
     }
 
-    my $pages = $model->sel_all_pages_in({ c_id => $content->{c_id}  });
+    my $pages = $model->sel_page_all_in({ c_id => $content->{c_id}  });
 
     my $urlset = Zaapt::Utils::UrlSet->new();
     foreach my $page ( @$pages ) {

@@ -30,7 +30,7 @@
     <input type="radio" name="notify" value="1"<% $a_notify ? ' checked="checked"' : '' %> />Yes
     <input type="radio" name="notify" value="0"<% $a_notify ? '' : ' checked="checked"' %> />No
     <br />
-    <input type="submit" name="action" value="Join Us!" /><br />
+    <input type="submit" name="_act" value="Join Us!" /><br />
 </form>
 </div>
 

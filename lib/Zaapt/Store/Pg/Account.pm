@@ -123,6 +123,7 @@ __PACKAGE__->mk_selecter_using_from( $schema, $tables->{permission}, 'name' );
 
 # confirm
 __PACKAGE__->mk_selecter_from( $schema, $tables->{confirm} );
+__PACKAGE__->mk_select_row( 'sel_confirm_using_account_id', "SELECT $tables->{confirm}{sql_sel_cols} FROM $tables->{confirm}{sql_fqt} WHERE account_id = ?", [ 'a_id' ] );
 
 # ra
 __PACKAGE__->_mk_do( 'del_ra_for', "DELETE FROM account.ra WHERE account_id = ?", [ 'a_id' ] );
@@ -218,7 +219,7 @@ sub confirm {
         $self->dbh()->rollback();
         return;
     }
-    my $code = $self->sel_confirm( $account );
+    my $code = $self->sel_confirm_using_account_id( $account );
     unless ( defined $code ) {
         $self->dbh()->rollback();
         return;

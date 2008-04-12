@@ -8,13 +8,17 @@
 %# ----------------------------------------------------------------------------
 <%args>
     $domain
-    $path
+    $path => undef
     $a_email
     $a_username
     $c_code
 </%args>
 %# ----------------------------------------------------------------------------
 <%init>
+    my $url = "http://$domain/";
+    $url .= "$path/" if defined $path;
+    $url .= 'confirm.html';
+
     my $email = {};
 
     $email->{To} = $a_email;
@@ -27,12 +31,12 @@ Dear $a_username,
 Welcome to KiwiWriters.org. Please click on the following link to confirm your
 account and email address.
 
-http://$domain/<% defined $path ? "$path/" : '' %>confirm.html?a_username=$a_username&c_code=$c_code
+$url?a_username=$a_username&c_code=$c_code
 
 If you can't click that link, please go to the following address and type in
 your username and confirmation code:
 
-URL      : http://$domain/<% defined $path ? "$path/" : '' %>confirm.html
+URL      : $url
 Username : $a_username
 Code     : $c_code
 

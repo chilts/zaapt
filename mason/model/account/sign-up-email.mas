@@ -43,5 +43,5 @@ Yours faithfully,
 The KiwiWriters.org Team
 EOF
     };
-<%init>
+</%init>
 %# ----------------------------------------------------------------------------

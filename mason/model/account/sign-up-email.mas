@@ -27,12 +27,12 @@ Dear $a_username,
 Welcome to KiwiWriters.org. Please click on the following link to confirm your
 account and email address.
 
-http://$domain/$path/confirm.html?a_username=$a_username&c_code=$c_code
+http://$domain/<% defined $path ? "$path/" : '' %>confirm.html?a_username=$a_username&c_code=$c_code
 
 If you can't click that link, please go to the following address and type in
 your username and confirmation code:
 
-URL      : http://$domain/$path/confirm.html
+URL      : http://$domain/<% defined $path ? "$path/" : '' %>confirm.html
 Username : $a_username
 Code     : $c_code
 

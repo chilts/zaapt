@@ -86,7 +86,8 @@
 
                 my $email = $m->comp(
                     'sign-up-email.mas',
-                    domain     => '',
+                    domain     => $domain,
+                    path       => $path,
                     a_email    => $a_email,
                     a_username => $a_username,
                     c_code     => $c_code,

@@ -9,17 +9,19 @@
 <%args>
     $domain
     $path
+    $a_email
     $a_username
     $c_code
 </%args>
 %# ----------------------------------------------------------------------------
 <%init>
-    return {
-        To => $a_email,
-        From => 'noreply@kiwiwriters.org',
-        Subject => 'Confirmation email...',
-        'X-Mailer' => "Mail::Sendmail version $Mail::Sendmail::VERSION",
-        Message => <<"EOF",
+    my $email = {};
+
+    $email->{To} = $a_email;
+    $email->{From} = 'noreply@kiwiwriters.org';
+    $email->{Subject} = 'KiwiWriters account confirmation email';
+    $email->{'X-Mailer'} = "Mail::Sendmail version $Mail::Sendmail::VERSION";
+    $email->{Message} = <<"EOF";
 Dear $a_username,
 
 Welcome to KiwiWriters.org. Please click on the following link to confirm your
@@ -42,6 +44,7 @@ get them to join you.
 Yours faithfully,
 The KiwiWriters.org Team
 EOF
-    };
+
+    return $email;
 </%init>
 %# ----------------------------------------------------------------------------

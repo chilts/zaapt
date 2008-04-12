@@ -9,6 +9,9 @@
     $a_notify    => 1
     $a_firstname => ''
     $a_lastname  => ''
+
+    $domain
+    $path        => undef
 </%args>
 %# ----------------------------------------------------------------------------
 <%once>
@@ -81,7 +84,13 @@
                 my $profile = $zaapt->get_model("KiwiWriters::Zaapt::Store::Pg::Profile");
                 $profile->ins_profile_skeleton({ a_id => $account->{a_id} });
 
-                my $email = $m->comp( 'sign-up-email.mas' );
+                my $email = $m->comp(
+                    'sign-up-email.mas',
+                    domain     => '',
+                    a_email    => $a_email,
+                    a_username => $a_username,
+                    c_code     => $c_code,
+                );
 
                 # add this email to the outgoing queue (or immediately if configured)
                 if ( $m->comp('/zaapt/model/email/send.mas', email => $email) ) {

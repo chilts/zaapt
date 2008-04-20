@@ -1,0 +1,22 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $dir
+    $files
+</%args>
+%# ----------------------------------------------------------------------------
+<h1><% $dir->{d_title} | h %></h1>
+% if ( @$files ) {
+%     foreach my $file ( @$files ) {
+<p>
+    <strong><% $file->{f_title} | h %></strong>
+    <br />
+    <% $file->{f_description} | h %>
+    <br />
+    Download: <a href="<% $dir->{d_webdir} | h %>/<% $file->{f_name} | h %>.<% $file->{f_ext} | h %>"><% $file->{f_name} | h %>.<% $file->{f_ext} | h %></a>
+</p>
+<p class="footnote"><& /zaapt/common/datetime.mhtml, datetime => $file->{f_inserted} &></p>
+%     }
+% } else {
+<p>Currently, there are no files in this location.</p>
+% }
+%# ----------------------------------------------------------------------------

@@ -1,0 +1,23 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $d_name
+    $page
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    # see if this looks like a date
+    if ( $page eq 'index' ) {
+        $m->comp('/zaapt/model/dir/view-index.mhtml', zaapt => $zaapt, d_name => $d_name);
+    }
+    else {
+        # this looks like it could be a file
+        $m->comp('/zaapt/model/dir/view-file.mhtml',
+            zaapt => $zaapt,
+            d_name => $d_name,
+            f_name => $page,
+        );
+    }
+    return;
+</%init>
+%# ----------------------------------------------------------------------------

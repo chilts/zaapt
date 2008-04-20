@@ -1,0 +1,18 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $d_name
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Dir');
+    my $dir = $model->sel_dir_using_name({ d_name => $d_name });
+    unless ( defined $dir ) {
+        die "Dir '$d_name' not found.";
+        return;
+    }
+    my $files = $model->sel_file_all_in({ d_id => $dir->{d_id} });
+</%init>
+%# ----------------------------------------------------------------------------
+<& view-index.render.mhtml, dir => $dir, files => $files &>
+%# ----------------------------------------------------------------------------

@@ -12,6 +12,8 @@
 </%args>
 %# ----------------------------------------------------------------------------
 <%once>
+    use Apache2::Request;
+    use Apache2::Upload;
     use Zaapt::Utils::Valid;
     use Zaapt::Utils::Conv;
     use URI::Escape;
@@ -78,7 +80,8 @@
             push @$err, "File with name '$f_name' already exists."
         }
 
-        my $upload = $r->upload('f_file');
+        my $req = Apache2::Request->new($r);
+        my $upload = $req->upload( 'f_file' );
         unless ( defined $upload ) {
             push @$err, "please specify a file to upload";
         }

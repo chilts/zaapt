@@ -196,8 +196,7 @@
         return;
     }
 
-    my $page_types = $zaapt->get_model('Common')->sel_type_all();
-    my @options = map { { value => $_->{t_id}, text => $_->{t_name} } } @$page_types;
+    my $options = $m->comp('/zaapt/common/options-type.mas', zaapt => $zaapt);
 </%init>
 %# ----------------------------------------------------------------------------
 <h1><% $title->{$_act} | n %> an Entry</h1>

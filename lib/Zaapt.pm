@@ -33,6 +33,21 @@ sub dbh {
     return $self->{dbh};
 }
 
+sub start_tx {
+    my ($self) = @_;
+    $self->dbh->begin_work();
+}
+
+sub commit_tx {
+    my ($self) = @_;
+    $self->dbh->commit();
+}
+
+sub rollback_tx {
+    my ($self) = @_;
+    $self->dbh->rollback();
+}
+
 sub get_model {
     my ($self, $model) = @_;
 

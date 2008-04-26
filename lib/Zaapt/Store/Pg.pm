@@ -77,7 +77,7 @@ sub _mk_sel_col {
             return "$col->[2] AS ${prefix}_$col->[0]";
         }
         if ( $type eq 'fk' ) {
-            return "${prefix}.$col->[0] AS ${prefix}_$col->[0]";
+            return "${prefix}.$col->[0] AS $col->[2]";
         }
         croak "Unknown column type '$col->[0]'";
     }

@@ -1,0 +1,28 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $perms
+</%args>
+%# ----------------------------------------------------------------------------
+<h1>Email Admin</h1>
+
+% if ( exists $perms->{super} ) {
+
+<h2>Emails</h2>
+
+<ul>
+    <li><a href="edit-e-list.html">Email List</a></li>
+    <li><a href="edit-e.html?_act=add">Add Email</a></li>
+</ul>
+
+<h2>View Email Info</h2>
+
+<ul>
+    <li>Email Stats (ToDo)</li>
+</ul>
+
+% } else {
+<p>Sorry, you do not have permission to administrate email.</p>
+% }
+
+%# ----------------------------------------------------------------------------

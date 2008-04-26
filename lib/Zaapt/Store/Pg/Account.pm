@@ -107,6 +107,7 @@ my $main_joins = "$tables->{account}{sql_fqt} $join->{a_ra} $join->{ra_r} $join-
 __PACKAGE__->mk_selecter_from( $schema, $tables->{account} );
 __PACKAGE__->mk_select_rows( 'sel_account_all', "SELECT $tables->{account}{sql_sel_cols} FROM $tables->{account}{sql_fqt} ORDER BY a.id" );
 __PACKAGE__->mk_selecter_using_from( $schema, $tables->{account}, 'username' );
+__PACKAGE__->mk_select_rows( 'sel_account_all_with_notify', "SELECT $tables->{account}{sql_sel_cols} FROM $tables->{account}{sql_fqt} WHERE notify = True ORDER BY a.id" );
 
 # role
 __PACKAGE__->mk_selecter_from( $schema, $tables->{role} );

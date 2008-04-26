@@ -1,0 +1,89 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $perms
+    $_act => 'add'
+    $e_id => undef
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    # check permissions for email
+    unless ( exists $perms->{super} ) {
+        $m->comp('/zaapt/common/denied.mhtml');
+        return;
+    }
+
+    # get the model and the email, get out if not found
+    my $model = $zaapt->get_model('Email');
+    my $email = $model->sel_email({ e_id => $e_id });
+    $m->redirect('edit-e-list.html')
+        unless defined $email;
+
+    my $msg = '';
+    my $values = $email;
+
+    # process the actions
+    if ( $_act eq 'add' ) {
+        $values->{_act} = 'ins';
+        $values->{submit} = 'Add Email to Queue';
+    }
+    elsif ( $_act eq 'ins' ) {
+        # start the transaction
+        $zaapt->start_tx();
+
+        my $count = 0;
+
+        # for each account with notifications turned on
+        my $accounts = $zaapt->get_model('Account')->sel_account_all_with_notify();
+        foreach my $account ( @$accounts ) {
+            $model->ins_recipient({
+                e_id      => $email->{e_id},
+                a_id      => $account->{a_id},
+                r_issent  => 0,
+                r_iserror => 0,
+                r_error   => '',
+            });
+            $count++;
+        }
+
+        # everything was fine, commit it all
+        # $zaapt->rollback_tx();
+        $zaapt->commit_tx();
+        $msg = "Added $count emails to queue";
+    }
+    else {
+        # invalid action
+        $m->redirect('edit-e-list.html')
+            unless defined $email;
+    }
+
+    my $options = $m->comp('/zaapt/common/options-type.mas', zaapt => $zaapt);
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Send an Email as a Notification</h1>
+
+<p><a href="edit-e-list.html">&laquo; Back to Email List</a></p>
+
+% if ( $_act eq 'add' ) {
+
+<& /zaapt/common/form/edit.mhtml,
+    action => '?',
+    values => $values,
+    elements => [
+        { type => 'hidden', name => '_act', def => 'ins' },
+        { type => 'hidden', name => 'e_id', def => '' },
+        { type => 'text', field => 'Subject', name => 'e_subject', size => 40, def => '' },
+        { type => 'textarea', field => 'Body (Text)', name => 'e_text', rows => 10, cols => 40, def => '' },
+        { type => 'textarea', field => 'Body (HTML)', name => 'e_html', rows => 10, cols => 40, def => '' },
+        { type => 'select', field => 'Type', name => 't_id', options => $options },
+
+        { type => 'submit', name => 'submit', field => 'Actions', cancel => 1, location => 'edit-e-list.html' },
+    ]
+&>
+
+% } elsif ( $_act eq 'ins' ) {
+
+<& /zaapt/common/msg.mhtml, msg => $msg &>
+
+% }
+%# ----------------------------------------------------------------------------

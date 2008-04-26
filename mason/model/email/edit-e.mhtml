@@ -1,0 +1,165 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $perms
+    $_act      => 'add'
+    $e_id      => undef
+    $e_subject => ''
+    $e_text    => ''
+    $e_html    => ''
+    $t_id      => ''
+</%args>
+%# ----------------------------------------------------------------------------
+<%once>
+    use URI::Escape;
+
+    my $heading = {
+        add => 'Add',
+        ins => 'Add',
+        edit => 'Edit',
+        upd  => 'Edit',
+        rem  => 'Delete',
+    };
+</%once>
+%# ----------------------------------------------------------------------------
+<%init>
+    # check permissions for email
+    unless ( exists $perms->{super} ) {
+        $m->comp('/zaapt/common/denied.mhtml');
+        return;
+    }
+
+    my $model = $zaapt->get_model('Email');
+
+    # some data manipulation
+    $e_text = Zaapt::Utils::Conv::remove_cr( $e_text );
+    $e_html = Zaapt::Utils::Conv::remove_cr( $e_html );
+
+    my $err = [];
+    my $values = {};
+    my $email;
+
+    if ( $_act eq 'edit' or $_act eq 'upd' or $_act eq 'del' ) {
+        $email = $model->sel_email({ e_id => $e_id });
+
+        $m->redirect('edit-e-list.html')
+            unless defined $email;
+    }
+
+    # let's do some of the actions
+    if ( $_act eq 'add' ) {
+        $values->{_act} = 'ins';
+        $values->{submit} = 'Add Email';
+    }
+    elsif ( $_act eq 'ins' ) {
+        # check that these values are valid
+        unless ( Zaapt::Utils::Valid::has_content($e_subject, 'Subject') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+        unless ( Zaapt::Utils::Valid::has_content($e_text, 'Body (Text)') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+        unless ( Zaapt::Utils::Valid::has_content($e_html, 'Body (HTML)') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+
+        # check this type exists
+        unless ( $zaapt->get_model('Common')->sel_type({ t_id => $t_id }) ) {
+            push @$err, 'invalid type';
+        }
+
+        # do the insert
+        unless ( @$err ) {
+            $model->ins_email({
+                e_subject => $e_subject,
+                e_text    => $e_text,
+                e_html    => $e_html,
+                t_id      => $t_id,
+            });
+            $m->redirect("edit-e-list.html");
+            return;
+        }
+
+        $values = { %ARGS };
+        $values->{submit} = 'Add Email';
+    }
+    elsif ( $_act eq 'edit' ) {
+        $values = $email;
+        $values->{_act} = 'upd';
+        $values->{submit} = 'Save Email';
+    }
+    elsif ( $_act eq 'upd' ) {
+        # check that these values are valid
+        unless ( Zaapt::Utils::Valid::has_content($e_subject, 'Subject') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+        unless ( Zaapt::Utils::Valid::has_content($e_text, 'Body (Text)') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+        unless ( Zaapt::Utils::Valid::has_content($e_html, 'Body (HTML)') ) {
+            push @$err, Zaapt::Utils::Valid::err();
+        }
+
+        # check this type exists
+        unless ( $zaapt->get_model('Common')->sel_type({ t_id => $t_id }) ) {
+            push @$err, 'invalid type';
+        }
+
+        # do the update
+        unless ( @$err ) {
+            $model->upd_email({
+                e_subject => $e_subject,
+                e_text    => $e_text,
+                e_html    => $e_html,
+                t_id      => $t_id,
+                e_id      => $e_id,
+            });
+            $m->redirect("edit-e-list.html");
+            return;
+        }
+
+        $values = { %ARGS };
+        $values->{submit} = 'Add Email';
+    }
+    elsif ( $_act eq 'rem' ) {
+        $values = $email;
+        $values->{_act} = 'del';
+        $values->{submit} = 'Delete Email';
+    }
+    elsif ( $_act eq 'del' ) {
+        # delete
+        $model->del_email({ e_id => $e_id });
+        $m->redirect("edit-e-list.html");
+        return;
+    }
+
+    my $options = $m->comp('/zaapt/common/options-type.mas', zaapt => $zaapt);
+</%init>
+%# ----------------------------------------------------------------------------
+<h1><% $heading->{$_act} | n %> a Email</h1>
+
+<p><a href="edit-e-list.html">&laquo; Back to Email List</a></p>
+
+% if ( defined $email ) {
+<h2>Email: '<% $email->{e_subject} | h %>'</h2>
+% } else {
+<h2>Email: ?</h2>
+% }
+
+<& /zaapt/common/err.mhtml, err => $err &>
+
+<& /zaapt/common/form/edit.mhtml,
+    action => '?',
+    values => $values,
+    elements => [
+        { type => 'hidden', name => '_act' },
+        { type => 'hidden', name => 'e_id', def => '' },
+        { type => 'text', field => 'Subject', name => 'e_subject', size => 40, def => '' },
+        { type => 'textarea', field => 'Body (Text)', name => 'e_text', rows => 10, cols => 40, def => '' },
+        { type => 'textarea', field => 'Body (HTML)', name => 'e_html', rows => 10, cols => 40, def => '' },
+        { type => 'select', field => 'Type', name => 't_id', options => $options },
+
+        { type => 'submit', name => 'submit', field => 'Actions', cancel => 1, location => 'edit-e-list.html' },
+    ]
+&>
+%# ----------------------------------------------------------------------------

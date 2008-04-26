@@ -1,0 +1,49 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $perms
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    # check permissions for email
+    unless ( exists $perms->{super} ) {
+        $m->comp('/zaapt/common/denied.mhtml');
+        return;
+    }
+
+    my $model = $zaapt->get_model('Email');
+    my $emails = $model->sel_email_all();
+</%init>
+%# ----------------------------------------------------------------------------
+<h1>Email List</h1>
+
+<p>
+    * <a href="edit-e.html?_act=add">Add Email &raquo;</a><br />
+</p>
+
+<&| /zaapt/common/admin/table-edit.mhtml, title => 'Email' &>
+
+% my $row = 1;
+% foreach my $email ( reverse @$emails ) {
+        <tr class="r<% $row++%2 %>">
+            <td>
+                (<% $email->{e_id} | h %>) <strong><% $email->{e_subject} | h %></strong><br />
+                <& /zaapt/admin/ins-upd.mhtml, row => $email, l => 'e' &>
+            </td>
+            <td>
+                * <a href="edit-e.html?_act=edit&amp;e_id=<% $email->{e_id} | u %>">Edit</a><br />
+%#                * <a href="#">Send to Everyone</a><br />
+                * <a href="edit-e-send-notification.html?_act=add&amp;e_id=<% $email->{e_id} | u %>">Send as Notification</a><br />
+%#                * <a href="#">Send to Specific Accounts</a><br />
+            </td>
+        </tr>
+% }
+% unless ( @$emails ) {
+        <tr class="r0">
+            <td>no emails found</td>
+            <td>* none</td>
+        </tr>
+% }
+
+</&>
+%# ----------------------------------------------------------------------------

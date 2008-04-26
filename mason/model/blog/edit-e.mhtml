@@ -223,7 +223,7 @@
         { type => 'textarea', field => 'Intro', name => 'e_intro', rows => 10, cols => 40, def => '' },
         { type => 'note', value => 'Note: The intro field is always plain text.' },
         { type => 'textarea', field => 'Article', name => 'e_article', rows => 10, cols => 40, def => '' },
-        { type => 'select', field => 'Type', name => 't_id', options => \@options },
+        { type => 'select', field => 'Type', name => 't_id', options => $options },
         { type => 'checkbox', field => 'Draft', name => 'e_draft' },
         { type => 'checkbox', field => 'Comment', name => 'e_comment' },
         { type => 'checkbox', field => 'Trackback', name => 'e_trackback' },

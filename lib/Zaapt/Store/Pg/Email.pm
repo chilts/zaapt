@@ -78,6 +78,7 @@ __PACKAGE__->mk_selecter( $schema, $table->{email}{name}, $table->{email}{prefix
 __PACKAGE__->mk_select_rows( 'sel_email_all', "SELECT $table->{email}{sql_sel_cols} FROM $table->{email}{sql_fqt} ORDER BY e.inserted", [] );
 
 # recipient
+__PACKAGE__->mk_select_row( 'sel_recipient_next_not_sent', "SELECT $recipient_cols FROM $recipient_joins WHERE issent IS False ORDER BY r.id LIMIT 1", [] );
 
 ## ----------------------------------------------------------------------------
 # methods

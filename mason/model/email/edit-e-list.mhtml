@@ -34,7 +34,7 @@
                 * <a href="edit-e.html?_act=edit&amp;e_id=<% $email->{e_id} | u %>">Edit</a><br />
 %#                * <a href="#">Send to Everyone</a><br />
                 * <a href="edit-e-send-notification.html?_act=add&amp;e_id=<% $email->{e_id} | u %>">Send as Notification</a><br />
-%#                * <a href="#">Send to Specific Accounts</a><br />
+                * <a href="edit-e-send-to.html?_act=add&amp;e_id=<% $email->{e_id} | u %>">Send to specific Accounts</a><br />
             </td>
         </tr>
 % }

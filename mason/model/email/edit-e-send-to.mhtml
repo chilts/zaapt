@@ -4,6 +4,7 @@
     $perms
     $_act => 'add'
     $e_id => undef
+    @a_ids => ()
 </%args>
 %# ----------------------------------------------------------------------------
 <%init>
@@ -21,11 +22,14 @@
 
     my $msg = '';
     my $values = $email;
+    my $accounts;
 
     # process the actions
     if ( $_act eq 'add' ) {
         $values->{_act} = 'ins';
         $values->{submit} = 'Add Email to Queue';
+        # get all the accounts
+        $accounts = $zaapt->get_model('Account')->sel_account_all();
     }
     elsif ( $_act eq 'ins' ) {
         # start the transaction
@@ -33,12 +37,11 @@
 
         my $count = 0;
 
-        # for each account with notifications turned on
-        my $accounts = $zaapt->get_model('Account')->sel_account_all_with_notify();
-        foreach my $account ( @$accounts ) {
+        # for each account given
+        foreach my $a_id ( @a_ids ) {
             $model->ins_recipient({
                 e_id      => $email->{e_id},
-                a_id      => $account->{a_id},
+                a_id      => $a_id,
                 r_issent  => 0,
                 r_iserror => 0,
                 r_error   => '',
@@ -65,20 +68,18 @@
 
 % if ( $_act eq 'add' ) {
 
-<& /zaapt/common/form/edit.mhtml,
-    action => '?',
-    values => $values,
-    elements => [
-        { type => 'hidden', name => '_act', def => 'ins' },
-        { type => 'hidden', name => 'e_id', def => '' },
-        { type => 'text', field => 'Subject', name => 'e_subject', size => 40, def => '' },
-        { type => 'textarea', field => 'Body (Text)', name => 'e_text', rows => 10, cols => 40, def => '' },
-        { type => 'textarea', field => 'Body (HTML)', name => 'e_html', rows => 10, cols => 40, def => '' },
-        { type => 'select', field => 'Type', name => 't_id', options => $options },
-
-        { type => 'submit', name => 'submit', field => 'Actions', cancel => 1, location => 'edit-e-list.html' },
-    ]
-&>
+<form action="?" method="post">
+    <input type="hidden" name="_act" value="ins" />
+    <input type="hidden" name="e_id" value="<% $e_id | h %>" />
+% foreach my $account ( @$accounts ) {
+    <input type="checkbox" name="a_ids" value="<% $account->{a_id} | h %>" />
+    <strong>(<% $account->{a_id} | h %>)</strong>
+    <% $account->{a_username} | h %> - <strong><% $account->{a_firstname} | h %> <% $account->{a_lastname} | h %></strong>
+    <br />
+% }
+<button class="button" type="submit">Add Email to Queue</button>
+<button class="button" type="button" onclick="document.location='edit-e-list.html';">Cancel</button>\
+</form>
 
 % } elsif ( $_act eq 'ins' ) {
 

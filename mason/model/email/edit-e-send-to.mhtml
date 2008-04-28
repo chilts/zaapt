@@ -62,7 +62,7 @@
     my $options = $m->comp('/zaapt/common/options-type.mas', zaapt => $zaapt);
 </%init>
 %# ----------------------------------------------------------------------------
-<h1>Send an Email as a Notification</h1>
+<h1>Send an Email To</h1>
 
 <p><a href="edit-e-list.html">&laquo; Back to Email List</a></p>
 

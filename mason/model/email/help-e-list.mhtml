@@ -1,8 +1,8 @@
 %# ----------------------------------------------------------------------------
-<h1><a href="edit-e-list.html">Email List</a></h1>
+<h1>Email List</h1>
 
 <p>
-    &laquo;&laquo; <a href="edit.html">Admin</a>
+    &laquo; <a href="edit.html">Admin</a>
 </p>
 
 <p>
@@ -12,13 +12,21 @@
     therefore editing of them is not required (nor useful).
 </p>
 
+<h2>Information</h2>
+
+<p>
+    The info column show the id of the email, it's subject, the time it was
+    inserted and the last time it was updated.
+</p>
+
+<h2>Actions</h2>
+
 <p>
     Each email in this list has the following four actions: (i) <a
     href="help-e.html">add an email</a>, (ii) <a href="help-e.html">edit a
     particular email</a>, (iii) <a href="help-e-send-notification.html">send
     one as a notification</a> or (iv) <a href="help-e-send-to.html">send one to
-    a specific list of accounts</a>. You can choose these in the right-hand
-    column. Some details about each email are in the left-hand column.
+    a specific list of accounts</a>.
 </p>
 
 <p>
@@ -37,8 +45,6 @@
     <a href="help.html">Main Help</a>
     |
     <a href="help-e.html">Add/Edit an Email</a>
-    |
-    <a href="help-e-list.html">Email List</a>
     ]
 </p>
 

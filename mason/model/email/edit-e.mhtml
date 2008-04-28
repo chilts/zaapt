@@ -75,6 +75,7 @@
                 e_text    => $e_text,
                 e_html    => $e_html,
                 t_id      => $t_id,
+                e_isbulk  => 1,
             });
             $m->redirect("edit-e-list.html");
             return;

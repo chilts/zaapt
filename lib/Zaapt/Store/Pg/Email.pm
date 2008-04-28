@@ -20,7 +20,7 @@ my $table = {
             'id',
             qw(subject text html),
             [ 'type_id', 'fk', 't_id' ],
-            qw(ts:inserted ts:updated),
+            qw(isbulk ts:inserted ts:updated),
         ],
     },
     recipient => {
@@ -76,6 +76,7 @@ my $info_joins = "$table->{account}{sql_fqt} $join->{a_i}";
 # email
 __PACKAGE__->mk_selecter( $schema, $table->{email}{name}, $table->{email}{prefix}, @{$table->{email}{cols}} );
 __PACKAGE__->mk_select_rows( 'sel_email_all', "SELECT $table->{email}{sql_sel_cols} FROM $table->{email}{sql_fqt} ORDER BY e.inserted", [] );
+__PACKAGE__->mk_select_rows( 'sel_email_all_bulk', "SELECT $table->{email}{sql_sel_cols} FROM $table->{email}{sql_fqt} WHERE isbulk IS True ORDER BY e.inserted", [] );
 
 # recipient
 __PACKAGE__->mk_select_row( 'sel_recipient_next_not_sent', "SELECT $recipient_cols FROM $recipient_joins WHERE issent IS False ORDER BY r.id LIMIT 1", [] );

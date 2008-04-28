@@ -12,7 +12,7 @@
     }
 
     my $model = $zaapt->get_model('Email');
-    my $emails = $model->sel_email_all();
+    my $emails = $model->sel_email_all_bulk();
 </%init>
 %# ----------------------------------------------------------------------------
 <h1>Email List</h1>

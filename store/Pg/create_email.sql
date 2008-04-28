@@ -10,6 +10,7 @@ CREATE TABLE email.email (
     text            TEXT NOT NULL,
     html            TEXT NOT NULL,
     type_id         INTEGER NOT NULL REFERENCES common.type,
+    isbulk          BOOLEAN NOT NULL,
 
     LIKE base       INCLUDING DEFAULTS
 );

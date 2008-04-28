@@ -4,7 +4,7 @@
     $perms
 </%args>
 %# ----------------------------------------------------------------------------
-<h1>Email Admin</h1>
+<h1>Email Admin [ <a href="help.html">Help</a> ]</h1>
 
 % if ( exists $perms->{super} ) {
 

@@ -1,0 +1,42 @@
+%# ----------------------------------------------------------------------------
+<h1>Send an Email To</h1>
+
+<p>
+    * &laquo;&laquo; <a href="edit.html">Admin</a>
+</p>
+
+<p>
+    You may use this screen to send an email to a specific set of
+    accounts. This may come in useful occassionally but generally you want to
+    <a href="help-a-sent-notification.html">send the email as a
+    notification</a>.
+</p>
+
+<p>
+    There are however two good uses for this screen. The first is for the site
+    administrator to test that email addition and sending is working correctly.
+</p>
+
+<p>
+    The second use is such that you can test what an email looks like. For
+    example, let's say you have added an email and feel happy that it is ready
+    to be send as a notification. A good way to test if it looks okay is to
+    firstly send it to a test group of accounts. If you receive positive
+    feedback from your test group that your email (formatting, links, etc) look
+    okay, you can feel happier about sending it to many users as a notification
+    (yes, your test group will receive it again, but they probably won't mind).
+</p>
+
+<h2>See Also</h2>
+
+<p>
+    [
+    <a href="help.html">Main Help</a>
+    |
+    <a href="help-e-list.html">Email List</a>
+    |
+    <a href="help-e-send-notification.html">Sending Notification</a>
+    ]
+</p>
+
+%# ----------------------------------------------------------------------------

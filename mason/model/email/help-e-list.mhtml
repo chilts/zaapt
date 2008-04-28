@@ -1,0 +1,45 @@
+%# ----------------------------------------------------------------------------
+<h1><a href="edit-e-list.html">Email List</a></h1>
+
+<p>
+    &laquo;&laquo; <a href="edit.html">Admin</a>
+</p>
+
+<p>
+    The email list shows all of the emails that have been added via the admin
+    interface. The emails that have been sent out automatically via other
+    models are not shown. Generally, these are added and sent automatically,
+    therefore editing of them is not required (nor useful).
+</p>
+
+<p>
+    Each email in this list has the following four actions: (i) <a
+    href="help-e.html">add an email</a>, (ii) <a href="help-e.html">edit a
+    particular email</a>, (iii) <a href="help-e-send-notification.html">send
+    one as a notification</a> or (iv) <a href="help-e-send-to.html">send one to
+    a specific list of accounts</a>. You can choose these in the right-hand
+    column. Some details about each email are in the left-hand column.
+</p>
+
+<p>
+    Note: Generally, you do not want to edit an email that has already been
+    sent out. Even in the case of wanting to re-send it with some
+    modifications, it might be worth copying the information to a new email so
+    that you know what emails have been sent to who. But please see <a
+    href="help-e-send-to.html">Send To</a> for details when re-sending an email
+    can come in useful.
+</p>
+
+<h2>See Also</h2>
+
+<p>
+    [
+    <a href="help.html">Main Help</a>
+    |
+    <a href="help-e.html">Add/Edit an Email</a>
+    |
+    <a href="help-e-list.html">Email List</a>
+    ]
+</p>
+
+%# ----------------------------------------------------------------------------

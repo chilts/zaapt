@@ -1,0 +1,77 @@
+%# ----------------------------------------------------------------------------
+<h1>Add/Edit an Email</h1>
+
+<p>
+    &laquo;&laquo; <a href="edit.html">Admin</a>
+</p>
+
+<p>
+    When adding an email, there are four fields which can be
+    completed: Subject, Body (Text), Body (HTML) and Type.
+</p>
+
+<p>
+    You'll notice that there are 2 fields for <strong>Body</strong>. This is so
+    that you have the flexibility to send the email as both text and/or
+    HTML. The majority of webmail clients show HTML but there are still many
+    people using text only clients (which also work using webmail). By giving
+    you both fields you may send either text email, HTML email or both. If both
+    are sent, the email client shows the alternative most appropriate for that
+    user. This also gives you the ability to customise both views of the same
+    information.
+</p>
+
+<p>
+    Once an email has been added, it may then be chosen from the email list to
+    be sent to the relevant accounts.
+</p>
+
+<h2>Fields</h2>
+
+<h3>Subject</h3>
+
+<p>
+    As is normally the case with email, each one <strong>must</strong> have a
+    subject. This may be of any length but it's best to stick to something
+    reasonably short, say less than 80 chars.
+</p>
+
+<h3>Body (Text)</h3>
+
+<p>
+    The textual representation of the email is sent exactly as it appears
+    here. It is recommended to have two line breaks between each paragraph. If
+    you want links, put these on a line of their own starting at the very left
+    column which can help if the links are long.
+</p>
+
+<h3>Body (HTML)</h3>
+
+<p>
+    The HTML version of the body is generated via the usual Zaapt means. How
+    this field is interpreted is dependent on what <strong>Type</strong> is
+    selected. The field is read and converted into HTML much like many other
+    parts of a Zaapt site e.g. content pages, blog entries, news items,
+    therefore you should enter the appropriate markup in this field.
+</p>
+
+<h3>Type</h3>
+
+<p>
+    This field determines how the <strong>Body (HTML)</strong> field (above) is
+    interpreted. Zaapt allows <em>code</em>, <em>html</em> and <em>text</em>
+    out of the box but your installation of Zaapt may allow others e.g. wiki
+    markup, BBCode. Please ask your web administrator for further details.
+</p>
+
+<h2>See Also</h2>
+
+<p>
+    [
+    <a href="help.html">Email Help</a>
+    |
+    <a href="help-e-list.html">Email List</a>
+    ]
+</p>
+
+%# ----------------------------------------------------------------------------

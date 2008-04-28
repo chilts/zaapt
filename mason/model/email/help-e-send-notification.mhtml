@@ -1,0 +1,31 @@
+%# ----------------------------------------------------------------------------
+<h1>Send an Email as a Notification</h1>
+
+<p>
+    * &laquo;&laquo; <a href="edit.html">Admin</a>
+</p>
+
+<p>
+    When people signed up to this site, they were asked whether they would like
+    to receive site notifications. All users that had chosen 'Yes' will receive
+    emails sent via this screen.
+</p>
+
+<p>
+    The emails themselves are added to a queue and are sent via a background
+    process. This may take a number of minutes dependent on your configuration.
+</p>
+
+<h2>See Also</h2>
+
+<p>
+    [
+    <a href="help.html">Main Help</a>
+    |
+    <a href="help-e-list.html">Email List</a>
+    |
+    <a href="help-e-send-to.html">Send To</a>
+    ]
+</p>
+
+%# ----------------------------------------------------------------------------

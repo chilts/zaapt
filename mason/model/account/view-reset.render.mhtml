@@ -76,7 +76,6 @@
         New Password<br />
         <input type="password" name="a_password" value="" /><br />
         Repeat<br />
-        <br />
         <input type="password" name="a_repeat" value="" /><br />
         <br />
         <input type="submit" value="Change Password" /><br />

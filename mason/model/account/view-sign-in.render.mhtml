@@ -18,6 +18,7 @@
         <br />
         <input type="submit" value="Sign In" /><br />
     </p>
+    <p><a href="reset.html">Forgot Password &laquo;</a></p>
 </form>
 </div>
 %# ----------------------------------------------------------------------------

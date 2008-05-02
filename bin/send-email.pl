@@ -9,6 +9,7 @@ use Config::Simple;
 use DBI;
 use Log::Log4perl qw(get_logger :levels);
 use MIME::Lite;
+use String::Random qw(random_string);
 use Zaapt;
 
 ## ----------------------------------------------------------------------------
@@ -79,13 +80,36 @@ sub process_emails {
         $zaapt->start_tx;
         my $recipient = $email->sel_recipient_next_not_sent();
 
-        unless ( $recipient ) {
+        unless ( defined $recipient ) {
             $done = 1;
             $zaapt->rollback_tx;
             next;
         }
 
         $logger->info("Recipient: a_id=$recipient->{a_id}, r_id=$recipient->{r_id}, e_id=$recipient->{e_id} - '$recipient->{e_subject}'");
+
+        # see if this account already has an 'info' row
+        my $info = $email->sel_info({ a_id => $recipient->{a_id} });
+
+        if ( defined $info ) {
+            $logger->info("Got info: sent=$info->{i_sent}, failed=$info->{i_failed}");
+        }
+        else {
+            $logger->info("Info not available");
+            # insert a new token
+            my $i_token = random_string('0' x 32, [ 'A'..'Z', 'a'..'z', '0'..'9' ]);
+            my $ret = $email->ins_info({
+                a_id    => $recipient->{a_id},
+                i_token => $i_token,
+                i_sent  => 0,
+                i_failed  => 0,
+            });
+            $logger->info("Got '$ret' from ins_info()");
+
+            $info = $email->sel_info({ a_id => $recipient->{a_id} });
+            die "Couldn't create"
+                unless defined $info;
+        }
 
         # create the email message
         my $msg = MIME::Lite->new(
@@ -94,6 +118,8 @@ sub process_emails {
             Subject => $recipient->{e_subject},
             Type    => 'multipart/alternative',
         );
+
+        # add the footer here...
 
         $msg->attach( Type => 'text/plain', Data => $recipient->{e_text} );
         # ToDo: dependant on type_id, this should be converted to HTML
@@ -107,6 +133,9 @@ sub process_emails {
                     r_id => $recipient->{r_id},
                     r_issent => 1
                 });
+                # set the info
+                $info->{i_sent}++;
+                $email->upd_info( $info );
             }
             else {
                 $logger->warn('Sending the email failed');
@@ -115,6 +144,9 @@ sub process_emails {
                     r_issent => 1,
                     r_iserror => 1
                 });
+                # set the info
+                $info->{i_failed}++;
+                $email->upd_info( $info );
             }
         };
         if ( $@ ) {
@@ -126,6 +158,9 @@ sub process_emails {
                 r_iserror => 1,
                 r_error => $@,
             });
+            # set the info
+            $info->{i_failed}++;
+            $email->upd_info( $info );
         }
 
         $i++;

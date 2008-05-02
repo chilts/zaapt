@@ -415,7 +415,13 @@ sub _mk_inserter {
     # my $sql = __PACKAGE__->_mk_ins( "$schema.$t->{name}", @cols );
     my $sql = "INSERT INTO $schema.$t->{name}($t->{sql_ins_cols}) VALUES($t->{qm})";
 
-    my @hr_names = $self->_mk_hr_names( $t->{prefix}, @{$t->{cols}}[1..$last] );
+    my @hr_names;
+    if ( ref $t->{cols}[0] ) {
+        @hr_names = $self->_mk_hr_names( $t->{prefix}, @{$t->{cols}} );
+    }
+    else {
+        @hr_names = $self->_mk_hr_names( $t->{prefix}, @{$t->{cols}}[1..$last] );
+    }
 
     # create the closure
     my $method =  sub {

@@ -37,8 +37,8 @@ CREATE SEQUENCE email.info_id_seq;
 CREATE TABLE email.info (
     account_id      INTEGER NOT NULL REFERENCES account.account PRIMARY KEY,
     token           VARCHAR(32) NOT NULL,
-    numsent         INTEGER NOT NULL DEFAULT 0,
-    numfailed       INTEGER NOT NULL DEFAULT 0,
+    sent            INTEGER NOT NULL DEFAULT 0,
+    failed          INTEGER NOT NULL DEFAULT 0,
 
     UNIQUE(token),
     LIKE base       INCLUDING DEFAULTS

@@ -40,7 +40,7 @@ my $table = {
         prefix => 'i',
         cols => [
             [ 'account_id', 'fk', 'a_id' ],
-            qw(token sent successful rejected ts:inserted ts:updated)
+            qw(token sent failed ts:inserted ts:updated)
         ],
         pk => [ 'account_id', 'fk', 'a_id' ],
     },
@@ -80,6 +80,9 @@ __PACKAGE__->mk_select_rows( 'sel_email_all_bulk', "SELECT $table->{email}{sql_s
 
 # recipient
 __PACKAGE__->mk_select_row( 'sel_recipient_next_not_sent', "SELECT $recipient_cols FROM $recipient_joins WHERE issent IS False ORDER BY r.id LIMIT 1", [] );
+
+# info
+__PACKAGE__->mk_selecter( $schema, $table->{info}{name}, $table->{info}{prefix}, @{$table->{info}{cols}} );
 
 ## ----------------------------------------------------------------------------
 # methods

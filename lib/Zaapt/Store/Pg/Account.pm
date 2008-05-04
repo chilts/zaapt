@@ -11,6 +11,7 @@ use warnings;
 my $schema = 'account';
 
 my $tables = {
+    # account tables
     account => {
         schema => $schema,
         name   => 'account',
@@ -77,14 +78,54 @@ my $tables = {
             qw(code ts:inserted ts:updated)
         ],
     },
+    # email tables
+    email => {
+        schema => $schema,
+        name   => 'email',
+        prefix => 'e',
+        cols   => [
+            'id',
+            qw(subject text html),
+            [ 'type_id', 'fk', 't_id' ],
+            qw(isbulk ts:inserted ts:updated),
+        ],
+    },
+    # type  => Zaapt::Store::Pg::Common->_get_table( 'type' ),
+    recipient => {
+        schema => $schema,
+        name   => 'recipient',
+        prefix => 're',
+        cols   => [
+            'id',
+            [ 'email_id', 'fk', 'e_id' ],
+            [ 'account_id', 'fk', 'a_id' ],
+            qw(issent iserror error),
+            qw(ts:inserted ts:updated),
+        ],
+    },
+    info => {
+        schema => $schema,
+        name => 'info',
+        prefix => 'inf',
+        cols => [
+            [ 'account_id', 'fk', 'a_id' ],
+            qw(token sent failed ts:inserted ts:updated)
+        ],
+        pk => [ 'account_id', 'fk', 'a_id' ],
+    },
 };
 
 my $join = {
+    # account joins
     a_ra => "JOIN $schema.ra ra ON (a.id = ra.account_id)",
     ra_r => "JOIN $schema.role r ON (ra.role_id = r.id)",
     r_pa => "JOIN $schema.pa pa ON (r.id = pa.role_id)",
     pa_p => "JOIN $schema.permission p ON (pa.permission_id = p.id)",
     a_c  => "JOIN $schema.confirm c ON (a.id = c.account_id)",
+    # email joins
+    re_e => "JOIN $schema.email e ON (re.email_id = e.id)",
+    re_a => "JOIN $schema.account a ON (re.account_id = a.id)",
+    a_in => "LEFT JOIN $schema.info inf ON (a.id = inf.account_id)",
 };
 
 sub _get_tables { return $tables; }
@@ -102,6 +143,11 @@ __PACKAGE__->_mk_store_accessors( $schema, $tables );
 # link all the tables
 my $main_cols = "$tables->{account}{sql_sel_cols}, $tables->{role}{sql_sel_cols}, $tables->{permission}{sql_sel_cols}";
 my $main_joins = "$tables->{account}{sql_fqt} $join->{a_ra} $join->{ra_r} $join->{r_pa} $join->{pa_p}";
+# email cols
+my $recipient_cols = "$tables->{recipient}{sql_sel_cols}, $tables->{email}{sql_sel_cols}, $tables->{account}{sql_sel_cols}";
+my $recipient_joins = "$tables->{recipient}{sql_fqt} $join->{re_e} $join->{re_a}";
+my $info_cols = "$tables->{account}{sql_sel_cols}, $tables->{info}{sql_sel_cols}";
+my $info_joins = "$tables->{account}{sql_fqt} $join->{a_in}";
 
 # account
 __PACKAGE__->mk_selecter_from( $schema, $tables->{account} );
@@ -140,6 +186,18 @@ __PACKAGE__->mk_selecter_using_from( $schema, $tables->{invitation}, 'email' );
 __PACKAGE__->_mk_do( 'del_token_invalid_for', "DELETE FROM account.token WHERE account_id = ? AND inserted < current_timestamp - '1 hour'::INTERVAL", [ 'a_id' ]);
 __PACKAGE__->mk_select_row( 'sel_token_using_account_id', "SELECT $tables->{token}{sql_sel_cols} FROM $tables->{token}{sql_fqt} WHERE account_id = ?", [ 'a_id' ]);
 __PACKAGE__->mk_select_row( 'sel_token_valid', "SELECT $tables->{token}{sql_sel_cols} FROM $tables->{token}{sql_fqt} WHERE t.code = ? AND t.inserted > current_timestamp - '1 hour'::INTERVAL", [ 't_code' ]);
+
+# email
+__PACKAGE__->mk_selecter( $schema, $tables->{email}{name}, $tables->{email}{prefix}, @{$tables->{email}{cols}} );
+__PACKAGE__->mk_select_rows( 'sel_email_all', "SELECT $tables->{email}{sql_sel_cols} FROM $tables->{email}{sql_fqt} ORDER BY e.inserted", [] );
+__PACKAGE__->mk_select_rows( 'sel_email_all_bulk', "SELECT $tables->{email}{sql_sel_cols} FROM $tables->{email}{sql_fqt} WHERE isbulk IS True ORDER BY e.inserted", [] );
+
+# recipient
+__PACKAGE__->mk_select_row( 'sel_recipient_next_not_sent', "SELECT $recipient_cols FROM $recipient_joins WHERE issent IS False ORDER BY re.id LIMIT 1", [] );
+
+# info
+__PACKAGE__->mk_selecter( $schema, $tables->{info}{name}, $tables->{info}{prefix}, @{$tables->{info}{cols}} );
+__PACKAGE__->mk_select_row( 'sel_info_using_token', "SELECT $info_cols FROM $info_joins WHERE inf.token = ?", [ 'inf_token' ]);
 
 ## ----------------------------------------------------------------------------
 # methods
@@ -242,11 +300,13 @@ sub confirm {
 sub _nuke {
     my ($self) = @_;
     $self->dbh()->begin_work();
-    $self->dbh()->do( "DELETE FROM account.pa" );
-    $self->dbh()->do( "DELETE FROM account.permission" );
-    $self->dbh()->do( "DELETE FROM account.ra" );
-    $self->dbh()->do( "DELETE FROM account.role" );
-    $self->dbh()->do( "DELETE FROM account.account" );
+    $self->_do( "DELETE FROM $schema.info" );
+    $self->_do( "DELETE FROM $schema.email" );
+    $self->_do( "DELETE FROM $schema.pa" );
+    $self->_do( "DELETE FROM $schema.permission" );
+    $self->_do( "DELETE FROM $schema.ra" );
+    $self->_do( "DELETE FROM $schema.role" );
+    $self->_do( "DELETE FROM $schema.account" );
     $self->dbh()->commit();
 }
 

@@ -1,0 +1,50 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $_act      => ''
+    $inf_token => undef
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Account');
+
+    my $msg;
+    my @err;
+
+    # need to do some stuff here
+    if ( $_act eq '' ) {
+        # nothing to do here, first page
+    }
+    elsif ( $_act eq 'unsubscribe' ) {
+        # they have asked to unsubscribe
+
+        my $error = 0;
+
+        my $info = $model->sel_info_using_token({ inf_token => $inf_token });
+        unless ( defined $info ) {
+            $error++;
+            push @err, 'Unknown token';
+        }
+
+        unless ( $error ) {
+            # unsubscribe this person from notifications
+            $model->upd_account({
+                a_id     => $info->{a_id},
+                a_notify => 0,
+            });
+            $m->clear_buffer();
+            $m->redirect('?_act=complete');
+            return;
+        }
+    }
+    elsif ( $_act eq 'complete' ) {
+        $msg = 'You have now been unsubscribed from site notifications.';
+    }
+</%init>
+%# ----------------------------------------------------------------------------
+<& view-unsubscribe.render.mhtml,
+    inf_token => $inf_token,
+    msg       => $msg,
+    err       => \@err,
+&>
+%# ----------------------------------------------------------------------------

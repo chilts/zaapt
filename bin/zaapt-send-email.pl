@@ -19,6 +19,8 @@ my $logger;
 
 MAIN: {
     my ($cfg_file) = @ARGV;
+    die "Please provide a config file"
+        unless defined $cfg_file;
 
     Config::Simple->import_from($cfg_file, $cfg);
 
@@ -32,7 +34,7 @@ MAIN: {
     # choose and setup the appender
     my $appender = Log::Log4perl::Appender->new(
         "Log::Dispatch::File",
-        filename => "$cfg->{log_dir}/send-email.log",
+        filename => "$cfg->{log_dir}/zaapt-send-email.log",
         mode     => "append",
     );
     $appender->layout( $layout );
@@ -57,7 +59,7 @@ MAIN: {
     $logger->debug("got database handle");
 
     my $zaapt = Zaapt->new({ store => 'Pg', dbh => $dbh });
-    my $email = $zaapt->get_model('Email');
+    my $email = $zaapt->get_model('Account');
 
     $logger->debug("got \$zaapt and \$email");
 
@@ -65,7 +67,7 @@ MAIN: {
 
     $dbh->disconnect();
     $logger->info("$0: finished");
-    $logger->debug(' ');
+    $logger->info(' ');
 }
 
 ## ----------------------------------------------------------------------------
@@ -76,7 +78,8 @@ sub process_emails {
     my $done = 0;
     my $i = 0;
 
-    while ( !$done ) {
+    #while ( !$done ) {
+    while ( !$i ) {
         $zaapt->start_tx;
         my $recipient = $email->sel_recipient_next_not_sent();
 
@@ -86,23 +89,25 @@ sub process_emails {
             next;
         }
 
-        $logger->info("Recipient: a_id=$recipient->{a_id}, r_id=$recipient->{r_id}, e_id=$recipient->{e_id} - '$recipient->{e_subject}'");
+        $logger->info("Recipient: a_id=$recipient->{a_id}, re_id=$recipient->{re_id}, e_id=$recipient->{e_id} - '$recipient->{e_subject}'");
 
         # see if this account already has an 'info' row
         my $info = $email->sel_info({ a_id => $recipient->{a_id} });
 
+        $logger->info("here");
+
         if ( defined $info ) {
-            $logger->info("Got info: sent=$info->{i_sent}, failed=$info->{i_failed}");
+            $logger->info("Got info: sent=$info->{inf_sent}, failed=$info->{inf_failed}");
         }
         else {
             $logger->info("Info not available");
             # insert a new token
-            my $i_token = random_string('0' x 32, [ 'A'..'Z', 'a'..'z', '0'..'9' ]);
+            my $inf_token = random_string('0' x 32, [ 'A'..'Z', 'a'..'z', '0'..'9' ]);
             my $ret = $email->ins_info({
                 a_id    => $recipient->{a_id},
-                i_token => $i_token,
-                i_sent  => 0,
-                i_failed  => 0,
+                inf_token => $inf_token,
+                inf_sent  => 0,
+                inf_failed  => 0,
             });
             $logger->info("Got '$ret' from ins_info()");
 
@@ -119,33 +124,53 @@ sub process_emails {
             Type    => 'multipart/alternative',
         );
 
-        # add the footer here...
+        # to add the footer, get the account:location setting first
+        my $zaapt_model = $zaapt->get_model('Zaapt');
+        my $model = $zaapt_model->sel_model_using_name({ m_name => 'account' });
+        my $location_setting = $zaapt_model->sel_setting_in_model({
+            m_id   => $model->{m_id},
+            s_name => 'location',
+        });
+        my $unsubscribe_url = "http://$cfg->{domain_name}/$location_setting->{s_value}/unsubscribe.html";
+
+        $recipient->{e_text} .= <<"EOF";
+If you do not wish to receive notifications, please click here:
+
+$unsubscribe_url?_act=unsubscribe&inf_token=$info->{inf_token}
+EOF
+
+        $recipient->{e_html} .= <<"EOF";
+<p>
+    If you do not wish to receive notifications, please <a href="$unsubscribe_url?_act=unsubscribe&amp;inf_token=$info->{inf_token}">unsubscribe</a>
+</p>
+EOF
 
         $msg->attach( Type => 'text/plain', Data => $recipient->{e_text} );
-        # ToDo: dependant on type_id, this should be converted to HTML
-        # $msg->attach( Type => 'text/html', Data => $recipient->{e_html} );
+        # ToDo: dependant on type_id, this should be converted to HTML, for now
+        # though assume just plain HTML
+        $msg->attach( Type => 'text/html', Data => $recipient->{e_html} );
 
         eval {
             my $sys_str = "/usr/sbin/sendmail -f $recipient->{a_email} -t -oi -oem";
             if ( $msg->send('sendmail', $sys_str) ) {
                 $logger->info('...sent OK');
                 $email->upd_recipient({
-                    r_id => $recipient->{r_id},
-                    r_issent => 1
+                    re_id => $recipient->{re_id},
+                    re_issent => 1
                 });
                 # set the info
-                $info->{i_sent}++;
+                $info->{inf_sent}++;
                 $email->upd_info( $info );
             }
             else {
                 $logger->warn('Sending the email failed');
                 $email->upd_recipient({
-                    r_id => $recipient->{r_id},
-                    r_issent => 1,
-                    r_iserror => 1
+                    re_id => $recipient->{re_id},
+                    re_issent => 1,
+                    re_iserror => 1
                 });
                 # set the info
-                $info->{i_failed}++;
+                $info->{inf_failed}++;
                 $email->upd_info( $info );
             }
         };
@@ -153,19 +178,18 @@ sub process_emails {
             $logger->info('...error sending email');
             $logger->warn($@);
             $email->upd_recipient({
-                r_id => $recipient->{r_id},
-                r_issent => 1,
-                r_iserror => 1,
-                r_error => $@,
+                re_id => $recipient->{re_id},
+                re_issent => 1,
+                re_iserror => 1,
+                re_error => $@,
             });
             # set the info
-            $info->{i_failed}++;
+            $info->{inf_failed}++;
             $email->upd_info( $info );
         }
 
         $i++;
         $logger->info("...done ($i)");
-        # $zaapt->rollback_tx();
         $zaapt->commit_tx();
     }
 

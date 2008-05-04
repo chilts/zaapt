@@ -29,7 +29,7 @@
         return;
     }
 
-    my $model = $zaapt->get_model('Email');
+    my $model = $zaapt->get_model('Account');
 
     # some data manipulation
     $e_text = Zaapt::Utils::Conv::remove_cr( $e_text );

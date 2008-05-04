@@ -15,7 +15,7 @@
     }
 
     # get the model and the email, get out if not found
-    my $model = $zaapt->get_model('Email');
+    my $model = $zaapt->get_model('Account');
     my $email = $model->sel_email({ e_id => $e_id });
     $m->redirect('edit-e-list.html')
         unless defined $email;
@@ -42,9 +42,9 @@
             $model->ins_recipient({
                 e_id      => $email->{e_id},
                 a_id      => $a_id,
-                r_issent  => 0,
-                r_iserror => 0,
-                r_error   => '',
+                re_issent  => 0,
+                re_iserror => 0,
+                re_error   => '',
             });
             $count++;
         }

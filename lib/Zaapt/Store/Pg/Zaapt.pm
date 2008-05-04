@@ -46,12 +46,13 @@ __PACKAGE__->_mk_store_accessors( $schema, $table );
 # model
 __PACKAGE__->mk_selecter_from( $schema, $table->{model} );
 __PACKAGE__->mk_select_rows( 'sel_model_all', "SELECT $table->{model}{sql_sel_cols} FROM $table->{model}{sql_fqt} ORDER BY m.name", [] );
+__PACKAGE__->mk_selecter_using_from( $schema, $table->{model}, 'name' );
 
 # setting
 my $setting_cols = "$table->{model}{sql_sel_cols}, $table->{setting}{sql_sel_cols}";
 my $setting_joins = "$table->{model}{sql_fqt} $join->{m_s}";
 __PACKAGE__->mk_select_row( 'sel_setting', "SELECT $setting_cols FROM $setting_joins WHERE s.id = ?", [ 's_id' ] );
-__PACKAGE__->mk_select_row( 'sel_setting_in_model', "SELECT $setting_cols FROM $setting_joins WHERE m.id = ? AND s.name = ?", [ 'b_id', 'e_name' ] );
+__PACKAGE__->mk_select_row( 'sel_setting_in_model', "SELECT $setting_cols FROM $setting_joins WHERE m.id = ? AND s.name = ?", [ 'm_id', 's_name' ] );
 __PACKAGE__->mk_select_rows( 'sel_setting_all_in', "SELECT $setting_cols FROM $setting_joins WHERE m.id = ? ORDER BY s.name DESC", [ 'm_id' ] );
 
 ## ----------------------------------------------------------------------------

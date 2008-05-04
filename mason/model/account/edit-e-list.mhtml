@@ -11,7 +11,7 @@
         return;
     }
 
-    my $model = $zaapt->get_model('Email');
+    my $model = $zaapt->get_model('Account');
     my $emails = $model->sel_email_all_bulk();
 </%init>
 %# ----------------------------------------------------------------------------

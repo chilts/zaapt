@@ -1,0 +1,29 @@
+%# ----------------------------------------------------------------------------
+<%args>
+    $inf_token
+    $msg
+    $err
+</%args>
+%# ----------------------------------------------------------------------------
+<h1>Unsubscribe from Site Notifications</h1>
+
+<& /zaapt/common/msg.mhtml, msg => $msg &>
+<& /zaapt/common/err.mhtml, err => $err &>
+
+<p>
+    To be able to unsubscribe from site notifications, you need to enter the
+    token you received on your last site noticiation email. If you do not have
+    that token, you can <& /zaapt/common/sign-in-url.mhtml, text => 'sign in'
+    &> and <a href="edit.html">edit your site settings</a>.
+</p>
+
+<div class="box center">
+    <form action="?" method="post">
+        <input type="hidden" name="_act" value="unsubscribe" /><br />
+        Token<br />
+        <input type="text" name="inf_token" value="<% $inf_token | h %>" /><br />
+        <Br />
+        <input type="submit" value="Unsubscribe" /><br />
+    </form>
+</div>
+%# ----------------------------------------------------------------------------

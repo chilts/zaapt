@@ -8,6 +8,9 @@ entities:
   - pa
   - permission
   - confirm
+  - email
+  - recipient
+  - info
 name: account
 stores: 
   - psql

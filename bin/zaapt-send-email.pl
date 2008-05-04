@@ -78,8 +78,7 @@ sub process_emails {
     my $done = 0;
     my $i = 0;
 
-    #while ( !$done ) {
-    while ( !$i ) {
+    while ( !$done ) {
         $zaapt->start_tx;
         my $recipient = $email->sel_recipient_next_not_sent();
 
@@ -134,13 +133,13 @@ sub process_emails {
         my $unsubscribe_url = "http://$cfg->{domain_name}/$location_setting->{s_value}/unsubscribe.html";
 
         $recipient->{e_text} .= <<"EOF";
-If you do not wish to receive notifications, please click here:
 
+If you do not wish to receive notifications, please click here:
 $unsubscribe_url?_act=unsubscribe&inf_token=$info->{inf_token}
 EOF
 
         $recipient->{e_html} .= <<"EOF";
-<p>
+<p style="font-size: small;">
     If you do not wish to receive notifications, please <a href="$unsubscribe_url?_act=unsubscribe&amp;inf_token=$info->{inf_token}">unsubscribe</a>
 </p>
 EOF

@@ -1,0 +1,10 @@
+===============================================================================
+
+Overview
+--------
+
+'zaapt' provides a helper framework and some out-of-the-box content models for
+you to use when setting up a website. It is written in Perl and uses Mason for
+it's main page processing. The main storage backend is PostgreSQL.
+
+===============================================================================

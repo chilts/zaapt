@@ -496,7 +496,7 @@ sub _mk_deleter {
     my ($self, $schema, $table, $prefix, $id) = @_;
 
     # my $sql = "DELETE FROM $schema.$table WHERE $id = ?";
-    my $sql = __PACKAGE__->_mk_del("$schema.$table", $id);
+    my $sql = $self->_mk_del("$schema.$table", $id);
 
     # create the closure
     my $method =  sub {
@@ -513,7 +513,7 @@ sub mk_deleter {
     carp "mk_deleter() is deprecated, use _mk_deleter() instead";
 
     # my $sql = "DELETE FROM $schema.$table WHERE $id = ?";
-    my $sql = __PACKAGE__->_mk_del("$schema.$table", $id);
+    my $sql = $self->_mk_del("$schema.$table", $id);
 
     # create the closure
     my $method =  sub {
@@ -526,7 +526,7 @@ sub mk_deleter {
 
 sub _mk_select_count {
     my ($self, $t) = @_;
-    __PACKAGE__->mk_select_row( "sel_$t->{name}_count", __PACKAGE__->_mk_count( "$t->{schema}.$t->{name}" ) );
+    $self->mk_select_row( "sel_$t->{name}_count", $self->_mk_count( "$t->{schema}.$t->{name}" ) );
 }
 
 sub _mk_do {
@@ -546,18 +546,18 @@ sub _mk_do {
 sub _mk_selecter {
     my ($self, $schema, $t) = @_;
     carp "_mk_selecter() is deprecated, use mk_selecter_from() instead";
-    __PACKAGE__->mk_selecter( $schema, $t->{name}, $t->{prefix}, @{$t->{cols}} );
+    $self->mk_selecter( $schema, $t->{name}, $t->{prefix}, @{$t->{cols}} );
 }
 
 sub mk_selecter_from {
     my ($self, $schema, $t) = @_;
-    __PACKAGE__->mk_selecter( $schema, $t->{name}, $t->{prefix}, @{$t->{cols}} );
+    $self->mk_selecter( $schema, $t->{name}, $t->{prefix}, @{$t->{cols}} );
 }
 
 sub mk_selecter {
     my ($self, $schema, $table, $prefix, $id, @cols) = @_;
 
-    my $cols = __PACKAGE__->_mk_sel_cols( $prefix, $id, @cols );
+    my $cols = $self->_mk_sel_cols( $prefix, $id, @cols );
     my $field = ref $id ? $id->[0] : $id;
     my $sql = "SELECT $cols FROM $schema.$table $prefix WHERE $prefix.$field = ?";
 
@@ -576,13 +576,13 @@ sub mk_selecter {
 
 sub _mk_selecter_all_from {
     my ($self, $schema, $t) = @_;
-    __PACKAGE__->_mk_selecter_all( $schema, $t->{name}, $t->{prefix}, @{$t->{cols}} );
+    $self->_mk_selecter_all( $schema, $t->{name}, $t->{prefix}, @{$t->{cols}} );
 }
 
 sub _mk_selecter_all {
     my ($self, $schema, $table, $prefix, $id, @cols) = @_;
 
-    my $cols = __PACKAGE__->_mk_sel_cols( $prefix, $id, @cols );
+    my $cols = $self->_mk_sel_cols( $prefix, $id, @cols );
     my $field = ref $id ? $id->[0] : $id;
     my $sql = "SELECT $cols FROM $schema.$table $prefix ORDER BY $prefix.id";
 
@@ -647,20 +647,20 @@ sub _mk_select_rows_offset {
 # easier way of doing the thing below
 sub mk_selecter_using_from {
     my ($self, $schema, $t, $col) = @_;
-    __PACKAGE__->mk_selecter_using( $schema, $t->{name}, $t->{prefix}, $col, @{$t->{cols}} );
+    $self->mk_selecter_using( $schema, $t->{name}, $t->{prefix}, $col, @{$t->{cols}} );
 }
 
 # ... and the old (probably unused) version
 sub _mk_selecter_using {
     my ($self, $schema, $table, $col) = @_;
     carp "_mk_selecter_using() is deprecated, use mk_selecter_using() instead";
-    __PACKAGE__->mk_selecter_using( $schema, $table->{name}, $table->{prefix}, $col, @{$table->{cols}} );
+    $self->mk_selecter_using( $schema, $table->{name}, $table->{prefix}, $col, @{$table->{cols}} );
 }
 
 sub mk_selecter_using {
     my ($self, $schema, $tablename, $prefix, $col, @cols) = @_;
 
-    my $cols = __PACKAGE__->_mk_sel_cols( $prefix, @cols );
+    my $cols = $self->_mk_sel_cols( $prefix, @cols );
     my $sql = "SELECT $cols FROM $schema.$tablename $prefix WHERE $prefix.$col = ?";
 
     my $class = ref $self || $self;
@@ -716,9 +716,9 @@ sub _mk_db_accessors {
 sub _mk_store_accessors {
     my ($self, $schema, $table) = @_;
     foreach my $t ( values %$table ) {
-        __PACKAGE__->_mk_inserter( $schema, $t );
-        __PACKAGE__->_mk_updater( $schema, $t );
-        __PACKAGE__->_mk_deleter( $schema, $t->{name}, $t->{prefix}, @{$t->{cols}}[0] );
+        $self->_mk_inserter( $schema, $t );
+        $self->_mk_updater( $schema, $t );
+        $self->_mk_deleter( $schema, $t->{name}, $t->{prefix}, @{$t->{cols}}[0] );
     }
 }
 
@@ -753,6 +753,8 @@ sub _inject_method {
 
     # don't have to check to see if $method_name is 'DESTROY' since it never will be
     my $class = ref $self || $self;
+
+    # print "injecting '${class}::$method_name'\n";
 
     # inject into package's namespace
     unless ( defined &{"${class}::$method_name"} ) {

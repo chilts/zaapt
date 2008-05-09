@@ -146,7 +146,7 @@ CREATE TRIGGER token_updated BEFORE UPDATE ON account.token
     FOR EACH ROW EXECUTE PROCEDURE updated();
 
 -- table: email
-CREATE SEQUENCE account..email_id_seq;
+CREATE SEQUENCE account.email_id_seq;
 CREATE TABLE account.email (
     id              INTEGER NOT NULL DEFAULT nextval('account.email_id_seq'::TEXT) PRIMARY KEY,
     subject         TEXT NOT NULL,

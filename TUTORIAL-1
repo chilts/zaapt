@@ -1,0 +1,614 @@
+-------------------------------------------------------------------------------
+
+Site I
+------
+
+Step 1) Making the Database and it's Schema
+
+Firstly, you need a PostgreSQL database and a user to connect to it. This
+tutorial is not going to cover how to set up a connection to a PostgreSQL
+database but I'll wait here until you can connect to it so come back soon.
+
+Some hints:
+
+ $ sudo -u postgres createuser -A -D mysiteuser
+ CREATE USER
+ $ sudo -u postgres createdb -O mysiteuser -E UTF-8 -T template0 mysitedb
+ CREATE DATABASE
+ $ sudo -u postgres createlang plpgsql mysitedb
+ $
+
+(but playing with pg_hba.conf is left as an excercise for the reader.)
+
+Ok, I'm going to assume you can connect to a database named 'mysitedb' with the
+username 'mysiteuser'.
+
+ $ psql -U mysiteuser mysitedb
+
+If you can't do that, try and figure it out and come back here when you
+can. Note: you should also be able to connect to the database when you are the
+system user 'www-data' (this is because Apache will be running as 'www-data').
+
+Right you can get into your database, so let's set up some tables:
+
+ mysitedb=> \i /usr/share/zaapt/store/Pg/create_zaapt.sql
+ ...etc...
+
+There should be no errors in the output. You will get some 'CREATE TABLE's,
+some 'CREATE FUNCION's and some 'CREATE SEQUENCE's.
+
+That's the base set of tables for Zaapt. There's not many but there are more to
+come.
+
+Next, we have some tables which are going to be common to a number of different
+models, so let's create that:
+
+ mysitedb=> \i /usr/share/zaapt/store/Pg/create_common.sql
+ ...etc...
+
+Check for errors and continue on if everything was okay.
+
+Most CMS's have the ability for people to log-in and manage content so let's
+add the user tables - called the 'accounts' in Zaapt:
+
+ mysitedb=> \i /usr/share/zaapt/store/Pg/create_account.sql
+ ...etc...
+
+Again there should be no errors.
+
+For the first part of our site, we're going to add a content managed section to
+the top level so let's add the content model whilst we're here:
+
+ mysitedb=> \i /usr/share/zaapt/store/Pg/create_content.sql
+ ...etc...
+
+Again, check for errors. There should be none.
+
+In review, you:
+
+* created a DB User
+* created a DB
+* connect to it
+* added the following sets of schema:
+** Zaapt
+** Common
+** Account
+** Content
+
+That's all the structure we need in the database to start off with. We haven't
+added any content yet but next let's set up the webserver.
+
+Step 2) Setting up the site
+
+For now, let's create your site itself inside your home directory:
+
+ $ mkdir -p ~/www/mysite/htdocs
+ $ cd ~/www/mysite/htdocs
+
+Now let's create some files to start off with:
+
+ $ touch autohandler index.html
+
+This is where having Mason knowledge comes in handy. You may or may not
+understand the following but please look things up on the internet if you
+require help.
+
+Let's create some files to start off with:
+
+ $ cat index.html
+ <h1>Welcome to MySite</h1>
+ <p>This page shows my Apache2 and Mason install is working correctly.</p>
+
+ $ cat autohandler
+ <html>
+     <head><title>MySite.org</title></head>
+     <body>
+ % $m->call_next();
+     </body>
+ </html>
+
+So that's a very simple Mason site. You can probably work out what it
+does. When the index.html page is rendered, it is wrapped inside the
+autohandler (ie. the $m->call_next() is replaced with the content inside
+index.html).
+
+Now to get the Apache2 server set up.
+
+ $ sudo vi /etc/apache2/sites-available/mysite.conf
+ $ cat /etc/apache2/sites-available/mysite.conf
+ <VirtualHost *>
+     ServerName mysite.localhost
+ 
+     DocumentRoot /home/andy/www/mysite/htdocs
+ 
+     PerlAddVar MasonCompRoot /home/andy/www/mysite/htdocs
+     PerlSetVar MasonDataDir /home/andy/www/mysite/mason
+ 
+     PerlModule HTML::Mason::ApacheHandler
+     PerlModule Apache2::Request
+ 
+     AddDefaultCharset utf-8
+ 
+     # set which files Mason handles
+     <LocationMatch "\.(html|xml)$">
+         SetHandler perl-script
+         PerlHandler HTML::Mason::ApacheHandler
+     </LocationMatch>
+ </VirtualHost>
+
+This essentially tells Apache to look in your htdocs and send any request for
+*.html files through the HTML::Mason::ApacheHandler. Mason knows about
+MasonCompRoot (where your pages are) and MasonDataDir.
+
+But hang on we don't have a MasonDataDir - not yet but we'll create one. Mason
+'compiles' the pages it sees and stores them somewhere. This means two things,
+(i) we need a place to store them and (ii) it needs to be writeable by the
+webserver. It's good not to have it in your DocumentRoot so ~/www/mysite/mason
+it is.
+
+ $ mkdir ~/www/mysite/mason
+ $ sudo chown www-data.www-data ~/www/mysite/mason
+
+You should be able to see that the 'mason' dir is now owned by 'www-data'.
+
+Tell Apache2 that this site is now enabled and restart the webserver:
+
+ $ sudo a2ensite mysite.conf
+ Site mysite.conf installed; run /etc/init.d/apache2 reload to enable.
+ $ sudo /etc/init.d/apache2 reload
+ * Reloading apache 2.0 configuration...                                 [ ok ]
+
+So finally, let's look at the site. Browse to localhost. Here I'll curl what
+you should be able to see:
+
+ $ curl localhost
+ <html>
+     <head><title>MySite.org</title></head>
+     <body>
+ <h1>Welcome to MySite</h1>
+ <p>This page shows my Apache2 and Mason install is working correctly.</p>
+     </body>
+ </html>
+
+That all looks lovely.
+
+Step 3) Adding content to the database
+
+Now that your site is going, we now want to add some content to the database
+but first, just a small introduction on models and permissions in Zaapt.
+
+Most models in Zaapt allow you to create multiple things of itself. For
+example, you can have multiple blogs within the same site. Blogs specify a
+number of different permissions which can be set such that duties can be split
+up between a number of different people. The content model also specifies that
+a number of permissions may be set up too.
+
+However, in our instance we're the only one who is going to access the site, so
+let's just add one permission for now.
+
+Let's go back to the database:
+
+ $ psql -U mysiteuser mysitedb
+ mysitedb=> INSERT INTO account.permission(name, description)
+            VALUES('admin', 'The Admin Permission');
+ INSERT 484734 1
+ mysitedb=> SELECT id, name, description FROM account.permission;
+  id | name  |     description      
+ ----+-------+----------------------
+   1 | admin | The Admin Permission
+ (1 row)
+
+Make a note of the id (in this case '1') because we'll need that later.
+
+Now, let's insert our 'home' content:
+
+ mysitedb=> INSERT INTO content.content(name, title, description, admin_id, view_id, edit_id, publish_id)
+            VALUES('home', 'Home', 'My Home Content', 1, 1, 1, 1);
+ INSERT 484736 1
+ 
+ mysitedb=> SELECT id, name FROM content.content;
+  id | name 
+ ----+------
+   1 | home
+ (1 row)
+
+Great, now you have a 'home' content model and again, make a note of the
+id.
+
+Now let's insert a page but first we need to decide what type of page to
+insert. Out of the box, Zaapt allows a few different page types but for now,
+we're going to stick with a page type of HTML to make it easy:
+
+ mysitedb=> SELECT id, name FROM common.type;
+  id | name 
+ ----+------
+   1 | html
+   2 | text
+   3 | code
+ (3 rows)
+
+The code for HTML is '1', so let's remember that too. Now insert the page
+(remembering, the content id is 1 and the type id is also 1):
+
+ mysitedb=> INSERT INTO content.page(content_id, type_id, name, content)
+            VALUES(1, 1, 'index', '<p>Homepage</p>');
+ INSERT 484737 1
+ mysitedb=> SELECT id, content_id, type_id, name, content FROM content.page;
+  id | content_id | type_id | name  |    content     
+ ----+------------+---------+-------+-----------------
+   1 |          1 |       1 | index | <p>Homepage</p>
+ (1 row)
+
+Finally, we now have a content model (called 'home') and a page in it (called
+'index'). The page is of HTML type and we'll make it serve up off the homepage
+of the site.
+
+So you need to go back to your 'index.html' and change it to this:
+
+ $ cat index.html
+ <%once>
+     use Zaapt;
+     use DBI;
+ </%once>
+ <%init>
+     my $dbh = DBI->connect(
+         "dbi:Pg:dbname=mysitedb",
+         'mysiteuser',
+         undef,
+         { RaiseError => 1, AutoCommit => 1 }
+     );
+     my $zaapt = Zaapt->new({ dbh => $dbh, store => 'Pg' });
+     $m->comp(
+         '/zaapt/model/content/view.mhtml',
+         zaapt => $zaapt,
+         c_name => 'home',
+         page => 'index'
+     );
+ </%init>
+
+This doesn't quite work yet though, you'll also have to change the following
+line in the Apache config:
+
+-    PerlAddVar MasonCompRoot /home/andy/www/mysite/htdocs
++    PerlAddVar MasonCompRoot "main => /home/andy/www/mysite/htdocs"
++    PerlAddVar MasonCompRoot "zaapt => /usr/share/zaapt/mason"
+
+What this tells Mason is that you are using both your own component root AND
+the one Zaapt gives you for free. Notice in the index.html page above, you're
+calling a component which doesn't live in your own htdocs (because you only
+have two files there for the moment) but now that Mason knows about this other
+pre-made component root, it should find the 'view.mhtml' component fine).
+
+Now reload your webserver and hit 'localhost' again. This is what you should
+get:
+
+ $ curl localhost
+ <html>
+     <head><title>MySite.org</title></head>
+     <body>
+     <p>Homepage</p>
+ 
+     </body>
+ </html>
+
+So now you can see that the content you put into the database is now being
+served out :-) This is now Zaapt in action. You really haven't written much
+code - especially for the website but yet you already have a page being served
+out.
+
+One page is great but let's do another. Actually, let's just go the whole way
+and do as many as we want:
+
+ $ cat dhandler
+ <%once>
+     use Zaapt;
+     use DBI;
+ </%once>
+ <%init>
+     $r->content_type('text/html');
+
+     my $dbh = DBI->connect(
+         "dbi:Pg:dbname=mysitedb",
+         'mysiteuser',
+         undef,
+         { RaiseError => 1, AutoCommit => 1 }
+     );
+     my $zaapt = Zaapt->new({ dbh => $dbh, store => 'Pg' });
+
+     my ($page_name) = $m->dhandler_arg() =~ m{ \A ([\w-]+) \. html \z }xms;
+     $m->comp(
+         '/zaapt/model/content/view.mhtml',
+         zaapt => $zaapt,
+         c_name => 'home',
+         page => $page_name
+     );
+ </%init>
+
+Now you can see that the page we're requesting from the database is a function
+of what is being asked for at the webserver. For example, if you want to get
+the page named 'about', you'd request:
+
+ $ curl localhost/about.html
+ <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+ <html><head>
+ <title>404 Not Found</title>
+ </head><body>
+ <h1>Not Found</h1>
+ <p>The requested URL /about.html was not found on this server.</p>
+ </body></html>
+
+...but that's because you haven't added it to the database yet. Let's do that
+now:
+
+ mysitedb=> INSERT INTO content.page(content_id, type_id, name, content)
+            VALUES(1, 1, 'about', '<p>My name is Andy</p>');
+ INSERT 484738 1
+ mysitedb=> SELECT id, content_id, type_id, name, content FROM content.page;
+  id | content_id | type_id | name  |        content         
+ ----+------------+---------+-------+------------------------
+   1 |          1 |       1 | index | <p>Homepage</p>
+   2 |          1 |       1 | about | <p>My name is Andy</p>
+ (2 rows)
+
+Now you can see both pages so let's try about with about:
+
+ $ curl localhost/about.html
+ <html>
+    <head><title>MySite.org</title></head>
+    <body>
+    <p>My name is Andy</p>
+
+    </body>
+ </html>
+
+Perfect!!! Now you can serve as many pages as you wish from the root of your
+webserver since the dhandler intercepts pages Apache doesn't know about. Notice
+that this about.html page has been wrapped by what's in the autohandler
+also. Therefore each and every page's framework (the outer part of the HTML) is
+entirely consistent throughout the site - which is really nice thanks to Mason.
+
+So go and add some more pages to your content section and every one of them
+will automatically show up at the top level of your webserver. Some other good
+names to use are 'content', 'about-me' and 'page-5'. Notice that each of these
+contain only letters, number and the dash character, much like a domain
+name. This is good for Search Engine Optimisation (SEO) since they can make out
+the words properly. As always, everything in Zaapt tends towards best
+practices.
+
+Step 4) Refactoring the site
+
+I said perfect earlier but when we look at the code in the dhandler, there's
+actually a lot in common with the index.html page, so let's do something about
+that. We could do loads about it but to start off with, let's remove the
+connection to the database from both files and put it in a common place. While
+we're at it, we'll also create that $zaapt instance in one place too.
+
+We've already seen that the autohandler wraps all pages so that's a good
+candidate for something which is execcuted during all requests.
+
+Change autohandler to this:
+
+ $ cat autohandler
+ <%once>
+     use DBI;
+ </%once>
+ <%init>
+     my $dbh = DBI->connect(
+         "dbi:Pg:dbname=mysitedb",
+         'mysiteuser',
+         undef,
+         { RaiseError => 1, AutoCommit => 1 }
+     );
+     $ZAAPT = Zaapt->new({ dbh => $dbh, store => 'Pg' });
+ </%init>
+ <html>
+     <head><title>MySite.org</title></head>
+     <body>
+ % $m->call_next();
+     </body>
+ </html>
+
+Notice we've made the $zaapt variable uppercase (now $ZAAPT). We also don't
+have to declare it with 'my' since we will be making it a global throughout the
+site. So let's tell the Apache configuration as such:
+
+Change /etc/apache2/sites-available/mysite.conf:
+
+     DocumentRoot /home/andy/www/mysite/htdocs
++    PerlSetVar MasonAllowGlobals $ZAAPT
+
+Next, remove the $dbh connection strings from index.html and dhandler, remove the
+creation of $zaapt and finally, use $ZAAPT in replacement of $zaapt earler:
+
+ $ cat index.html
+ <%init>
+     $m->comp(
+         '/zaapt/model/content/view.mhtml',
+         zaapt => $ZAAPT,
+         c_name => 'home',
+         page => 'index'
+     );
+ </%init>
+
+ $ cat dhandler
+ <%init>
+     $r->content_type('text/html');
+     my ($page_name) = $m->dhandler_arg() =~ m{ \A ([\w-]+) \. html \z }xms;
+     $m->comp(
+         '/zaapt/model/content/view.mhtml',
+         zaapt => $ZAAPT,
+         c_name => 'home',
+         page => $page_name
+     );
+ </%init>
+
+You'll notice that these two components are now considerably smaller. Deleting
+code always makes us happy.
+
+Let's just check both pages again:
+
+ $ curl localhost/index.html
+ <html>
+     <head><title>MySite.org</title></head>
+     <body>
+     <p>Homepage</p>
+ 
+     </body>
+ </html>
+
+ $ curl localhost/about.html
+ <html>
+     <head><title>MySite.org</title></head>
+     <body>
+     <p>My name is Andy</p>
+ 
+     </body>
+ </html>
+
+Wow. We now have a content managed top level of the site.
+
+Step 5) Adding other content
+
+But wait, we said earlier that we wanted a blog too, so let's get that
+started. Firstly, we need to add the blog tables, then add a blog itself and
+let's also add one entry to it too. Back to database-land:
+
+ mysitedb=> \i /usr/share/zaapt/store/Pg/create_blog.sql
+ ...etc...
+ mysitedb=> INSERT INTO blog.blog(name, title, description, show, admin_id, view_id, edit_id, publish_id, comment_id, trackback_id)
+            VALUES('blog', 'My Blog', 'Where I hang out.', 7, 1, 1, 1, 1, 1, 1);
+ INSERT 484886 1
+
+When we add entries to a blog, the blog needs to know who added it, so let's create an account we can attribute those blog entries to. Note that we won't fill in all the account fields yet:
+
+ mysitedb=> INSERT INTO account.account(username, firstname, lastname, email, salt, password)
+            VALUES('andy', 'Andrew', 'Chilton', 'andychilton@gmail.com', '', '');
+ INSERT 484889 1
+
+Now, let's add that blog entry:
+
+ mysitedb=> INSERT INTO blog.entry(blog_id, account_id, type_id, name, title, intro, article)
+            VALUES(1, 1, 1, 'first-entry', 'First Blog Entry', 'Welcome to my blog.', '<p>This is where I hang out</p>');
+ INSERT 484891 1
+
+(Note: 1, 1, 1 is blog_id, account_id and type_id which you saw earlier.)
+
+Now we have a blog, let's make sure the webserver can serve it. Firstly, cheat
+by copying the top level index.html and dhandler files:
+
+ $ mkdir ~/www/mysite/htdocs/blog
+ $ cd ~/www/mysite/htdocs/blog
+ $ cp ../index.html ../dhandler .
+
+Now we have to change a few things. Watch out for the component we're calling
+and the fact that we're nowing using a blog name of 'blog' instead of a content
+name of 'home'. All the other hard work is done in the background:
+
+ $ cat index.html
+ <%init>
+     $m->comp(
+         '/zaapt/model/blog/view.mhtml',
+         zaapt => $ZAAPT,
+         b_name => 'blog',
+         page => 'index'
+     );
+ </%init>
+
+ $ cat dhandler
+ <%init>
+     $r->content_type('text/html');
+     my ($page_name) = $m->dhandler_arg() =~ m{ \A ([\w:-]+) \. html \z }xms;
+     $m->comp(
+         '/zaapt/model/blog/view.mhtml',
+         zaapt => $ZAAPT,
+         b_name => 'blog',
+         page => $page_name
+     );
+ </%init>
+
+So let's hit the index page:
+
+ $ curl localhost/blog/index.html
+ <html>
+     <head><title>MySite.org</title></head>
+     <body>
+ <h1><a href="first-entry.html">First Blog Entry</a></h1>
+ 
+ <p class="r">Posted by: andy</p>
+ 
+ <p><strong>Welcome to my blog.</strong></p>
+ 
+ <p><a href="first-entry.html">Read more...</a></p>
+ 
+ <p class="r">
+     <a href="first-entry.html#comments" class="z-comments">Comments (0)</a>
+ </p>
+ 
+ <p class="footnote">2008-05-10 03:09:38</p>
+ 
+     </body>
+ </html>
+
+Wow! Look at all that. That's Zaapt just doing it's thing. You don't just get
+an index file though. You also get the page name too:
+
+ $ curl localhost/blog/first-entry.html
+
+AND you get some archive pages too!!! A yearly, monthly and daily one
+(substitute in your own dates):
+
+ $ curl localhost/blog/archive:2008.html
+ $ curl localhost/blog/archive:2008-05.html
+ $ curl localhost/blog/archive:2008-05-10.html
+
+So let's insert another page:
+
+ mysitedb=> INSERT INTO blog.entry(blog_id, account_id, type_id, name, title, intro, article)
+            VALUES(1, 1, 1, 'the-second', 'Another Entry', 'Been here before.', '<p>Still here.</p>');
+ INSERT 484892 1
+
+Now, the index and all the archive pages have grown in size and a new page has
+appeared:
+
+ $ curl localhost/blog/index.html
+ $ curl localhost/blog/archive:2008.html
+ $ curl localhost/blog/archive:2008-05.html
+ $ curl localhost/blog/archive:2008-05-10.html
+ $ curl localhost/blog/the-second.html
+
+One final thing I want to show you. Why not add some labels to each blog entry:
+
+ mysitedb=> INSERT INTO common.label(name) VALUES('first');
+ INSERT 484893 1
+ mysitedb=> INSERT INTO common.label(name) VALUES('second');
+ INSERT 484894 1
+ mysitedb=> INSERT INTO common.label(name) VALUES('entry');
+ INSERT 484895 1
+
+And assign them to each blog entry:
+
+ mysitedb=> INSERT INTO blog.entry_label(entry_id, label_id) VALUES(1, 1);
+ mysitedb=> INSERT INTO blog.entry_label(entry_id, label_id) VALUES(2, 2);
+ mysitedb=> INSERT INTO blog.entry_label(entry_id, label_id) VALUES(1, 3);
+ mysitedb=> INSERT INTO blog.entry_label(entry_id, label_id) VALUES(2, 3);
+
+So now entry 1 has the labels 'first' and 'entry', and entry 2 has the labels
+'second' and 'entry'. So let's see a list of all entries with each tag:
+
+ $ curl localhost/blog/label:first.html
+ $ curl localhost/blog/label:second.html
+ $ curl localhost/blog/label:entry.html
+
+PHEW!
+
+I think that's about enough for the first tutorial to get Zaapt up and
+going. So already you have a site which has a content managed home section (at
+'/') and a blog (at '/blog/'). Each of the pages can be of type HTML, Text or
+Code as can the main entry part of each blog. You also get free archive and
+label pages on the blogs.
+
+Please see /usr/share/zaapt/examples/site-1/ for all the files used in this
+tutorial. They stand at the final configuration here and do not show
+intermediate steps.
+
+-------------------------------------------------------------------------------

@@ -1,0 +1,95 @@
+-------------------------------------------------------------------------------
+
+Tutorial
+--------
+
+Before you start, you need to be familiar with all of the following:
+
+* Debian
+* Apache2
+* Mason (therefore Perl too)
+* PostgreSQL
+
+(Notice that this list is my variation on LAMP - but instead DAMP!)
+
+Some people may be put off by that list but if you're not, then Zaapt is for
+you because Zaapt is a programmer's CMS. Instead of automatically installing a
+website and having to click around, you install, control and interface with
+Zaapt using your normal everyday editors, command line tools and other things
+you already like.
+
+If you are not familiar with the above list but you have a good idea about Linux
+
+-------------------------------------------------------------------------------
+
+What is a Programmer's CMS?
+---------------------------
+
+Firstly, I will answer this question.
+
+A programmer's CMS is for those people who want:
+
+* to be in complete control of the database
+* to be in complete control of the webserver
+* to be in complete control of the site code
+* to allow the Content Management System to edit Content only
+* to be compliant with best practices (such as Linux Filesystem Hierarchy and
+  other Debian practices)
+
+As a quick example, some CMS's require you to have a writeable directory inside
+the Apache DocumentRoot. This doesn't sound like best practise to me. Instead
+you create a directory during package install, with the correct permissions and
+in the correct place on the file-system (eg. /var/lib/mysite/uploads instead of
+/var/www/mysite/uploads) and DirectoryAlias that into the right place in the
+webserver.
+
+So already with that small example it means you need to know about Debian file
+hierarchy, correct owner and permissions for the webserver and a number of
+Apache2 config options.
+
+Suffice to say I won't follow up all of these points now but may touch on them
+at various points in this tutorial.
+
+-------------------------------------------------------------------------------
+
+Stages of Development
+---------------------
+
+We're going to build a personal website which we're going to call 'mysite.com'
+and we'll do it in stages so you can see what's happening at each turn.
+
+Site I
+
+This tutorial is going to start off just getting a website up and going. It
+will have a section at the top level (/) which is just plain content managed
+pages. We will also put a blog at the second level (/blog/).
+
+You won't yet have logins or the administration interface but you will be able
+to add pages via some direct database calls.
+
+Site II
+
+Here we will add a menu to the site so that we can navigate around.
+
+Site III
+
+The next step is to then have an administration interface into which you can
+login and edit content.
+
+Site IV
+
+Now that most of the site is working we will delve into a few other content
+models. We will add a news section (/news/) and another blog
+(/random-thoughts/) just so you can see how to add more content throughout the
+site.
+
+Site V
+
+Finally, we will allow other people to register on the site and browse to a
+forum so everyone can chat to each other. We will also add the ability for them
+to message each other through the site.
+
+Please read TUTORIAL-{1..5} for further details. Note that all code in each of
+the tutorials will be available in /usr/share/doc/zaapt/examples/site-{1..5}.
+
+-------------------------------------------------------------------------------

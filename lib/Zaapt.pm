@@ -98,16 +98,153 @@ sub get_model {
 
 B<Zaapt> - a small lightweight CMS written in Perl/Mason using PostgreSQL
 
-=head1 ABOUT
+=head1 SYNOPSIS
 
-This package has no functionality except to hold a bit of documentation for
-L<Zaapt>.
+    use Zaapt;
 
-=head1 HOMEPAGE
+    # create a Zaapt instance, passing it the DBH and telling it the store to use
+    $zaapt = Zaapt->new({
+        store => 'Pg',
+        dbh => $dbh,
+    });
 
-The project page is at: http://code.google.com/p/zaapt/
+    # get an instance of the model that represents the 'Content'
+    $model = $zaapt->get_model('Content');
 
-The main information page is at: http://kapiti.geek.nz/software/zaapt.html
+    # get the information for the content section named 'home'
+    $content = $model->sel_content_using_name({ c_name => 'home' });
+
+    # get the info for the page named 'index' with the 'home' section
+    $page = $content_model->sel_page_using_name({
+        c_id   => $content->{c_id},
+        p_name => 'index',
+    });
+
+=head1 DESCRIPTION
+
+The $zaapt instance you create helps you interface with the models that Zaapt
+has to offer. Usually you use it to then retrieve an instance which helps you
+interface with a particular model.
+
+Zaapt model interfaces has a simple but consistent way of dealing with
+data. Instance methods are not used to access data since no objects that
+represent data are returned, instead normal Perl data structures are
+returned. This may not sound ideal for interface purposes but it works rather
+well.
+
+See L<Zaapt::Model> for further information.
+
+=head1 Methods
+
+=over 4
+
+=item Zaapt->new()
+
+Creates a new instance of the Zaapt module. Allows interaction with all of the
+models within Zaapt.
+
+Takes a hashref which can contain a number of different keys.
+
+=head3 dbh => $dbh
+
+The 'dbh' key is the DBI::* connection to the database.
+
+=head3 store => 'Pg'
+
+The 'store' parameter is the Zaapt::Store::* name which will be used to talk to
+the store. Currently on Pg is defined.
+
+=head3 map => { Something => 'Path::To::Something' }
+
+The 'map' parameter is a hashref which defines which Zaapt::Store::Pg::* module
+to use. In reality, this mapping is automatic but this can be used if you have
+your own content models in your
+website. e.g. KapitiGeekNZ::Zaapt::Store::Pg::Something.
+
+    $zaapt = Zaapt->new({
+        store => 'Pg',
+        dbh   => $dbh,
+        map   => {
+            Something => 'KapitiGeekNZ::Zaapt::Store::Pg::Something',
+        },
+    });
+
+This will retrieve the correct model when you just ask for 'Something':
+
+    $something = $zaapt->get_model('Something');
+
+NOTE: this should really pass the things passed in (ie. $dbh) to the
+appropriate Zaapt::Store::* which is then used instead of the raw $dbh which is
+not necessarily going to be available with all stores.
+
+=item $zaapt->get_model($str)
+
+This takes a string and tries to map it onto a model.
+
+If the string exists in the previously passed in 'map' hash reference, it tried
+to create an instance of that value and returns it.
+
+    $something = $zaapt->get_model('Something');
+
+Returns an object of type KapitiGeekNZ::Zaapt::Store::Pg::Something.
+
+If the string looks just like a normal name (consists of only letters), it
+tries to return a standard Zaapt model:
+
+    $account = $zaapt->get_model('Account');
+
+Returns an object of type Zaapt::Store::Pg::Account.
+
+If the string looks like a module name (it has :: in it somewhere), it tries to
+return a model with the same name:
+
+    $vlog = $zaapt->get_model('Elsewhere::Zaapt::Store::Pg::Vlog');
+
+Returns an object of type Elsewhere::Zaapt::Store::Pg::Vlog.
+
+=item $zaapt->start_tx()
+
+Starts a transaction in the back-end store.
+
+Currently, this just starts a transaction in the $dbh passed in when this
+instance was created.
+
+NOTE: it really should just delegate to the $store instance and call start_tx()
+on that.
+
+=item $zaapt->commit_tx()
+
+Commits the transaction in the back-end store.
+
+Currently, this just commits the transaction in the $dbh passed in when this
+instance was created.
+
+NOTE: it really should just delegate to the $store instance and call
+commit_tx() on that.
+
+=item $zaapt->rollback_tx()
+
+Rolls back the transaction in the back-end store.
+
+Currently, this just rolls back the transaction in the $dbh passed in when this
+instance was created.
+
+NOTE: it really should just delegate to the $store instance and call
+rollback_tx() on that.
+
+=item $zaapt->dbh()
+
+Returns the $dbh originally passed in when this $zaapt instance was created.
+
+NOTE: will be deprecated in favour of a 'store' method.
+
+=back
+
+=head1 LINKS
+
+Project page : http://code.google.com/p/zaapt/
+
+Git repo     : http://git.kapiti.geek.nz/?p=zaapt.git
 
 =head1 SUPPORT
 
@@ -117,29 +254,24 @@ zaapt-commit. For notification of issues see zaapt-issue.
 
 Bugs may be posted at: http://code.google.com/p/zaapt/issues/list
 
-=head1 AUTHOR
+=head1 SEE ALSO
 
-Contact: Andrew Chilton B<E<lt>andychilton@gmail.comE<gt>>
-
-Website: http://kapiti.geek.nz/
+L<Zaapt::Model>, L<Zaapt::Store>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2006 Andrew Chilton.
+Copyright (c) 2006-2008 Andrew Chilton B<E<lt>andychilton@gmail.comE<gt>>
 
-All rights reserved. This program is free software; you can redistribute and/or
-modify it under the same terms as Perl itself.
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
 
-All Zaapt::* modules written by me (Andrew Chilton) have this same copyright and
-distribution terms. This is the definitive and overrides any others which may
-omit this or which say otherwise.
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
-=head1 VERSION
-
-Version 0.1
-
-=head1 SEE ALSO
-
-perl(1)
+You should have received a copy of the GNU General Public License along with
+this program.  If not, see <http://www.gnu.org/licenses/>.
 
 =cut

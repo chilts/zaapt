@@ -1,0 +1,18 @@
+<%once>
+    use DBI;
+</%once>
+<%init>
+    my $dbh = DBI->connect(
+        "dbi:Pg:dbname=mysitedb",
+        'mysiteuser',
+        undef,
+        { RaiseError => 1, AutoCommit => 1 }
+    );
+    $ZAAPT = Zaapt->new({ dbh => $dbh, store => 'Pg' });
+</%init>
+<html>
+    <head><title>MySite.org</title></head>
+    <body>
+% $m->call_next();
+    </body>
+</html>

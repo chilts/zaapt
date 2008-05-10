@@ -1,0 +1,10 @@
+<%init>
+    $r->content_type('text/html');
+    my ($page_name) = $m->dhandler_arg() =~ m{ \A ([\w-]+) \. html \z }xms;
+    $m->comp(
+        '/zaapt/model/content/view.mhtml',
+        zaapt => $ZAAPT,
+        c_name => 'home',
+        page => $page_name
+    );
+</%init>

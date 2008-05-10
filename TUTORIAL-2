@@ -1,0 +1,298 @@
+-------------------------------------------------------------------------------
+
+Site II
+-------
+
+In the earlier tutorial, we started the site off. We added a top level content
+managed section to which you can add as many pages as you like. This tutorial
+starts off straight after and presumes you have a ~/www/mysite/htdocs directory
+containing the files as shown in /usr/share/zaapt/examples/site-1/.
+
+-------------------------------------------------------------------------------
+
+Step 1) Adding other content
+
+But wait, we said earlier that we wanted a blog too, so let's get that
+started. Firstly, we need to add the blog tables, then add a blog itself and
+let's also add one entry to it too. Back to database-land:
+
+ mysitedb=> \i /usr/share/zaapt/store/Pg/create_blog.sql
+ ...etc...
+ mysitedb=> INSERT INTO blog.blog(name, title, description, show, admin_id, view_id, edit_id, publish_id, comment_id, trackback_id)
+            VALUES('blog', 'My Blog', 'Where I hang out.', 7, 1, 1, 1, 1, 1, 1);
+ INSERT 484886 1
+
+When we add entries to a blog, the blog needs to know who added it, so let's create an account we can attribute those blog entries to. Note that we won't fill in all the account fields yet:
+
+ mysitedb=> INSERT INTO account.account(username, firstname, lastname, email, salt, password)
+            VALUES('andy', 'Andrew', 'Chilton', 'andychilton@gmail.com', '', '');
+ INSERT 484889 1
+
+Now, let's add that blog entry:
+
+ mysitedb=> INSERT INTO blog.entry(blog_id, account_id, type_id, name, title, intro, article)
+            VALUES(1, 1, 1, 'first-entry', 'First Blog Entry', 'Welcome to my blog.', '<p>This is where I hang out</p>');
+ INSERT 484891 1
+
+(Note: 1, 1, 1 is blog_id, account_id and type_id which you saw earlier.)
+
+Now we have a blog, let's make sure the webserver can serve it. Firstly, cheat
+by copying the top level index.html and dhandler files:
+
+ $ mkdir ~/www/mysite/htdocs/blog
+ $ cd ~/www/mysite/htdocs/blog
+ $ cp ../index.html ../dhandler .
+
+Now we have to change a few things. Watch out for the component we're calling
+and the fact that we're nowing using a blog name of 'blog' instead of a content
+name of 'home'. All the other hard work is done in the background:
+
+ $ cat index.html
+ <%init>
+     $m->comp(
+         '/zaapt/model/blog/view.mhtml',
+         zaapt => $ZAAPT,
+         b_name => 'blog',
+         page => 'index'
+     );
+ </%init>
+
+ $ cat dhandler
+ <%init>
+     $r->content_type('text/html');
+     my ($page_name) = $m->dhandler_arg() =~ m{ \A ([\w:-]+) \. html \z }xms;
+     $m->comp(
+         '/zaapt/model/blog/view.mhtml',
+         zaapt => $ZAAPT,
+         b_name => 'blog',
+         page => $page_name
+     );
+ </%init>
+
+So let's hit the index page:
+
+ $ curl localhost/blog/index.html
+ <html>
+     <head><title>MySite.org</title></head>
+     <body>
+ <h1><a href="first-entry.html">First Blog Entry</a></h1>
+ 
+ <p class="r">Posted by: andy</p>
+ 
+ <p><strong>Welcome to my blog.</strong></p>
+ 
+ <p><a href="first-entry.html">Read more...</a></p>
+ 
+ <p class="r">
+     <a href="first-entry.html#comments" class="z-comments">Comments (0)</a>
+ </p>
+ 
+ <p class="footnote">2008-05-10 03:09:38</p>
+ 
+     </body>
+ </html>
+
+Wow! Look at all that. That's Zaapt just doing it's thing. You don't just get
+an index file though. You also get the page name too:
+
+ $ curl localhost/blog/first-entry.html
+
+AND you get some archive pages too!!! A yearly, monthly and daily one
+(substitute in your own dates):
+
+ $ curl localhost/blog/archive:2008.html
+ $ curl localhost/blog/archive:2008-05.html
+ $ curl localhost/blog/archive:2008-05-10.html
+
+So let's insert another page:
+
+ mysitedb=> INSERT INTO blog.entry(blog_id, account_id, type_id, name, title, intro, article)
+            VALUES(1, 1, 1, 'the-second', 'Another Entry', 'Been here before.', '<p>Still here.</p>');
+ INSERT 484892 1
+
+Now, the index and all the archive pages have grown in size and a new page has
+appeared:
+
+ $ curl localhost/blog/index.html
+ $ curl localhost/blog/archive:2008.html
+ $ curl localhost/blog/archive:2008-05.html
+ $ curl localhost/blog/archive:2008-05-10.html
+ $ curl localhost/blog/the-second.html
+
+One final thing I want to show you. Why not add some labels to each blog entry:
+
+ mysitedb=> INSERT INTO common.label(name) VALUES('first');
+ INSERT 484893 1
+ mysitedb=> INSERT INTO common.label(name) VALUES('second');
+ INSERT 484894 1
+ mysitedb=> INSERT INTO common.label(name) VALUES('entry');
+ INSERT 484895 1
+
+And assign them to each blog entry:
+
+ mysitedb=> INSERT INTO blog.entry_label(entry_id, label_id) VALUES(1, 1);
+ mysitedb=> INSERT INTO blog.entry_label(entry_id, label_id) VALUES(2, 2);
+ mysitedb=> INSERT INTO blog.entry_label(entry_id, label_id) VALUES(1, 3);
+ mysitedb=> INSERT INTO blog.entry_label(entry_id, label_id) VALUES(2, 3);
+
+So now entry 1 has the labels 'first' and 'entry', and entry 2 has the labels
+'second' and 'entry'. So let's see a list of all entries with each tag:
+
+ $ curl localhost/blog/label:first.html
+ $ curl localhost/blog/label:second.html
+ $ curl localhost/blog/label:entry.html
+
+PHEW!
+
+Step 2) Adding a menu to the site
+
+Some sites have a menu on the left or the right hand side. For our purposes
+here, we will create a simple menu which we will float over to the right hand
+side (this is mainly to aim for simple and clean HTML for the purposes of this
+tutorial).
+
+Firstly, we need to create the menu schema in the database. Back to your 'psql'
+session.
+
+ mysitedb=> \i /usr/share/zaapt/store/Pg/create_menu.sql
+ ...etc...
+
+And let's insert a menu:
+
+ mysitedb=> INSERT INTO menu.menu(name, title, description, admin_id, view_id, edit_id)
+            VALUES('rhs-menu', 'RHS Menu', 'The menu on the RHS.', 1, 1, 1);
+ INSERT 485469 1
+
+And let's insert a few items:
+
+ mysitedb=> INSERT INTO menu.item(menu_id, display, level, url, text)
+            VALUES(1, 1, 1, '/', 'Home');
+ INSERT 485470 1
+ mysitedb=> INSERT INTO menu.item(menu_id, display, level, url, text)
+            VALUES(1, 2, 2, '/about.html', 'About');
+ INSERT 485471 1
+ mysitedb=> INSERT INTO menu.item(menu_id, display, level, url, text)
+            VALUES(1, 3, 1, '/blog/', 'My Blog');
+ INSERT 485472 1
+ mysitedb=> INSERT INTO menu.item(menu_id, display, level, url, text)
+            VALUES(1, 4, 1, 'http://kapiti.geek.nz/', 'Other Site');
+ INSERT 485473 1
+
+With our menu, we don't actually want it to be a page itself. In fact, we want
+it to display on every page. As you may have noticed with the blog, to make it
+show on the page we call a 'view.mhtml' component inside the blog model's Mason
+directory, much like we did with the content. As a reminder, these are the
+components we called when displaying a page (first the content, then the blog):
+
+ $m->comp(
+     '/zaapt/model/content/view.mhtml',
+     zaapt => $zaapt,
+     c_name => 'home',
+     page => $page_name
+ );
+ 
+ $m->comp(
+     '/zaapt/model/blog/view.mhtml',
+     zaapt => $ZAAPT,
+     b_name => 'blog',
+     page => $page_name
+ );
+ 
+As you can see, it's very similar. In fact, in most content models, that's all
+you need to do. Tell it where $zaapt is, the content name you wish to extract
+information from and the page name you wish to display. Most of the components
+that provide page views for it's content are named like 'view-*.html' so it's
+easy to tell what type of pages there are (see
+/usr/share/zaapt/mason/zaapt/model/blog/ for examples of component names).
+
+In the case of menu, it's slightly different because we don't actually want to
+call it as a page (though in theory, there is no reason why we shouldn't). So
+instead of calling the 'view.mhtml' component, we're going to call the
+'widget-list.mhtml' component instead. I will describe the differences later
+but for now let's show that menu of every page of the site.
+
+Go and edit your autohandler to add the following lines:
+
+     <body>
++    <div style="float: right; background-color: #ddd">
++       <h3>Menu</h3>
++        Menu goes here
++    </div>
+ % $m->call_next();
+     </body>
+
+Then refresh your browser to make sure you have the '<div>' in the right
+place. (Note: from now on, I won't show all the output from each 'curl' command
+but just snippets when needed.)
+
+ $ curl http://localhost/
+ ...etc...
+
+So let's add the menu itself:
+
+-        Menu goes here
++        <& /zaapt/model/menu/widget-list.mhtml, zaapt => $ZAAPT, m_name => 'rhs-menu' &>
+
+Refresh your browser and you can now see that the menu has been displayed:
+
+ $ curl http://localhost/
+ ...etc...
+    <div style="float: right; background-color: #ddd;">
+        <h3>Menu</h3>
+        <ul>
+    <li>
+            
+        <a href="/">
+            Home
+        </a>
+    </li>
+    <li>
+            -
+        <a href="/about.html">
+            About
+        </a>
+    </li>
+    <li>
+            
+        <a href="/blog/">
+            My Blog
+        </a>
+    </li>
+    <li>
+            
+        <a href="http://kapiti.geek.nz/">
+            Other Site
+        </a>
+    </li>
+</ul>
+    </div>
+ ...etc...
+
+As stated earlier, to view some content for a page, you called the 'view.html'
+component and that all components which view whole pages are of the form
+'view*.mhtml'.
+
+In this case, we're just rendering a part of a page - or in other terms, a
+widget. A lot of content models have 'widget*.html' components which you can
+use to display snippets of information anywhere you like on a page - most
+usually inside a '<div>' somewhere.
+
+There's a reason why we do make the distinction between pages themselves and
+just parts of pages.
+
+You'll have noticed earlier that if you had browed to a URL such as
+'http://localhost/non-existant-page.html' that you actually received a proper
+HTTP Code 404 from the server. This is because the 'view.html' components check
+that the data being asked for exists before serving up the correct 404. This
+could be because either the content model has not been added to the database or
+because that page does not exist within that content model.
+
+In the case of a missing menu, we don't want to serve up a 404 since otherwise
+every page on the site would say 'Page not found' even when it exists (due to
+the fact that this component is called from every page on the site due to it
+being in the autohandler)
+
+That concludes part 2 of this tutorial. Again, all relevant files can be found
+in /usr/share/doc/zaapt/examples/site-2/.
+
+-------------------------------------------------------------------------------

@@ -1,0 +1,8 @@
+%# ----------------------------------------------------------------------------
+<h1>Not signed in</h1>
+
+<p>
+    Please <& /zaapt/common/sign-in-url.mhtml, text => 'sign in' &> if you wish
+    to use this part of the site fully.
+</p>
+%# ----------------------------------------------------------------------------

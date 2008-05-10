@@ -68,6 +68,15 @@
             m_message  => $m_message,
         );
     }
+    elsif ( $page =~ m{ \A msg: (.*) \z }xms ) {
+        $m->comp(
+            '/zaapt/model/message/user-message.mhtml',
+            %ARGS,
+            zaapt => $zaapt,
+            id    => $id,
+            m_id  => $1,
+        );
+    }
     else {
         $m->clear_buffer();
         $m->abort(404);

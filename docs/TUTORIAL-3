@@ -1,0 +1,11 @@
+-------------------------------------------------------------------------------
+
+Tutorial 3
+----------
+
+For this tutorial, we will get the administration interface setup. The main
+problem with this isn't the HTML or calling the Zaapt componentts, but having
+to get the sessions up and going. Luckily, Zaapt comes with some helpers for
+doing that for you.
+
+-------------------------------------------------------------------------------

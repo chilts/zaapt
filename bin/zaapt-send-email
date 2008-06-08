@@ -196,3 +196,80 @@ EOF
 }
 
 ## ----------------------------------------------------------------------------
+=head1 NAME
+
+zaapt-send-email - cron to send email from a Zaapt database
+
+=head1 SYNOPSIS
+
+    $ zaapt-send-email /etc/mysite/mysite.cfg
+
+=head1 DESCRIPTION
+
+Currently, zaapt-send-email doesn't have too many options to the command but
+instead reads a config file which contains the information it requires.
+
+It dies if you don't give it a config file.
+
+Currently, the config file can be in any format that l<Config::Simple>
+understands. The keys that it requires are as follows:
+
+=over
+
+=item log_dir
+
+The directory to log output (see l<Log::Log4perl>) from this command. You
+should probably add this log to logrotate.
+
+=item domain_name
+
+The domain name to use when linking to the unsubscribe pages. Note that the
+setting for where the unsubscribe page is located on the site is configurable
+via the Admin interface, as the c<location> setting for the C<account> model.
+
+=item email_from_address
+
+The From address any emails should appear to come from.
+
+=item db_name
+
+The database name to connect to.
+
+=item db_user
+
+The database user to use when connecting.
+
+=back
+
+=head1 BUGS
+
+Currently, there are no settings read for C<db_pass>, C<db_host> and
+C<db_port>. These should be added.
+
+Also, apart from the DB connection parameters, all of the other parameters
+should be read from the C<zaapt.setting> table relevant model.
+
+=head1 AUTHOR
+
+Andrew Chilton <andychilton@gmail.com>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2008 by Andrew Chilton
+
+zaapt-send-email is free software: you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your option) any
+later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+this program.  If not, see <http://www.gnu.org/licenses/> or write to the Free
+Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301, USA.
+
+=cut
+## ----------------------------------------------------------------------------

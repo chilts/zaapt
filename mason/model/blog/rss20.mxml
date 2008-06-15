@@ -64,7 +64,7 @@
             dc => {
                 creator => $domain,
             },
-            pubDate => $a->{e_inserted},
+            pubDate => $entry->{e_inserted},
         );
     }
     print $rss->as_string();

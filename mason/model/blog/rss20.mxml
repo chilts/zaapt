@@ -4,6 +4,7 @@
     The input args are:
     - $domain - e.g. 'zaapt.org.nz' (no http:// or trailing slash)
     - $path - e.g. 'blog' (no preceeding/trailing slashes)
+    - _fulltext - to specify whether to show just the intro or full text
 
 </%doc>
 %# ----------------------------------------------------------------------------
@@ -21,6 +22,7 @@
     $zaapt
     $b_name
     $domain
+    $_fulltext => 0
     $path   => undef
     $scheme => 'http://'
 </%args>
@@ -53,6 +55,19 @@
     );
 
     foreach my $entry ( @$entries ) {
+        # add the plain text intro
+        $entry->{e_html} = "<p>$entry->{e_intro}</p>";
+
+        # see if we want everything
+        if ( $_fulltext ) {
+            # call the render component so we get the correct HTML back
+            $entry->{e_html} .= $m->scomp(
+                '/zaapt/common/render.mhtml',
+                t_name => $entry->{t_name},
+                content => $entry->{e_article},
+            );
+        }
+
         $entry->{e_inserted} =~ /(\d{4})-(\d{2})-(\d{2}) (\d{2}:\d{2}:\d{2})/;
         $entry->{e_inserted} = "$3 $tm->{$2} $1 $4 +1200";
 
@@ -60,7 +75,7 @@
             title => $entry->{e_title},
             link => "$base_url/$entry->{e_name}.html",
             permaLink => "$base_url/$entry->{e_name}.html",
-            description => HTML::Entities::encode($entry->{e_intro}),
+            description => HTML::Entities::encode( $entry->{e_html} ),
             dc => {
                 creator => $domain,
             },

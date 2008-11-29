@@ -55,8 +55,8 @@
     );
 
     foreach my $entry ( @$entries ) {
-        # add the plain text intro
-        $entry->{e_html} = "<p>$entry->{e_intro}</p>";
+        # add the plain text intro, but only if it's there
+        $entry->{e_html} = "<p>$entry->{e_intro}</p>" if $entry->{e_html};
 
         # see if we want everything
         if ( $_fulltext ) {

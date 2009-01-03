@@ -1,0 +1,5 @@
+lib/*               usr/share/perl5
+mason/*             usr/share/zaapt/mason/zaapt
+store/*             usr/share/zaapt/store
+models/*.yaml       usr/share/zaapt/models
+bin/zaapt-send-email.pl   usr/bin

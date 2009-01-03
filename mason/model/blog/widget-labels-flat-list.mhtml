@@ -1,0 +1,39 @@
+%# ----------------------------------------------------------------------------
+<%doc>
+
+    This example demonstrates how to get your blog labels into a flat list. It
+    just shows the label and the number of hits:
+
+    * spending (2)
+    * living (3)
+    * saving (1)
+
+</%doc>
+%# ----------------------------------------------------------------------------
+<%once>
+    use Zaapt::Store::Pg::Blog;
+</%once>
+%# ----------------------------------------------------------------------------
+<%args>
+    $zaapt
+    $b_name
+</%args>
+%# ----------------------------------------------------------------------------
+<%init>
+    my $model = $zaapt->get_model('Blog');
+    my $blog = $model->sel_blog_using_name({ b_name => $b_name });
+
+    # since this is a widget and not a top level component just return
+    return unless defined $blog;
+
+    my $items = $model->sel_label_counts({ b_id => $blog->{b_id} });
+</%init>
+%# ----------------------------------------------------------------------------
+% if ( @$items ) {
+<ul>
+%     foreach my $item ( @$items ) {
+    <li><a href="/label:<% $item->{l_name} %>.html"><% $item->{l_name} %></a> (<% $item->{count} %>)</li>
+%     }
+</ul>
+% }
+%# ----------------------------------------------------------------------------

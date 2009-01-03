@@ -95,6 +95,7 @@ __PACKAGE__->mk_select_rows( 'sel_blog_all', "SELECT $table->{blog}{sql_sel_cols
 # entry
 my $blog_cols = "$table->{blog}{sql_sel_cols}, $table->{entry}{sql_sel_cols}, $table->{type}{sql_sel_cols}, $table->{account}{sql_sel_cols}";
 my $blog_joins = "$table->{blog}{sql_fqt} $join->{b_e} $join->{e_t} $join->{e_a}";
+my $label_joins = "$table->{blog}{sql_fqt} $join->{b_e} $join->{e_l}";
 
 __PACKAGE__->mk_select_row( 'sel_entry', "SELECT $blog_cols FROM $blog_joins WHERE e.id = ?", [ 'e_id' ] );
 
@@ -109,6 +110,9 @@ __PACKAGE__->mk_select_rows( 'sel_entry_archive', "SELECT $blog_cols FROM $blog_
 __PACKAGE__->mk_select_rows( 'sel_entry_label', "SELECT $blog_cols FROM $blog_joins $join->{e_l} WHERE b.id = ? AND l.name = ? ORDER BY e.inserted DESC", [ 'b_id', 'l_name' ] );
 
 __PACKAGE__->mk_select_rows( 'sel_label_all_for', "SELECT $table->{label}{sql_sel_cols} FROM $table->{entry}{sql_fqt} $join->{e_l} WHERE e.id = ? ORDER BY l.name", [ 'e_id' ] );
+
+__PACKAGE__->mk_select_rows( 'sel_label_counts', "SELECT l.name AS l_name, count(*) AS count FROM $label_joins WHERE b.id = ? GROUP BY l_name ORDER BY l_name", [ 'e_id' ] );
+__PACKAGE__->mk_select_rows( 'sel_archive_months', "SELECT to_char(e.inserted, 'yyyy') AS _year, to_char(e.inserted, 'mm') AS _mm, to_char(e.inserted, 'month') AS _month, count(*) AS count FROM $blog_joins WHERE b.id = ? GROUP BY 1,2,3 ORDER BY _year DESC, _month DESC", [ 'e_id' ] );
 
 # comment
 __PACKAGE__->mk_selecter( $schema, $table->{comment}{name}, $table->{comment}{prefix}, @{$table->{comment}{cols}} );

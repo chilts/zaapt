@@ -98,8 +98,6 @@
     }
 </%init>
 %# ----------------------------------------------------------------------------
-<div class="z_blog">
-
 % if ( $act eq 'ty' ) {
 <p class="info">Thank you for your comment. It is awaiting moderation.</p>
 % }
@@ -124,6 +122,4 @@
     c_homepage => $c_homepage,
     c_comment => $c_comment
 &>
-
-</div>
 %# ----------------------------------------------------------------------------

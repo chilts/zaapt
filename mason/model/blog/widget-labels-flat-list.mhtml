@@ -32,7 +32,7 @@
 % if ( @$items ) {
 <ul>
 %     foreach my $item ( @$items ) {
-    <li><a href="/label:<% $item->{l_name} %>.html"><% $item->{l_name} %></a> (<% $item->{count} %>)</li>
+    <li><a href="./label:<% $item->{l_name} %>.html"><% $item->{l_name} %></a> (<% $item->{count} %>)</li>
 %     }
 </ul>
 % }

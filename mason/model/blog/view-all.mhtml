@@ -19,11 +19,11 @@
 <p>Found <% scalar @$entries | h %> <% scalar @$entries == 1 ? 'entry' : 'entries' %> in this blog.</p>
 
 % if ( @$entries ) {
-%     foreach my $entry ( @$entries ) {
 <ul>
+%     foreach my $entry ( @$entries ) {
     <li><a href="<% $entry->{e_name} %>.html"><% $entry->{e_title} | h %></a></li>
-</ul>
 %     }
+</ul>
 % } else {
 <p>Currently, there are no entries in this blog.</p>
 % }

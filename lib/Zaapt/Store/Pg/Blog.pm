@@ -112,7 +112,7 @@ __PACKAGE__->mk_select_rows( 'sel_entry_label', "SELECT $blog_cols FROM $blog_jo
 __PACKAGE__->mk_select_rows( 'sel_label_all_for', "SELECT $table->{label}{sql_sel_cols} FROM $table->{entry}{sql_fqt} $join->{e_l} WHERE e.id = ? ORDER BY l.name", [ 'e_id' ] );
 
 __PACKAGE__->mk_select_rows( 'sel_label_counts', "SELECT l.name AS l_name, count(*) AS count FROM $label_joins WHERE b.id = ? GROUP BY l_name ORDER BY l_name", [ 'b_id' ] );
-__PACKAGE__->mk_select_rows( 'sel_archive_months', "SELECT to_char(e.inserted, 'yyyy') AS _year, to_char(e.inserted, 'mm') AS _mm, to_char(e.inserted, 'month') AS _month, count(*) AS count FROM $blog_joins WHERE b.id = ? GROUP BY 1,2,3 ORDER BY _year DESC, _month DESC", [ 'b_id' ] );
+__PACKAGE__->mk_select_rows( 'sel_archive_months', "SELECT to_char(e.inserted, 'yyyy') AS _year, to_char(e.inserted, 'mm') AS _mm, to_char(e.inserted, 'month') AS _month, count(*) AS count FROM $blog_joins WHERE b.id = ? GROUP BY 1,2,3 ORDER BY _year DESC, _mm DESC", [ 'b_id' ] );
 
 # comment
 __PACKAGE__->mk_selecter( $schema, $table->{comment}{name}, $table->{comment}{prefix}, @{$table->{comment}{cols}} );

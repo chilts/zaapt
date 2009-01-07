@@ -23,6 +23,10 @@
         # main index page
         $m->comp('/zaapt/model/blog/view-index.mhtml', zaapt => $zaapt, b_name => $b_name);
     }
+    elsif ( $page =~ m{ \A all \z}xms ) {
+        # main index page
+        $m->comp('/zaapt/model/blog/view-all.mhtml', zaapt => $zaapt, b_name => $b_name);
+    }
     elsif ( $page =~ m{ \A tags \z}xms ) {
         # do the tag cloud
     }

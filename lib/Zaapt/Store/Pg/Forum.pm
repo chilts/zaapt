@@ -110,7 +110,7 @@ __PACKAGE__->_mk_select_rows_offset( 'sel_topic_all_in', "SELECT $topic_cols, $t
 __PACKAGE__->mk_select_row( 'sel_post', "SELECT $post_cols FROM $post_tables WHERE p.id = ?", [ 'p_id' ] );
 __PACKAGE__->mk_select_rows( 'sel_post_all', "SELECT $tables->{forum}{sql_sel_cols} FROM $tables->{forum}{sql_fqt} ORDER BY f.name" );
 __PACKAGE__->_mk_select_rows_offset( 'sel_post_all_in', "SELECT $post_cols, CASE WHEN current_timestamp < p.inserted + '1 hour'::INTERVAL THEN 1 ELSE 0 END AS p_editable, $tables->{type}{sql_sel_cols}, $tables->{account}{sql_sel_cols}, $tables->{info}{sql_sel_cols} FROM $post_tables $join->{p_t} $join->{p_a} $join->{p_i} WHERE tp.id = ? ORDER BY p.inserted", [ 'tp_id' ] );
-__PACKAGE__->_mk_select_rows_offset( 'sel_post_all_for', "SELECT $post_cols, $tables->{account}{sql_sel_cols} FROM $post_tables $join->{tp_a} WHERE p.account_id = ? ORDER BY p.inserted DESC", [ 'p_id' ] );
+__PACKAGE__->_mk_select_rows_offset( 'sel_post_all_for', "SELECT $post_cols, $tables->{account}{sql_sel_cols} FROM $post_tables $join->{tp_a} WHERE p.account_id = ? ORDER BY p.inserted DESC", [ 'a_id' ] );
 __PACKAGE__->_mk_select_count( $tables->{post} );
 
 # info
